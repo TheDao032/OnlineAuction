@@ -8,8 +8,5 @@ const authenticateProductController = require('../controllers/authenticateProduc
 const cartController = require('../controllers/cart.controller')
 
 API.use('/account', accountController)
-API.use('/cart', cartController)
-API.use('/auth-categories', authenticateCategoriesController)
-API.use('/auth-product', authenticateProductController)
 
 module.exports = API

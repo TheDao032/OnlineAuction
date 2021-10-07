@@ -1,5 +1,11 @@
 const knex = require('../utils/dbConnection')
 
+const accountStatus = {
+	activatedStatus: 0,
+	inActivatedStatus: 1,
+	unAuthorizeStatus: 2
+}
+
 const findAll = async () => {
 	const info =  await knex('tbl_account')
 
@@ -42,11 +48,17 @@ const isValidRefreshToken = async (accId, refreshToken) => {
 	return true
 }
 
+const update = async (accId, accountObject) => {
+	await knex('tbl_account').where('acc_id', accId).update(accountObject)
+}
+
 module.exports = {
 	findByEmail,
 	findById,
 	findAll,
 	findActiveUser,
 	updateRefreshToken,
-	isValidRefreshToken
+	isValidRefreshToken,
+	update,
+	accountStatus
 }

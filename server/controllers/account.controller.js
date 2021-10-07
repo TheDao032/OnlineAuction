@@ -7,13 +7,12 @@ const bcrypt = require('bcrypt')
 
 const accountModel = require('../models/account.model')
 const roleModel = require('../models/role.model')
-const deliveryModel = require('../models/delivery.model')
 const imageService = require('../services/imageService')
 
 const successCode = 0
 const errorCode = 1
 
-router.get('/list', accountValidation.listParamsInfo, async (req, res) => {
+router.get('/list', accountValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
 
 	const allAccount = await accountModel.findAll()
@@ -34,7 +33,7 @@ router.get('/list', accountValidation.listParamsInfo, async (req, res) => {
 	if (result) {
 		result.sort((a, b) => a - b)
 
-		if (page || limit) {
+		if (page && limit) {
 			let startIndex = (parseInt(page) - 1) * parseInt(limit)
 			let endIndex = (parseInt(page) * parseInt(limit))
 			let totalPage = Math.floor(result[0].length / parseInt(limit))
@@ -64,10 +63,19 @@ router.get('/list', accountValidation.listParamsInfo, async (req, res) => {
 	})
 })
 
-router.get('/details/:id', accountValidation.paramsInfo, async (req, res) => {
-	const { id } = req.params
+router.post('/details', accountValidation.detailInfo, async (req, res) => {
+	const { accId } = req.body
+	const { accRole } = req.account
 
-	const accInfo = await accountModel.findById(id)
+	let accIdFlag = req.account.accId
+
+	if (accId) {
+		if (roleModel.checkAdminRole(accRole)) {
+			accIdFlag = accId
+		}
+	}
+
+	const accInfo = await accountModel.findById(accIdFlag)
 
 	if (accInfo.length === 0) {
 		return res.status(200).json({
@@ -76,7 +84,7 @@ router.get('/details/:id', accountValidation.paramsInfo, async (req, res) => {
 		})
 	}
 
-	const deliveryAddress = await deliveryModel.findDeliveryByAccId(id)
+	const deliveryAddress = await deliveryModel.findDeliveryByAccId(accIdFlag)
 
 	const responseResult = {
 		accEmail: accInfo[0].acc_email,
@@ -92,60 +100,49 @@ router.get('/details/:id', accountValidation.paramsInfo, async (req, res) => {
 	})
 })
 
-router.post('/update', accountValidation.updateAccount, async (req, res) => {
-	const avatar = req.files
-	let checkAvatar = false
-	if (avatar) {
-		checkAvatar = avatar.image ? true : false
-	}
+router.post('/update', accountValidation.updateAccount, async (req, res) => {	
 	const { accId, accEmail, accPhoneNumber, accFullName } = req.body
-	
-	let date_ob = new Date()
+	const { accRole } = req.account
+
+	let accIdFlag = req.account.accId
+
+	if (accId) {
+		if (roleModel.checkAdminRole(accRole)) {
+			accIdFlag = accId
+		}
+	}
+
+	const allAccount = await accountModel.findAll()
 
 	if (accEmail && accEmail !== '') {
-		const emailInfo = await knex('tbl_account')
-		.where('acc_email', accEmail ? accEmail : '')
-		.whereNot('acc_id', accId)
+		const checkExistEmail = allAccount.find((item) => (item.acc_id !== accIdFlag) && (item.acc_email === accEmail))
 
-		if (emailInfo.length != 0) {
+		if (checkExistEmail) {
 			return res.status(400).json({
-				errorMessage: 'Email exist',
+				errorMessage: 'Email Has Already Existed',
 				statusCode: errorCode
 			})
 		}
 	}
 
-	const result = await accountModel.findById(accId)
+	const result = await accountModel.findById(accIdFlag)
 
 	if (result.length === 0) {
 		res.status(400).json({
-			errorMessage: 'Account Does Not Exist',
+			errorMessage: `Account Doesn't Exist`,
 			statusCode: errorCode
 		})
 	}
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
-	if (checkAvatar) {
-		if (result[0].acc_avatar === null) {
-			await imageService.avatarUploader(avatar.image, accId, 'insert')
-		} else {
-			let promiseToUploadImage = new Promise(async function (resolve) {
-				await imageService.avatarUploader(avatar.image, accId, 'update', result[0].acc_avatar)
-				resolve();
-			})
-			promiseToUploadImage.then(function () {
-				imageService.deleteImage(result[0].acc_avatar)
-			})
-		}
-	}
-
-	const account = {
+	const accountInfo = {
 		acc_email:  accEmail ? accEmail : result[0].acc_email,
 		acc_phone_number: accPhoneNumber ? accPhoneNumber : result[0].acc_phone_number,
 		acc_full_name: accFullName ? accFullName : result[0].acc_full_name,
-		acc_updated_date: date_ob
+		acc_updated_date: presentDate
 	}
 
-	await knex('tbl_account').where('acc_id', accId).update(account)
+	await accountModel.update(accIdFlag, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
@@ -154,81 +151,93 @@ router.post('/update', accountValidation.updateAccount, async (req, res) => {
 
 router.post('/update-password', accountValidation.updateAccountPassword, async (req, res) => {
 	const { accId, accOldPassword, accNewPassword, accConfirmPassword } = req.body
+	const { accRole } = req.account
+	
+	let accIdFlag = req.account.accId
+	
+	if (accId) {
+		if (roleModel.checkAdminRole(accRole)) {
+			accIdFlag = accId
+		}
+	}
 
-	const accInfo = await accountModel.findById(accId)
+	const accInfo = await accountModel.findById(accIdFlag)
 
 	if (accInfo.length === 0) {
 		return res.status(400).json({ 
-			errorMessage: 'User Does Not Exist!',
+			errorMessage: 'User Does Not Exist',
 			statusCode: errorCode
 		})
 	}
 
 	if (!bcrypt.compareSync(accOldPassword, accInfo[0].acc_password)) {
 		return res.status(400).json({ 
-			errorMessage: 'Password Incorrect!',
+			errorMessage: 'Password Incorrect',
 			statusCode: errorCode
 		})
 	}
 
 	if (accNewPassword !== accConfirmPassword) {
 		return res.status(400).json({
-			errorMessage: 'password is different from confirm password',
+			errorMessage: 'Password Is Different From Confirm Password',
 			statusCode: errorCode
 		})
 	}
 
-	let date_ob = new Date()
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
 	const hashPassword = bcrypt.hashSync(accNewPassword, 3)
-	const account = {
+	const accountInfo = {
 		acc_password: hashPassword,
-		acc_updated_date: date_ob
+		acc_updated_date: presentDate
 	}
 
-	await knex('tbl_account').where('acc_id', accId).update(account)
+	await accountModel.update(accIdFlag, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
 	})
 })
 
-router.post('/delete/:id', accountValidation.paramsInfo, async (req, res) => {
-	const { id } = req.params
+router.post('/delete', accountValidation.deleteAccount, async (req, res) => {
+	const { accId } = req.body
 	const { accRole } = req.account
 
 	if (!roleModel.checkAdminRole(accRole)) {
 		return res.status(400).json({
-			errorMessage: 'permission access denied'
+			errorMessage: 'Permission Access Denied'
 		})
 	}
 
-	const checkExist = await accountModel.findById(id)
+	const checkExist = await accountModel.findById(accId)
 
 	if (checkExist.length === 0) {
 		return res.status(400).json({
-			errorMessage: 'AccountID is invalid',
+			errorMessage: 'Invalid Account Id',
 			statusCode: errorCode
 		})
 	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+	const accountInfo = {
+		acc_status: accountModel.accountStatus.inActivatedStatus,
+		acc_updated_date: presentDate
+	}
 	
-	await knex('tbl_account')
-		.update({ acc_status: 1 })
-		.where('acc_id', id)
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
 	})
 })
 
-// đặt tài khoản làm nhân viên, xóa vai trò nhân viên
 router.post('/update-role', accountValidation.updateRoleAccount, async (req, res) => {
 	const { accId, accRole } = req.body
 	const presentRole = req.account.accRole
 
 	if (!roleModel.checkAdminRole(presentRole)) {
 		return res.status(400).json({
-			errorMessage: 'permission access denied'
+			errorMessage: 'Permission Access Denied'
 		})
 	}
 
@@ -237,73 +246,72 @@ router.post('/update-role', accountValidation.updateRoleAccount, async (req, res
 
 	if (resultRole.length === 0) {
 		return res.status(400).json({
-			errorMessage: 'role not exists',
+			errorMessage: 'Invalid Role',
 			statusCode: errorCode
 		})
 	}
 
 	if (resultAcc.length === 0) {
 		return res.status(400).json({
-			errorMessage: 'account not exists',
+			errorMessage: 'Invalid Account Id',
 			statusCode: errorCode
 		})
 	}
 
-	await knex('tbl_account').where('acc_id', accId).update('acc_role', accRole)
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+	const accountInfo = {
+		acc_role: accRole,
+		acc_updated_date: presentDate
+	}
+
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
 	})
 })
 
-router.post('/add-avatar', accountValidation.avatar, async (req, res) => {
+router.post('/update-avatar', accountValidation.avatar, async (req, res) => {
 	const { accId } = req.body
 	var avatar = req.files
+	const { accRole } = req.account
+	
+	let accIdFlag = req.account.accId
+
+	if (accId) {
+		if (roleModel.checkAdminRole(accRole)) {
+			accIdFlag = accId
+		}
+	}
 
 	const checkAvatar = avatar.image ? true : false
 
-	const result = await accountModel.findById(accId)
+	const result = await accountModel.findById(accIdFlag)
 
 	if (result.length === 0) {
 		return res.status(400).json({
-			errorMessage: 'AccountId Is Invalid'
+			errorMessage: `Invalid Account Id`,
+			statusCode: errorCode
 		})
 	}
 
 	if (checkAvatar) {
-		await imageService.avatarUploader(avatar.image, accId, 'insert')
+		const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+		const accountInfo = {
+			acc_avatar: avatar.image,
+			acc_updated_date: presentDate
+		}
 
+		await accountModel.update(accIdFlag, accountInfo)
+		
 		return res.status(200).json({
-			statusCode: 0
+			statusCode: successCode
 		})
 	}
 
 	return res.status(400).json({
-		errorMessage: 'Request Missing Image',
-		statusCode: 0
-	})
-})
-
-router.post('/update-avatar', accountValidation.avatar, async (req, res) => {
-	const { accId } = req.body
-	var avatar = req.files
-
-	const checkAvatar = avatar.image ? true : false
-
-	const result = await accountModel.findById(accId)
-
-	if (checkAvatar) {
-		let promiseToUploadImage = new Promise(async (resolve) => {
-			await imageService.avatarUploader(avatar.image, accId, 'update', result[0].acc_avatar)
-			resolve();
-		})
-		promiseToUploadImage.then(() => {
-			imageService.deleteImage(result[0].acc_avatar)
-		})
-	}
-
-	return res.status(200).json({
-		statusCode: 0
+		errorMessage: `Image File Is Required`,
+		statusCode: errorCode
 	})
 })
 
@@ -314,20 +322,60 @@ router.post('/delete-avatar', accountValidation.avatar, async (req, res) => {
 
 	if (result.length === 0) {
 		return res.status(400).json({
-			errorMessage: 'AccountId Is Invalid'
+			errorMessage: 'Invalid Account Id'
 		})
 	}
 
-	const deleteImage = {
-		acc_avatar: null
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+	const accountInfo = {
+		acc_avatar: null,
+		acc_updated_date: presentDate
 	}
 
-	await knex('tbl_account').where({ acc_id: accId}).update(deleteImage)
-
-	imageService.deleteImage(result[0].acc_avatar)
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
-		statusCode: 0
+		statusCode: successCode
+	})
+})
+
+router.post('/update-status', accountValidation.updateStatusAccount, async (req, res) => {
+	const { accId, accStatus } = req.body
+	const presentRole = req.account.accRole
+
+	if (!roleModel.checkAdminRole(presentRole)) {
+		return res.status(400).json({
+			statusCode: errorCode,
+			errorMessage: `Permission Access Denied`
+		})
+	}
+
+	if (accStatus !== '0' || accStatus !== '1' && accStatus !== '2') {
+		return res.status(400).json({
+			statusCode: errorCode,
+			errorMessage: `Invalid Status`
+		})
+	}
+	
+	const resultAcc = await accountModel.findById(accId)
+
+	if (resultAcc.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Account Doesn't Exist`,
+			statusCode: errorCode
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+	const accountInfo = {
+		acc_status: accStatus,
+		acc_updated_date: presentDate
+	}
+
+	await accountModel.update(accId, accountInfo)
+
+	return res.status(200).json({
+		statusCode: successCode
 	})
 })
 
