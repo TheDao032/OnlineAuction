@@ -6,10 +6,10 @@ const login = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			email: { type: 'string', pattern: '' },
-			passWord: { type: 'string', pattern: '', }
+			accEmail: { type: 'string', pattern: '' },
+			accPassword: { type: 'string', pattern: '' }
 		},
-		required: ['email', 'passWord'],
+		required: ['accEmail', 'accPassword'],
 		additionalProperties: false
 	}
 
@@ -34,12 +34,12 @@ const register = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		passWord: { type: 'string', pattern: '', minLength: 1 },
-    		email: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{3,32}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
-    		phoneNumber: { type: 'string', pattern: '', maxLength: 15 },
-    		role: { type: 'string', pattern: '', maxLength: 5}
+    		accPassword: { type: 'string', pattern: '', minLength: 1 },
+    		accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{6,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
+    		accPhoneNumber: { type: 'string', pattern: '', maxLength: 15 },
+    		accRole: { type: 'string', pattern: '', maxLength: 5}
   		},
-		required: ['passWord', 'email'],
+		required: ['accPassword', 'accEmail'],
 		additionalProperties: true
 	}
 
@@ -64,10 +64,9 @@ const confirmToken = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			accId: { type: 'integer' },
 			accToken: { type: 'string', pattern: '', }
 		},
-		required: ['accId', 'accToken'],
+		required: ['accToken'],
 		additionalProperties: false
 	}
 
@@ -94,9 +93,9 @@ const forgotPassword = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			email: { type: 'string', pattern: '', maxLength: 100 }
+			accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{6,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 }
 		},
-		required: ['email'],
+		required: ['accEmail'],
 		additionalProperties: false
 	}
 
@@ -121,11 +120,10 @@ const newPassword = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			accId: { type: 'integer' },
 			accPassword: { type: 'string', pattern: '' , minLength: 1 },
 			tokenChangePass: { type: 'string', pattern: '' }
 		},
-		required: ['accId', 'accPassword', 'tokenChangePass'],
+		required: ['accPassword', 'tokenChangePass'],
 		additionalProperties: false
 	}
 
