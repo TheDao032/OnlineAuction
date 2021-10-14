@@ -9,6 +9,7 @@ const API = require('./api')
 
 
 router.use('/api/authentication', authenticattionController)
+router.use('/api/categories', categoriesController)
 router.use('/api', authentication.verifyToken, API)
 
 router.use((req, res, next) => {
