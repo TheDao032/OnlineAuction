@@ -1,16 +1,18 @@
 import React from 'react';
 import Navbar from './components/Navbar';
 import './App.css';
+import './asset/css/grid.css';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Home from './components/pages/Home';
 import Register from './components/pages/Register';
 import Search from './components/pages/Search';
 import Detail from './components/pages/Detail';
+import AdminFeature from './feature/Admin';
+import SellerFeature from './feature/Seller';
 
 function App() {
   const url = window.location.href.split('/');
   return (
-
     <Router>
       {url[3] === 'signup' || url[3] === 'dangnhap' ? '' : <Navbar />}
 
@@ -20,6 +22,12 @@ function App() {
         <Route path='/search/:text' component={Search} />
         <Route path='/detail/:prodId' component={Detail} />
 
+        <Route path='/admin'>
+          <AdminFeature />
+        </Route>
+        <Route path='/seller'>
+          <SellerFeature />
+        </Route>
       </Switch>
     </Router>
   );

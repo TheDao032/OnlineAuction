@@ -1,28 +1,28 @@
-*{
-    padding : 0;
-    margin : 0;  
+* {
+    padding: 0;
+    margin: 0;
 }
 
-.header{
+.header {
     height: 89vh;
     width: 100%;
     background-position: center;
     background-size: cover;
     position: relative;
-    background-image: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(bg.jpg);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../images/bg.jpg);
     z-index: 0;
 }
 
 
-.main{
+.main {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
     text-align: center;
 }
 
-.text h1{
+.text h1 {
     font-weight: 800;
     font-size: 60px;
     letter-spacing: 2px;
@@ -38,7 +38,7 @@
     letter-spacing: 1px;
 }
 
-.btnone{
+.btnone {
     margin: 0px 10px;
     border: 2px solid #fabd02;
     padding: 13px 35px;
@@ -49,15 +49,15 @@
     text-decoration: none;
 }
 
-.btnone:hover{
-    border: 2px splid #fabd02;  
+.btnone:hover {
+    border: 2px splid #fabd02;
     background-color: white;
     transition: 0.5s;
     cursor: pointer;
 }
 
-.btntwo{
-     margin: 0px 10px;
+.btntwo {
+    margin: 0px 10px;
     border: 2px solid #fabd02;
     padding: 13px 35px;
     letter-spacing: 1px;
@@ -67,7 +67,7 @@
     text-decoration: none;
 }
 
-.btntwo:hover{
+.btntwo:hover {
     border: 2px solid #fabd02;
     color: #000;
     background-color: #fabd02;
@@ -75,12 +75,6 @@
     cursor: pointer;
 }
 
-.sp{
+.sp {
     color: #fabd02;
 }
-
-
-
-
-
-
