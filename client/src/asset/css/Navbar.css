@@ -1,9 +1,9 @@
-.container{
+.container {
     display: flex;
-    background: rgb(0,100,0);
+    background: rgb(0, 100, 0);
 }
 
-.logo1{
+.logo1 {
     padding: 10px;
     justify-content: flex-start;
     margin-left: 20px;
@@ -14,9 +14,10 @@
     font-family: 'Oswald', sans-serif;
     font-weight: 300;
     font-size: 35px;
-    line-height:1.3;
-    
+    line-height: 1.3;
+
 }
+
 .logo p {
     font-size: 10px;
     letter-spacing: 3px;
@@ -26,8 +27,8 @@
 }
 
 
-.menu-bar{
-  
+.menu-bar {
+
     text-align: center;
 }
 
@@ -51,21 +52,22 @@
 }
 
 
-.menu-bar ul li:hover{
+.menu-bar ul li:hover {
     background: #2bab0d;
     border-radius: 3px;
 }
 
-.sub-menu-1{
+.sub-menu-1 {
     display: none;
 
 }
-.a{
+
+.a {
     text-decoration: none;
     color: #fff;
 }
 
-.menu-bar ul li:hover .sub-menu-1{
+.menu-bar ul li:hover .sub-menu-1 {
     display: block;
     position: absolute;
     background: rgb(0, 100, 0);
@@ -79,7 +81,7 @@
     margin: 10px;
 }
 
-.menu-bar ul li:hover .sub-menu-1 ul li{
+.menu-bar ul li:hover .sub-menu-1 ul li {
     width: 150px;
     padding: 10px;
     border-bottom: 1px solid #fff;
@@ -88,75 +90,77 @@
     text-align: left;
 }
 
-.menu-bar ul li:hover .sub-menu-1 ul li:last-child{
+.menu-bar ul li:hover .sub-menu-1 ul li:last-child {
     border-bottom: none;
 }
 
 form {
-  display: inline-block;
+    display: inline-block;
 
 }
 
-.form_div{
+.form_div {
     padding-top: 27px !important;
     margin-left: 20px;
     justify-content: end;
 }
 
 .pseudo-search {
-  display: inline;
-  border: 2px solid #ccc;
-  border-radius: 100px;
-  padding: 10px 15px;
-  transition: background-color 0.5 ease-in-out;
+    display: inline;
+    border: 2px solid #ccc;
+    border-radius: 100px;
+    padding: 10px 15px;
+    transition: background-color 0.5 ease-in-out;
 }
 
-input {
+.pseudo-search input {
     border: 0;
     background-color: transparent;
     width: 200px;
 }
 
 
-input:focus{
+input:focus {
     outline: none;
 }
 
-button, i {
+button,
+i {
     border: none;
     background: none;
     cursor: pointer;
-  }
-  
-  select {
+}
+
+select {
     border: none;
-  }
+}
 
 
-.button-login{
+.button-login {
     padding-top: 20px;
     margin-left: 200px;
-  }
+}
+
 .button-33 {
-  background-color: #c2fbd7;
-  border-radius: 100px;
-  box-shadow: rgba(44, 187, 99, .2) 0 -25px 18px -14px inset,rgba(44, 187, 99, .15) 0 1px 2px,rgba(44, 187, 99, .15) 0 2px 4px,rgba(44, 187, 99, .15) 0 4px 8px,rgba(44, 187, 99, .15) 0 8px 16px,rgba(44, 187, 99, .15) 0 16px 32px;
-  color: green;
-  cursor: pointer;
-  display: inline-block;
-  font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
-  padding: 7px 20px;
-  text-align: center;
-  text-decoration: none;
-  transition: all 250ms;
-  border: 0;
-  font-size: 16px;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
+    background-color: #c2fbd7;
+    border-radius: 100px;
+    box-shadow: rgba(44, 187, 99, .2) 0 -25px 18px -14px inset, rgba(44, 187, 99, .15) 0 1px 2px, rgba(44, 187, 99, .15) 0 2px 4px, rgba(44, 187, 99, .15) 0 4px 8px, rgba(44, 187, 99, .15) 0 8px 16px, rgba(44, 187, 99, .15) 0 16px 32px;
+    color: green;
+    cursor: pointer;
+    display: inline-block;
+    font-family: CerebriSans-Regular, -apple-system, system-ui, Roboto, sans-serif;
+    padding: 7px 20px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 250ms;
+    border: 0;
+    font-size: 16px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
 .button-33:hover {
-  box-shadow: rgba(44,187,99,.35) 0 -25px 18px -14px inset,rgba(44,187,99,.25) 0 1px 2px,rgba(44,187,99,.25) 0 2px 4px,rgba(44,187,99,.25) 0 4px 8px,rgba(44,187,99,.25) 0 8px 16px,rgba(44,187,99,.25) 0 16px 32px;
-  transform: scale(1.05) rotate(-1deg);
+    box-shadow: rgba(44, 187, 99, .35) 0 -25px 18px -14px inset, rgba(44, 187, 99, .25) 0 1px 2px, rgba(44, 187, 99, .25) 0 2px 4px, rgba(44, 187, 99, .25) 0 4px 8px, rgba(44, 187, 99, .25) 0 8px 16px, rgba(44, 187, 99, .25) 0 16px 32px;
+    transform: scale(1.05) rotate(-1deg);
 }
