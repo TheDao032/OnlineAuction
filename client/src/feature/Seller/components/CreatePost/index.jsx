@@ -12,6 +12,7 @@ import ImageUpload from './ImageUpload';
 import BuyNowField from './BuyNowField';
 import AutoRenew from './AutoRenew';
 import SelectField from '../../../../components/formComtrol/selectField';
+import axios from 'axios';
 
 CreatePost.propTypes = {};
 
@@ -69,7 +70,7 @@ function CreatePost(props) {
     setValue({ ...value, prodDescription })
   }
 
-  const handleOnSubmit = (data) => {
+  const handleOnSubmit = async (data) => {
     if (value.image.length >= 3) {
       data = {
         image: value.image,
@@ -81,8 +82,17 @@ function CreatePost(props) {
         prodBuyPrice: parseInt(data.prodBuyPrice),
         prodCateId: data.prodCateId,
       }
+
+      // const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/seller/add-product', data);
+      // console.log('post bài mới: ', res)
+
     }
+
+
+
     console.log(data)
+
+
   }
 
   return <div className='crePost__container'>

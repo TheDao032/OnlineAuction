@@ -28,6 +28,16 @@ function EditorField({ onEditorStateChange = null }) {
     wrapperClassName="wrapperClassName"
     editorClassName="editorClassName"
     onEditorStateChange={onChangeEditorState}
+    toolbar={{
+      options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'colorPicker', 'link', 'embedded', 'emoji', 'image', 'remove', 'history'],
+      fontFamily: {
+        options: ['Arial', 'Georgia', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Montserrat'],
+        className: undefined,
+        component: undefined,
+        dropdownClassName: undefined,
+      },
+
+    }}
   />;
 }
 
