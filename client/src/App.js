@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Home from './components/pages/Home';
 import Register from './components/pages/Register';
 import Search from './components/pages/Search';
-import Detail from './components/pages/Detail';
+import Detail from './components/pages/Detail/Detail';
 import AdminFeature from './feature/Admin';
 import SellerFeature from './feature/Seller';
 
