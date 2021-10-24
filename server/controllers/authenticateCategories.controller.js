@@ -37,3 +37,48 @@ router.post('/add-father', categoriesValidation.newCategoryFather, async (req, r
 		statusCode: successCode
 	})
 })
+
+router.post('/add-child', categoriesValidation.newCategoryChild, async (req, res) => {
+	const { cateName, cateFather } = req.body
+
+	const allCategories = await categoriesModel.findAll()
+
+	const checkExist = allCategories.find((item) => item.cate_name.toLowerCase() === cateName.toLowerCase())
+
+	if (checkExist) {
+		return res.status(400).json({
+			errorMessage: 'Category Name Has Already Existed',
+			statusCode: errorCode
+		})
+	}
+
+	const fatherInfo = await categoriesModel.findById(cateFather)
+
+	if (fatherInfo.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Invalid Category Father Id`,
+			statusCode: errorCode
+		})
+	}
+
+	if (fatherInfo[0].cate_father !== null) {
+		return res.status(400).json({
+			errorMessage: `Can't Set Sub-Category To Be Category Father`,
+			statusCode: errorCode
+		})
+	}
+
+	const presentDate = moment().format("YYYY-MM-DD HH:mm:ss")
+	const cateInfo = {
+		cate_name: cateName,
+		cate_father: cateFather,
+		cate_created_date: presentDate,
+		cate_updated_date: presentDate
+	}
+
+	await categoriesModel.create(cateInfo)
+	
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
