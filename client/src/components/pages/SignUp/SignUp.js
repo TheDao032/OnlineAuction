@@ -1,6 +1,6 @@
 import { Axios } from 'axios';
 import React, { useState } from 'react';
-import '../asset/css/SignUp.css';
+import '../../../asset/css/SignUp.css';
 
 function SignUp() {
   const url = '';

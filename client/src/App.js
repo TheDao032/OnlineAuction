@@ -9,6 +9,7 @@ import Search from './components/pages/Search';
 import Detail from './components/pages/Detail/Detail';
 import AdminFeature from './feature/Admin';
 import SellerFeature from './feature/Seller';
+import BidderFeature from './feature/Bidder';
 
 function App() {
   const url = window.location.href.split('/');
@@ -27,6 +28,9 @@ function App() {
         </Route>
         <Route path='/seller'>
           <SellerFeature />
+        </Route>
+        <Route path='/bidder'>
+          <BidderFeature />
         </Route>
       </Switch>
     </Router>
