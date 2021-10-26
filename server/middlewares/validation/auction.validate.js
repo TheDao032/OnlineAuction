@@ -2,14 +2,23 @@ const ajvLib = require('ajv')
 
 const errorCode = 1
 
-const banBidder = (req, res, next) => {
-	const shema = {
-		type: 'object',
-		properties: {
-			accId: { type: 'integer' },
-			prodId: { type: 'integer' }
-		},
-		required: ['accId', 'prodId'],
+const listAuction = (req, res, next) => {
+    const shemaBody = {
+        type: 'object',
+  		properties: {
+    		prodId: { type: 'integer' }
+  		},
+		required: ['prodId'],
+		additionalProperties: true
+    }
+
+	const shemaQuery = {
+  		type: 'object',
+  		properties: {
+    		page: { type: 'string', pattern: '^\\d+$' },
+			limit: { type: 'string', pattern: '^\\d+$' }
+  		},
+		required: [],
 		additionalProperties: true
 	}
 
@@ -17,12 +26,22 @@ const banBidder = (req, res, next) => {
 		allErrors: true
 	})
 
-	const validator = ajv.compile(shema)
-	const valid = validator(req.body)
+	const validatorQuery = ajv.compile(shemaQuery)
+	const validQuery = validatorQuery(req.query)
 
-	if (!valid) {
+	if (!validQuery) {
 		return res.status(400).json({
-			errorMessage: validator.errors[0].message,
+			errorMessage: validatorQuery.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+    const validatorBody = ajv.compile(shemaBody)
+	const validBody = validatorBody(req.body)
+
+	if (!validBody) {
+		return res.status(400).json({
+			errorMessage: validatorBody.errors[0].message,
 			statusCode: errorCode
 		})
 	}
@@ -31,5 +50,5 @@ const banBidder = (req, res, next) => {
 }
 
 module.exports = {
-    banBidder
+    listAuction
 }
