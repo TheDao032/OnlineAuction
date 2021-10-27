@@ -43,16 +43,38 @@ function SignIn(props) {
   }
 
   const handleOnSubmit = async (data) => {
-    const bodyJson = {
-      "accEmail": "email",
-      "accPassword": "pw"
-    }
+    // const bodyJson = {
+    //   "accEmail": "email",
+    //   "accPassword": "pw"
+    // }
     // console.log(bodyJson);
     // const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/authentication/login', data)
     //   .then(res => console.log(res))
     //   .catch(err => console.log(err))
 
     // console.log('kết quả trả về: ', res);
+
+    console.log("da ta ne", data);
+
+
+    const postData = {
+      accEmail: data.accEmail.toString(),
+      accPassword: data.accPassword.toString()
+    }
+    try {
+
+      const response = await axios
+        .post('https://onlineauctionserver.herokuapp.com/api/authentication/login', postData)
+        .catch((err) => {
+          return err;
+        });
+
+      console.log('thế đạo cho dữ lieu: ', response);
+    } catch (error) {
+      console.log(error);
+    }
+
+
   };
 
   return (

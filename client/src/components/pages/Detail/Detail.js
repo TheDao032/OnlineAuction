@@ -13,6 +13,8 @@ export default function Detail() {
   // const dispatch = useDispatch();
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(false);
+  const [seller, setSeller] = useState([]);
+ 
 
   const fetchProductDetail = async () => {
     setLoading(true);
@@ -23,13 +25,17 @@ export default function Detail() {
       .catch((err) => {
         console.log('Err', err);
       });
-
-    console.log('product fetch', response.data.productDetail);
     setProduct(response.data.productDetail[0]);
+    setSeller(response.data.productDetail[0].seller);
+    console.log('the dao cho: ', response.data.productDetail[0].seller[0].accName)
+
     setLoading(false);
   };
 
-  console.log('Product detail: ', product);
+  console.log('Product detail abc: ', product);
+  console.log('cái mảng nè dume nứng lắm: ', seller);
+
+
   const {
     prodName,
     createDate,
@@ -101,8 +107,8 @@ export default function Detail() {
               {daysSell > 0
                 ? `${daysSell} ngày trước`
                 : hours > 0
-                ? `${hoursSell} giờ trước`
-                : `${minSell} phút trước`}
+                  ? `${hoursSell} giờ trước`
+                  : `${minSell} phút trước`}
             </p>
             <AddToWishList />
           </div>
@@ -128,7 +134,10 @@ export default function Detail() {
           )}
           <div className='detail__seller'>
             <p className='detail__seller-name'>
-              Người bán: <span>Nguyễn Thế Đạo</span>
+
+              {seller.map((s) => (
+                <div> Người bán : <span>{s.accName}</span></div>
+              ))}
             </p>
             <p className='detail__seller-rate'>
               <p className='detail__seller-react'>

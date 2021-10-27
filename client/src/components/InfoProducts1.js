@@ -15,8 +15,8 @@ function InfoProducts1() {
   const top5Offer = useSelector(selectTop5AlmostOver).products_offer;
   const top5Price = useSelector(selectTop5AlmostOver).products_price;
 
-  console.log('store top 5', top5Almost);
-  console.log('store top 5 offer', top5Offer);
+  console.log('store top 5 la', top5Almost);
+  console.log('store top 5 offer la', top5Offer);
 
   const fetchProduct = async () => {
     const response = await axios
@@ -27,7 +27,7 @@ function InfoProducts1() {
         console.log('Err', err);
       });
     dispatch(get_top_5_almost_over(response.data.listTimeOut));
-    console.log('API ve', response.data.listTimeOut);
+    console.log('API ve sap ket thuc', response.data.listTimeOut);
   };
 
   const fetchProduct1 = async () => {

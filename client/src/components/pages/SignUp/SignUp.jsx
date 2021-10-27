@@ -49,21 +49,26 @@ function SignUp() {
   const handleOnSubmit = async (data) => {
     console.log(data);
 
-    const body = {
-      "accEmail": "pvtd1807@gmail.com",
-      "accFullName": "Thanh Đạo",
-      "accPassword": "thanhdao1807",
-      "accPhoneNumber": "0923182502",
-    };
+    const postData = {
+      // "accEmail": data.accEmail.toString(),
+      // "accPassword": data.accPassword.toString()
 
+      "accEmail" : "jirochuoi@gmail.com",
+      "accPassword" : "123"
+
+
+
+    }
+    
     const res = await axios
       .post(
         'https://onlineauctionserver.herokuapp.com/api/authentication/register',
-        body
+        postData
       )
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
 
+    console.log("da ta dang ky", data);
     console.log('kết quả trả về: ', res);
   };
 

@@ -15,7 +15,7 @@ function Info() {
             <Link to='/signup' className='btnone'>
               Learn more
             </Link>
-            <Link className='btntwo'>Signup Here</Link>
+            <Link to='/signup' className='btntwo'>Signup Here</Link>
           </div>
         </div>
       </div>
