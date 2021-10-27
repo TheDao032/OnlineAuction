@@ -7,8 +7,7 @@ export default function Home() {
     return (
         <>
             <Info></Info>
-            <InfoProducts1></InfoProducts1>
-            
+            <InfoProducts1></InfoProducts1>          
         </>
     )
 }
