@@ -13,7 +13,7 @@ function AdminFeature(props) {
   const { url } = useRouteMatch()
 
 
-  return <section className='admin__container'>
+  return <section className='admin__container grid wide'>
     <ul className='admin__nav'>
       <li>
         <NavLink className='admin__nav-item' to={`${url}/category`}>Category</NavLink>
