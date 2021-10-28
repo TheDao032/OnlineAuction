@@ -11,7 +11,7 @@ import PasswordField from '../../formComtrol/passwordField';
 
 function SignUp() {
   const history = useHistory();
-  const [err, setErr] = useState(false);
+  const [err, setErr] = useState('');
 
   const schema = yup.object().shape({
     accEmail: yup
@@ -50,26 +50,27 @@ function SignUp() {
     console.log(data);
 
     const postData = {
-      // "accEmail": data.accEmail.toString(),
-      // "accPassword": data.accPassword.toString()
-
-      "accEmail" : "jirochuoi@gmail.com",
-      "accPassword" : "123"
-
-
-
+      "accEmail": data.accEmail.toString(),
+      "accPassword": data.accPassword.toString(),
+      "accFullName": data.accFullName.toString(),
+      "accPhoneNumber": data.accPhoneNumber.toString(),
     }
-    
-    const res = await axios
-      .post(
-        'https://onlineauctionserver.herokuapp.com/api/authentication/register',
-        postData
-      )
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
 
-    console.log("da ta dang ky", data);
-    console.log('kết quả trả về: ', res);
+    try {
+      const res = await axios
+        .post(
+          'https://onlineauctionserver.herokuapp.com/api/authentication/register',
+          postData
+        )
+      setErr('')
+      console.log("Response", res);
+    } catch (error) {
+      console.log(error.response)
+      let errMess = error.response.data.errorMessage
+      if (errMess === 'Email Has Already Existed') errMess = 'Tài khoản đã tồn tại'
+      setErr(errMess)
+    }
+
   };
 
   return (
@@ -77,7 +78,7 @@ function SignUp() {
       <div className='signUp__container'>
         <h2>ĐĂNG KÝ</h2>
         <hr />
-        {err && <p className='signUp__noti'>Người dùng không tồn tại</p>}
+        {err !== '' && <p className='signUp__noti'>{err}</p>}
         <form
           className='signUp__form'
           onSubmit={form.handleSubmit(handleOnSubmit)}
