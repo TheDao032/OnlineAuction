@@ -6,10 +6,12 @@ import { getCategory } from '../redux/actions/categoryAction';
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { list_search } from '../redux/actions/productAction';
+import DropDownMenu from './DropdownMenu/DropDownMenu';
 
 const selectAllCategory = (state) => state.allCategorys;
 
 function Navbar() {
+  const dataUser = JSON.parse(localStorage.getItem('@user'));
   const dispatch = useDispatch();
   const allCategory = useSelector(selectAllCategory).categorys;
   console.log('store la`', allCategory);
@@ -120,7 +122,13 @@ function Navbar() {
         </form>
       </div>
       <div className='button-login'>
-        <Link to="/sign-in" className='button-33'>Đăng Nhập</Link>
+        {dataUser !== null ? (
+          <DropDownMenu />
+        ) : (
+          <Link to='/sign-in' className='button-33'>
+            Đăng Nhập
+          </Link>
+        )}
       </div>
     </div>
   );

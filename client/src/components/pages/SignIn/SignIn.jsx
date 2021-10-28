@@ -15,7 +15,7 @@ SignIn.propTypes = {};
 
 function SignIn(props) {
   const history = useHistory()
-  const [err, setErr] = useState(false);
+  const [err, setErr] = useState('');
 
   const schema = yup.object().shape({
     accEmail: yup
@@ -43,35 +43,31 @@ function SignIn(props) {
   }
 
   const handleOnSubmit = async (data) => {
-    // const bodyJson = {
-    //   "accEmail": "email",
-    //   "accPassword": "pw"
-    // }
-    // console.log(bodyJson);
-    // const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/authentication/login', data)
-    //   .then(res => console.log(res))
-    //   .catch(err => console.log(err))
-
-    // console.log('kết quả trả về: ', res);
-
-    console.log("da ta ne", data);
-
-
     const postData = {
       accEmail: data.accEmail.toString(),
       accPassword: data.accPassword.toString()
     }
     try {
-
       const response = await axios
         .post('https://onlineauctionserver.herokuapp.com/api/authentication/login', postData)
-        .catch((err) => {
-          return err;
-        });
 
-      console.log('thế đạo cho dữ lieu: ', response);
+      console.log('thế đạo cho dữ lieu: ', response.data.data);
+      const user = response.data.data.user
+      if (localStorage.getItem('@user') === null) {
+        localStorage.setItem('@user', JSON.stringify(user))
+      }
+      else {
+        localStorage.setItem('@user', JSON.stringify(user))
+      }
+
+      setErr('')
+      history.goBack()
     } catch (error) {
-      console.log(error);
+      let errorMessage = error.response.data.errorMessage
+      if (errorMessage === 'Password Incorrect!') errorMessage = "Mật khẩu không đúng"
+      else if (errorMessage === 'User Does Not Exist!') errorMessage = "Người dùng không tồn tại"
+      console.log(error.response);
+      setErr(errorMessage)
     }
 
 
@@ -82,7 +78,7 @@ function SignIn(props) {
       <div className='signIn__container'>
         <h2>ĐĂNG NHẬP</h2>
         <hr />
-        {err && <p className='signIn__noti'>Người dùng không tồn tại</p>}
+        {err !== '' && <p className='signIn__noti'>{err}</p>}
 
         <form className="signIn__form" onSubmit={form.handleSubmit(handleOnSubmit)}>
           <InputField form={form} name='accEmail' label='Email' labelClass='form__group-label' />

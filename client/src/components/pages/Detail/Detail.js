@@ -8,13 +8,16 @@ import formatCurrency from '../../../util/formatCurrency';
 import formatTime from '../../../util/formatTime';
 import { AiOutlineHeart } from 'react-icons/ai';
 
+const dataUser = JSON.parse(localStorage.getItem('@user'));
+let role = dataUser === null ? '' : dataUser?.role;
+let accId = dataUser === null ? '' : dataUser?.accId;
+
 export default function Detail() {
   const { prodId } = useParams();
   // const dispatch = useDispatch();
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(false);
   const [seller, setSeller] = useState([]);
- 
 
   const fetchProductDetail = async () => {
     setLoading(true);
@@ -27,14 +30,17 @@ export default function Detail() {
       });
     setProduct(response.data.productDetail[0]);
     setSeller(response.data.productDetail[0].seller);
-    console.log('the dao cho: ', response.data.productDetail[0].seller[0].accName)
+    console.log(
+      'the dao cho: ',
+      response.data.productDetail[0].seller[0].accName
+    );
 
     setLoading(false);
   };
 
   console.log('Product detail abc: ', product);
   console.log('cái mảng nè dume nứng lắm: ', seller);
-
+  const sellerID = seller[0]?.accId;
 
   const {
     prodName,
@@ -52,7 +58,7 @@ export default function Detail() {
     fetchProductDetail();
   }, []);
 
-  const { days, hours, mins } = formatTime('2021-10-30 22:23:12');
+  const { days, hours, mins } = formatTime(expireDate);
 
   const {
     days: daysSell,
@@ -107,8 +113,8 @@ export default function Detail() {
               {daysSell > 0
                 ? `${daysSell} ngày trước`
                 : hours > 0
-                  ? `${hoursSell} giờ trước`
-                  : `${minSell} phút trước`}
+                ? `${hoursSell} giờ trước`
+                : `${minSell} phút trước`}
             </p>
             <AddToWishList />
           </div>
@@ -129,22 +135,28 @@ export default function Detail() {
             <div className='buyNow'>
               <p className='buyNow__text'>Mua ngay với giá chỉ</p>
               <p className='buyNow__price'>{formatCurrency(prodBuyPrice)}</p>
-              <button className='buyNow__btn'>Mua ngay</button>
+              {role !== '' ? (
+                <button className='buyNow__btn'>Mua ngay</button>
+              ) : (
+                ''
+              )}
             </div>
           )}
           <div className='detail__seller'>
             <p className='detail__seller-name'>
-
+              Người bán:{' '}
               {seller.map((s) => (
-                <div> Người bán : <span>{s.accName}</span></div>
+                <span> {s.accName}</span>
               ))}
             </p>
             <p className='detail__seller-rate'>
               <p className='detail__seller-react'>
-                2 <AiFillLike className='detail__seller-react--like' />
+                {seller[0]?.accGoodVote}
+                <AiFillLike className='detail__seller-react--like' />
               </p>
               <p className='detail__seller-react'>
-                100 <AiFillDislike className='detail__seller-react--dislike' />
+                {seller[0]?.accBadVote}
+                <AiFillDislike className='detail__seller-react--dislike' />
               </p>
             </p>
           </div>
@@ -164,7 +176,7 @@ export default function Detail() {
           <Offer currentPrice={currenPrice} stepPrice={prodStepPrice} />
         </div>
       </div>
-      <Description description={description} />
+      <Description description={description} sellerID={sellerID} />
       <History />
       <div className='detail__relate'>
         <h5 className='detail__relate-title'>Sản phẩm tương tự</h5>
@@ -202,6 +214,8 @@ function DayLeft({ days, hours, mins }) {
         ) : (
           <p className='currentPrice__timeleft'>Còn {mins} phút nữa</p>
         )
+      ) : days < 0 ? (
+        <p className='currentPrice__ended'>Đã kết thúc</p>
       ) : (
         <TimeLeft days={days} hours={hours} mins={mins} />
       )}
@@ -231,12 +245,18 @@ function RelateItem({ src, seller, price, name }) {
 
 function AddToWishList() {
   return (
-    <div className='detail__wishList'>
-      <button className='detail__wishList-btn'>
-        <AiOutlineHeart />
-        <p className='detail__wishList-text'>Thêm vào yêu thích</p>
-      </button>
-    </div>
+    <>
+      {role === 'BID' ? (
+        <div className='detail__wishList'>
+          <button className='detail__wishList-btn'>
+            <AiOutlineHeart />
+            <p className='detail__wishList-text'>Thêm vào yêu thích</p>
+          </button>
+        </div>
+      ) : (
+        ''
+      )}
+    </>
   );
 }
 
@@ -252,17 +272,27 @@ function Offer({ currentPrice, stepPrice }) {
         disabled
       />
       <hr />
-      <button className='detail__offer-btn'>Ra giá</button>
+      {role === '' ? (
+        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
+          Hãy đăng nhập để đấu giá sản phẩm này
+        </p>
+      ) : (
+        <button className='detail__offer-btn'>Ra giá</button>
+      )}
     </form>
   );
 }
 
-function Description({ description }) {
+function Description({ description, sellerID }) {
   return (
     <div className='detail__description'>
       <div className='detail__description-header'>
         <h5 className='detail__description-title'>Mô tả sản phẩm</h5>
-        <button className='detail__description-btn'>Thêm mô tả</button>
+        {role === 'SEL' && accId === sellerID ? (
+          <button className='detail__description-btn'>Thêm mô tả</button>
+        ) : (
+          ''
+        )}
       </div>
       <hr />
       <p
