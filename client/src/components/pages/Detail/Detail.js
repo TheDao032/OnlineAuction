@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { useEffect } from 'react';
 import axios from 'axios';
 import './Detail.scss';
 import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import formatCurrency from '../../../util/formatCurrency';
 import formatTime from '../../../util/formatTime';
-import { AiOutlineHeart } from 'react-icons/ai';
+import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import swal from 'sweetalert';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '../../../redux/actions/loadingAction';
@@ -22,10 +22,14 @@ export default function Detail() {
   const dispatch = useDispatch();
 
   const loadingState = useSelector((state) => state.loading);
-  console.log('cc', loadingState);
 
   const [product, setProduct] = useState({});
   const [seller, setSeller] = useState([]);
+  const [userRole, setUserRole] = useState('');
+
+  useEffect(() => {
+    setUserRole(role);
+  }, [userRole]);
 
   const fetchProductDetail = async () => {
     dispatch(setLoading(true));
@@ -128,7 +132,7 @@ export default function Detail() {
                     ? `${hoursSell} giờ trước`
                     : `${minSell} phút trước`}
                 </p>
-                <AddToWishList prodId={prodId} />
+                <AddToWishList prodId={prodId} userRole={userRole} />
               </div>
 
               <div className='currentPrice'>
@@ -149,7 +153,7 @@ export default function Detail() {
                   <p className='buyNow__price'>
                     {formatCurrency(prodBuyPrice)}
                   </p>
-                  {role !== '' ? (
+                  {userRole !== '' ? (
                     <button className='buyNow__btn'>Mua ngay</button>
                   ) : (
                     ''
@@ -194,11 +198,14 @@ export default function Detail() {
                 stepPrice={prodStepPrice}
                 sellerID={sellerID}
                 prodId={prodId}
-                // loading={load}
               />
             </div>
           </div>
-          <Description description={description} sellerID={sellerID} />
+          <Description
+            description={description}
+            sellerID={sellerID}
+            userRole={userRole}
+          />
           <History />
           <div className='detail__relate'>
             <h5 className='detail__relate-title'>Sản phẩm tương tự</h5>
@@ -267,31 +274,123 @@ function RelateItem({ src, seller, price, name }) {
   );
 }
 
-function AddToWishList({ prodId }) {
+function AddToWishList({ prodId, userRole }) {
+  prodId = parseInt(prodId);
+
+  const history = useHistory();
+
+  const [isLogin, setIsLogin] = useState(false);
+  const [wishItem, setWishItem] = useState([]);
+  const [wish, setWish] = useState({
+    isWish: false,
+    watchId: null,
+  });
+
   const {
     user: { accessToken },
   } = useSelector((state) => state.currentUser);
+  let { loggedIn } = useSelector((state) => state.currentUser);
 
-  prodId = parseInt(prodId);
+  useEffect(() => {
+    setIsLogin(loggedIn);
+  }, [loggedIn]);
+
+  async function getWatchList() {
+    try {
+      const res = await axios.get(
+        'https://onlineauctionserver.herokuapp.com/api/watch-list/list',
+        {
+          headers: {
+            authorization: accessToken,
+          },
+        }
+      );
+      setWishItem(res.data.listWatch);
+    } catch (error) {
+      console.log('Danh sách Watch list lỗi: ', error.response);
+    }
+  }
+
+  console.log('sản phảm đã thích là: ', wishItem);
+
+  // console.log('item check: ', isWish);
+
+  useEffect(() => {
+    getWatchList();
+  }, []);
+
+  useEffect(() => {
+    const checkItem = () => {
+      for (let i of wishItem) {
+        if (prodId === i.prodId) {
+          setWish({
+            isWish: true,
+            watchId: i.watchId,
+          });
+          return;
+        }
+      }
+    };
+
+    checkItem();
+  }, [wishItem, prodId]);
+
   async function handleAddToWishList() {
+    if (isLogin) {
+      try {
+        const res = await axios.post(
+          'https://onlineauctionserver.herokuapp.com/api/watch-list/add',
+          {
+            prodId,
+          },
+          { headers: { authorization: accessToken } }
+        );
+
+        console.log(res);
+        setWish({
+          isWish: true,
+          watchId: res.data.watchId,
+        });
+        swal('Thành công!', 'Sản phẩm đã được thêm vào yêu thích!', 'success');
+      } catch (err) {
+        console.log(err.response);
+        swal(
+          'Thất bại!',
+          'Có lỗi khi thêm sản phẩm vào yêu thích, vui lòng thử lại!',
+          'error'
+        );
+      }
+    } else {
+      history.push('/sign-in');
+    }
+  }
+
+  async function handleRemoveToWishList() {
+    let { watchId } = wish;
     try {
       const res = await axios.post(
-        'https://onlineauctionserver.herokuapp.com/api/watch-list/add',
+        'https://onlineauctionserver.herokuapp.com/api/watch-list/delete',
         {
-          prodId,
+          watchId,
         },
         { headers: { authorization: accessToken } }
       );
 
       console.log(res);
+      swal('Thành công!', 'Đã xóa khỏi danh sách yêu thích!', 'success');
     } catch (err) {
       console.log(err.response);
+      swal(
+        'Thất bại!',
+        'Có lỗi khi xóa sản phẩm khỏi yêu thích, vui lòng thử lại!',
+        'error'
+      );
     }
   }
 
   return (
     <>
-      {role !== '' ? (
+      {!wish.isWish ? (
         <div className='detail__wishList'>
           <button
             className='detail__wishList-btn'
@@ -302,7 +401,15 @@ function AddToWishList({ prodId }) {
           </button>
         </div>
       ) : (
-        ''
+        <div className='detail__wishList detail__wishList--remove'>
+          <button
+            className='detail__wishList-btn'
+            onClick={handleRemoveToWishList}
+          >
+            <AiFillHeart style={{ color: 'red' }} />
+            <p className='detail__wishList-text'>Xóa khỏi yêu thích</p>
+          </button>
+        </div>
       )}
     </>
   );
@@ -311,6 +418,9 @@ function AddToWishList({ prodId }) {
 function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
   const defaultPrice = currentPrice + stepPrice;
   const [offer, setOffer] = useState(0);
+  const [isLogin, setIsLogin] = useState(false);
+
+  let { loggedIn } = useSelector((state) => state.currentUser);
 
   function handleOnChange(e) {
     const value = e.target.value;
@@ -318,6 +428,10 @@ function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
     // console.log(value);
     setOffer(value);
   }
+
+  useEffect(() => {
+    setIsLogin(loggedIn);
+  }, [loggedIn]);
 
   useEffect(() => {
     setOffer(defaultPrice);
@@ -373,26 +487,26 @@ function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
         <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
           Thời gian đấu giá đã kết thúc
         </p>
-      ) : role === '' ? (
-        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
-          Hãy đăng nhập để đấu giá sản phẩm này
-        </p>
-      ) : (
+      ) : isLogin ? (
         <button className='detail__offer-btn' onClick={handleMakeBet}>
           Ra giá
         </button>
+      ) : (
+        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
+          Hãy đăng nhập để đấu giá sản phẩm này
+        </p>
       )}
       {}
     </form>
   );
 }
 
-function Description({ description, sellerID }) {
+function Description({ description, sellerID, userRole }) {
   return (
     <div className='detail__description'>
       <div className='detail__description-header'>
         <h5 className='detail__description-title'>Mô tả sản phẩm</h5>
-        {role === 'SEL' && accId === sellerID ? (
+        {userRole === 'SEL' && accId === sellerID ? (
           <button className='detail__description-btn'>Thêm mô tả</button>
         ) : (
           ''

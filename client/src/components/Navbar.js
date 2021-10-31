@@ -17,7 +17,6 @@ function Navbar() {
   const dispatch = useDispatch();
   const loadingState = useSelector((state) => state.loading);
 
-  const dataUser = JSON.parse(localStorage.getItem('@user'));
   const allCategory = useSelector(selectAllCategory).categorys;
   console.log('store la`', allCategory);
   const [data, setData] = useState({
@@ -25,7 +24,6 @@ function Navbar() {
   });
 
   const userInfo = useSelector(currentUser);
-  console.log(userInfo.loggedIn);
 
   function handle(e) {
     const newData = { ...data };

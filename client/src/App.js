@@ -1,31 +1,32 @@
-import React from 'react';
-import Navbar from './components/Navbar';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { Route, Switch, useLocation } from 'react-router-dom';
 import './App.css';
 import './asset/css/grid.css';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Detail from './components/pages/Detail/Detail';
 import Home from './components/pages/Home';
 import Register from './components/pages/Register';
 import Search from './components/pages/Search';
-import Detail from './components/pages/Detail/Detail';
-import AdminFeature from './feature/Admin';
-import SellerFeature from './feature/Seller';
-import BidderFeature from './feature/Bidder';
 import SignIn from './components/pages/SignIn/SignIn';
-import { useDispatch, useSelector } from 'react-redux';
+import AdminFeature from './feature/Admin';
+import BidderFeature from './feature/Bidder';
+import SellerFeature from './feature/Seller';
 import { logIn } from './redux/actions/userAction';
 
 function App() {
   const dispatch = useDispatch();
+  let { pathname } = useLocation();
 
   if (localStorage.getItem('@user') !== null) {
     dispatch(logIn(JSON.parse(localStorage.getItem('@user'))));
   }
 
-  const url = window.location.href.split('/');
+  // console.log('url nè: ', pathname);
 
   return (
-    <Router>
-      {url[3] === 'signup' || url[3] === 'sign-in' ? '' : <Navbar />}
+    <>
+      {pathname === '/signup' || pathname === '/sign-in' ? '' : <Navbar />}
       <Switch>
         <Route path='/' exact component={Home} />
         <Route path='/signup' component={Register} />
@@ -44,7 +45,7 @@ function App() {
           <BidderFeature />
         </Route>
       </Switch>
-    </Router>
+    </>
   );
 }
 
