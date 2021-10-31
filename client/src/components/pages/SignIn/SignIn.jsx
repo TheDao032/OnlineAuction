@@ -9,13 +9,26 @@ import PasswordField from '../../formComtrol/passwordField';
 import { FaFacebookSquare, FaGooglePlusG, FaTwitter } from "react-icons/fa";
 import { Route, Switch, useRouteMatch, useHistory } from 'react-router';
 import axios from 'axios';
+import { logIn } from '../../../redux/actions/userAction'
+import { useDispatch, useSelector } from 'react-redux';
+import { setLoading } from '../../../redux/actions/loadingAction';
+import Loading from '../../Loading/Loading';
+
 
 SignIn.propTypes = {};
 
+const selectUser = state => state.currentUser;
 
 function SignIn(props) {
+  const dispatch = useDispatch()
+
+  const loadingState = useSelector((state) => state.loading);
+
   const history = useHistory()
   const [err, setErr] = useState('');
+  const userInfo = useSelector(selectUser);
+  // console.log('store user', userInfo)
+
 
   const schema = yup.object().shape({
     accEmail: yup
@@ -47,12 +60,19 @@ function SignIn(props) {
       accEmail: data.accEmail.toString(),
       accPassword: data.accPassword.toString()
     }
+
+
+    dispatch(setLoading(true));
+
+
     try {
       const response = await axios
         .post('https://onlineauctionserver.herokuapp.com/api/authentication/login', postData)
 
-      console.log('thế đạo cho dữ lieu: ', response.data.data);
-      const user = response.data.data.user
+      console.log('Dữ liệu khi đăng nhập: ', response.data.data);
+      const user = response.data.data
+      dispatch(logIn(user))
+
       if (localStorage.getItem('@user') === null) {
         localStorage.setItem('@user', JSON.stringify(user))
       }
@@ -62,46 +82,54 @@ function SignIn(props) {
 
       setErr('')
       history.goBack()
+      dispatch(setLoading(false));
     } catch (error) {
       let errorMessage = error.response.data.errorMessage
       if (errorMessage === 'Password Incorrect!') errorMessage = "Mật khẩu không đúng"
       else if (errorMessage === 'User Does Not Exist!') errorMessage = "Người dùng không tồn tại"
       console.log(error.response);
       setErr(errorMessage)
+      dispatch(setLoading(false));
     }
+
 
 
   };
 
   return (
-    <div className='signIn'>
-      <div className='signIn__container'>
-        <h2>ĐĂNG NHẬP</h2>
-        <hr />
-        {err !== '' && <p className='signIn__noti'>{err}</p>}
+    <>
+      {loadingState.loading
+        ? <Loading />
+        : <div className='signIn'>
+          <div className='signIn__container'>
+            <h2>ĐĂNG NHẬP</h2>
+            <hr />
+            {err !== '' && <p className='signIn__noti'>{err}</p>}
 
-        <form className="signIn__form" onSubmit={form.handleSubmit(handleOnSubmit)}>
-          <InputField form={form} name='accEmail' label='Email' labelClass='form__group-label' />
-          <PasswordField form={form} name='accPassword' label='Mật khẩu' labelClass='form__group-label' />
-          <input type='submit' className='signIn__button' value='Đăng nhập' />
-          <p className='signIn__res'>Chưa có tài khoản? <span onClick={directSignUp}>Đăng ký ngay</span></p>
+            <form className="signIn__form" onSubmit={form.handleSubmit(handleOnSubmit)}>
+              <InputField form={form} name='accEmail' label='Email' labelClass='form__group-label' />
+              <PasswordField form={form} name='accPassword' label='Mật khẩu' labelClass='form__group-label' />
+              <input type='submit' className='signIn__button' value='Đăng nhập' />
+              <p className='signIn__res'>Chưa có tài khoản? <span onClick={directSignUp}>Đăng ký ngay</span></p>
 
-          <p className='signIn__or'>Hoặc</p>
-          <div className='signIn__another signIn__another-fb'>
-            <FaFacebookSquare />
-            <p className='signIn__title'>Đăng nhập bằng Facebook</p>
+              <p className='signIn__or'>Hoặc</p>
+              <div className='signIn__another signIn__another-fb'>
+                <FaFacebookSquare />
+                <p className='signIn__title'>Đăng nhập bằng Facebook</p>
+              </div>
+              <div className='signIn__another signIn__another-gg'>
+                <FaGooglePlusG />
+                <p className='signIn__title'>Đăng nhập bằng Google</p>
+              </div>
+              <div className='signIn__another signIn__another-tt'>
+                <FaTwitter />
+                <p className='signIn__title'>Đăng nhập bằng Twitter</p>
+              </div>
+            </form>
           </div>
-          <div className='signIn__another signIn__another-gg'>
-            <FaGooglePlusG />
-            <p className='signIn__title'>Đăng nhập bằng Google</p>
-          </div>
-          <div className='signIn__another signIn__another-tt'>
-            <FaTwitter />
-            <p className='signIn__title'>Đăng nhập bằng Twitter</p>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      }
+    </>
   );
 }
 

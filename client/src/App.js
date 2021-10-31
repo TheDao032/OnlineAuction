@@ -11,13 +11,21 @@ import AdminFeature from './feature/Admin';
 import SellerFeature from './feature/Seller';
 import BidderFeature from './feature/Bidder';
 import SignIn from './components/pages/SignIn/SignIn';
+import { useDispatch, useSelector } from 'react-redux';
+import { logIn } from './redux/actions/userAction';
 
 function App() {
+  const dispatch = useDispatch();
+
+  if (localStorage.getItem('@user') !== null) {
+    dispatch(logIn(JSON.parse(localStorage.getItem('@user'))));
+  }
+
   const url = window.location.href.split('/');
+
   return (
     <Router>
       {url[3] === 'signup' || url[3] === 'sign-in' ? '' : <Navbar />}
-
       <Switch>
         <Route path='/' exact component={Home} />
         <Route path='/signup' component={Register} />

@@ -3,16 +3,19 @@ import PropTypes from 'prop-types';
 import { FaUser } from "react-icons/fa";
 import './DropDownMenu.scss';
 import { useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logOut } from '../../redux/actions/userAction';
 
 
 DropDownMenu.propTypes = {};
 
+const selectUser = state => state.currentUser;
+
 const Profile = {
   Bidder() {
     const history = useHistory()
-
     function directBidderProfile() {
-      history.push('/profile/my-profile')
+      history.push('/bidder/profile/my-profile')
     }
 
     return (
@@ -48,13 +51,23 @@ const Profile = {
 }
 
 function DropDownMenu({ }) {
+  const dispatch = useDispatch()
+  const userInfo = useSelector(selectUser)
   const dataUser = JSON.parse(localStorage.getItem('@user'))
-  let role = dataUser === null ? '' : dataUser?.role
-  console.log(role)
+  let role = dataUser === null ? '' : dataUser?.user?.role
+
+
+  // console.log(userInfo)
+
+  function handleLogout() {
+    dispatch(logOut())
+    localStorage.clear()
+  }
+
   return <div className='menu-signin'>
     <div className="menu-signin__btn">
       <FaUser />
-      <p>Phan Vũ Thanh Đạo Phan Vũ Thanh Đạo</p>
+      <p style={{ textAlign: 'center' }}>{dataUser?.user.accName !== null ? dataUser?.user.accName : "Unknown"}</p>
     </div>
     <div className='menu-signin__menu'>
       {
@@ -66,7 +79,7 @@ function DropDownMenu({ }) {
               ? <Profile.Admin />
               : ''))
       }
-      <span className='menu-signin__menu-item'>Đăng xuất</span>
+      <span className='menu-signin__menu-item' onClick={handleLogout}>Đăng xuất</span>
     </div>
   </div>;
 }

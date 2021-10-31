@@ -7,17 +7,25 @@ import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { list_search } from '../redux/actions/productAction';
 import DropDownMenu from './DropdownMenu/DropDownMenu';
+import { setLoading } from '../redux/actions/loadingAction';
+import Loading from './Loading/Loading';
 
 const selectAllCategory = (state) => state.allCategorys;
+const currentUser = (state) => state.currentUser;
 
 function Navbar() {
-  const dataUser = JSON.parse(localStorage.getItem('@user'));
   const dispatch = useDispatch();
+  const loadingState = useSelector((state) => state.loading);
+
+  const dataUser = JSON.parse(localStorage.getItem('@user'));
   const allCategory = useSelector(selectAllCategory).categorys;
   console.log('store la`', allCategory);
   const [data, setData] = useState({
     value: '',
   });
+
+  const userInfo = useSelector(currentUser);
+  console.log(userInfo.loggedIn);
 
   function handle(e) {
     const newData = { ...data };
@@ -26,13 +34,22 @@ function Navbar() {
   }
 
   const fetchCategory = async () => {
-    const response = await axios
-      .get('https://onlineauctionserver.herokuapp.com/api/categories/list')
-      .catch((err) => {
-        console.log('Err', err);
-      });
-    dispatch(getCategory(response.data.listCategories));
-    console.log('API ve', response.data.listCategories);
+    dispatch(setLoading(true));
+
+    try {
+      const response = await axios
+        .get('https://onlineauctionserver.herokuapp.com/api/categories/list')
+        .catch((err) => {
+          console.log('Err', err);
+        });
+      dispatch(getCategory(response.data.listCategories));
+
+      console.log('API ve', response.data.listCategories);
+    } catch (error) {
+      console.log(error.response);
+    }
+
+    dispatch(setLoading(false));
   };
 
   const searchProduct = async () => {
@@ -73,64 +90,70 @@ function Navbar() {
   }, []);
 
   return (
-    <div className='container'>
-      <div className='logo'>
-        <a href>
-          <h3>Epic</h3>
-          <p>Econon Service</p>
-        </a>
-      </div>
-      <div className='menu-bar'>
-        <ul>
-          {allCategory.map((cat) => (
-            <li className='active'>
-              {' '}
-              <Link to='/services' className='a'>
-                {cat.cateName}
-              </Link>
-              <div className='sub-menu-1'>
-                <ul>
-                  {cat.subCategories.map((sub) => (
-                    <li>
-                      <Link to='/services' className='a'>
-                        {sub.cateName}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className='form_div'>
-        <form onSubmit={handleSubmit}>
-          <div className='pseudo-search'>
-            <input
-              onChange={(e) => handle(e)}
-              onKeyPress={KeyPress}
-              id='value'
-              type='text'
-              placeholder='Search...'
-              autofocus
-              required
-            />
-            <button className='fa fa-search' type='submit'>
-              tìm
-            </button>
+    <>
+      {loadingState.loading ? (
+        <Loading />
+      ) : (
+        <div className='container'>
+          <div className='logo'>
+            <a href>
+              <h3>Epic</h3>
+              <p>Econon Service</p>
+            </a>
           </div>
-        </form>
-      </div>
-      <div className='button-login'>
-        {dataUser !== null ? (
-          <DropDownMenu />
-        ) : (
-          <Link to='/sign-in' className='button-33'>
-            Đăng Nhập
-          </Link>
-        )}
-      </div>
-    </div>
+          <div className='menu-bar'>
+            <ul>
+              {allCategory.map((cat) => (
+                <li className='active'>
+                  {' '}
+                  <Link to='/services' className='a'>
+                    {cat.cateName}
+                  </Link>
+                  <div className='sub-menu-1'>
+                    <ul>
+                      {cat.subCategories.map((sub) => (
+                        <li>
+                          <Link to='/services' className='a'>
+                            {sub.cateName}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className='form_div'>
+            <form onSubmit={handleSubmit}>
+              <div className='pseudo-search'>
+                <input
+                  onChange={(e) => handle(e)}
+                  onKeyPress={KeyPress}
+                  id='value'
+                  type='text'
+                  placeholder='Search...'
+                  autofocus
+                  required
+                />
+                <button className='fa fa-search' type='submit'>
+                  tìm
+                </button>
+              </div>
+            </form>
+          </div>
+          <div className='button-login'>
+            {userInfo.loggedIn ? (
+              <DropDownMenu />
+            ) : (
+              <Link to='/sign-in' className='button-33'>
+                Đăng Nhập
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
