@@ -7,39 +7,47 @@ import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import formatCurrency from '../../../util/formatCurrency';
 import formatTime from '../../../util/formatTime';
 import { AiOutlineHeart } from 'react-icons/ai';
+import swal from 'sweetalert';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLoading } from '../../../redux/actions/loadingAction';
+import Loading from '../../Loading/Loading';
 
 const dataUser = JSON.parse(localStorage.getItem('@user'));
-let role = dataUser === null ? '' : dataUser?.role;
-let accId = dataUser === null ? '' : dataUser?.accId;
+let role = dataUser === null ? '' : dataUser?.user?.role;
+let accId = dataUser === null ? '' : dataUser?.user?.accId;
+const accessToken = dataUser === null ? null : dataUser?.accessToken;
 
 export default function Detail() {
   const { prodId } = useParams();
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
+
+  const loadingState = useSelector((state) => state.loading);
+  console.log('cc', loadingState);
+
   const [product, setProduct] = useState({});
-  const [loading, setLoading] = useState(false);
   const [seller, setSeller] = useState([]);
 
   const fetchProductDetail = async () => {
-    setLoading(true);
-    const response = await axios
-      .post('https://onlineauctionserver.herokuapp.com/api/product/detail', {
-        prodId: parseInt(prodId),
-      })
-      .catch((err) => {
-        console.log('Err', err);
-      });
-    setProduct(response.data.productDetail[0]);
-    setSeller(response.data.productDetail[0].seller);
-    console.log(
-      'the dao cho: ',
-      response.data.productDetail[0].seller[0].accName
-    );
+    dispatch(setLoading(true));
 
-    setLoading(false);
+    try {
+      const response = await axios
+        .post('https://onlineauctionserver.herokuapp.com/api/product/detail', {
+          prodId: parseInt(prodId),
+        })
+        .catch((err) => {
+          console.log('Err', err.response);
+        });
+      setProduct(response.data.productDetail[0]);
+      setSeller(response.data.productDetail[0].seller);
+      dispatch(setLoading(false));
+    } catch (error) {
+      console.log(error.response);
+      dispatch(setLoading(false));
+    }
   };
 
   console.log('Product detail abc: ', product);
-  console.log('cái mảng nè dume nứng lắm: ', seller);
   const sellerID = seller[0]?.accId;
 
   const {
@@ -75,121 +83,137 @@ export default function Detail() {
 `;
 
   return (
-    <div className='detail grid wide'>
-      <div className='detail__container'>
-        <div className='detail__image'>
-          <div
-            className='detail__image-item detail__image-item--big'
-            style={{
-              backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-            }}
-          ></div>
-          <div className='detail__image-sub'>
-            <div
-              className='detail__image-item detail__image-item--small'
-              style={{
-                backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-              }}
-            ></div>
-            <div
-              className='detail__image-item detail__image-item--small'
-              style={{
-                backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-              }}
-            ></div>
-            <div
-              className='detail__image-item detail__image-item--small'
-              style={{
-                backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-              }}
-            ></div>
-          </div>
-        </div>
-        <div className='detail__info'>
-          <h3 className='detail__info-name'>{prodName}</h3>
-          <div className='detail__info-header'>
-            <p className='detail__info-releaseTime'>
-              Đăng bán vào:{'   '}
-              {daysSell > 0
-                ? `${daysSell} ngày trước`
-                : hours > 0
-                ? `${hoursSell} giờ trước`
-                : `${minSell} phút trước`}
-            </p>
-            <AddToWishList />
-          </div>
+    <>
+      {loadingState.loading ? (
+        <Loading />
+      ) : (
+        <div className='detail grid wide'>
+          <div className='detail__container'>
+            <div className='detail__image'>
+              <div
+                className='detail__image-item detail__image-item--big'
+                style={{
+                  backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
+                }}
+              ></div>
+              <div className='detail__image-sub'>
+                <div
+                  className='detail__image-item detail__image-item--small'
+                  style={{
+                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
+                  }}
+                ></div>
+                <div
+                  className='detail__image-item detail__image-item--small'
+                  style={{
+                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
+                  }}
+                ></div>
+                <div
+                  className='detail__image-item detail__image-item--small'
+                  style={{
+                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
+                  }}
+                ></div>
+              </div>
+            </div>
+            <div className='detail__info'>
+              <h3 className='detail__info-name'>{prodName}</h3>
+              <div className='detail__info-header'>
+                <p className='detail__info-releaseTime'>
+                  Đăng bán vào:{'   '}
+                  {daysSell > 0
+                    ? `${daysSell} ngày trước`
+                    : hours > 0
+                    ? `${hoursSell} giờ trước`
+                    : `${minSell} phút trước`}
+                </p>
+                <AddToWishList prodId={prodId} />
+              </div>
 
-          <div className='currentPrice'>
-            <div className='currentPrice__left'>
-              <p className='currentPrice__text'>Giá hiện tại</p>
-              <p className='currentPrice__price'>
-                {formatCurrency(currenPrice)}
-              </p>
-            </div>
-            <div className='currentPrice__right'>
-              <p className='currentPrice__textEnd'>Thời gian kết thúc</p>
-              <DayLeft days={days} mins={mins} hours={hours} />
-            </div>
-          </div>
-          {prodBuyPrice !== 0 && (
-            <div className='buyNow'>
-              <p className='buyNow__text'>Mua ngay với giá chỉ</p>
-              <p className='buyNow__price'>{formatCurrency(prodBuyPrice)}</p>
-              {role !== '' ? (
-                <button className='buyNow__btn'>Mua ngay</button>
-              ) : (
-                ''
+              <div className='currentPrice'>
+                <div className='currentPrice__left'>
+                  <p className='currentPrice__text'>Giá hiện tại</p>
+                  <p className='currentPrice__price'>
+                    {formatCurrency(currenPrice)}
+                  </p>
+                </div>
+                <div className='currentPrice__right'>
+                  <p className='currentPrice__textEnd'>Thời gian kết thúc</p>
+                  <DayLeft days={days} mins={mins} hours={hours} />
+                </div>
+              </div>
+              {prodBuyPrice !== 0 && (
+                <div className='buyNow'>
+                  <p className='buyNow__text'>Mua ngay với giá chỉ</p>
+                  <p className='buyNow__price'>
+                    {formatCurrency(prodBuyPrice)}
+                  </p>
+                  {role !== '' ? (
+                    <button className='buyNow__btn'>Mua ngay</button>
+                  ) : (
+                    ''
+                  )}
+                </div>
               )}
+              <div className='detail__seller'>
+                <p className='detail__seller-name'>
+                  Người bán:{' '}
+                  {seller.map((s) => (
+                    <span> {s.accName}</span>
+                  ))}
+                </p>
+                <p className='detail__seller-rate'>
+                  <p className='detail__seller-react'>
+                    {seller[0]?.accGoodVote}
+                    <AiFillLike className='detail__seller-react--like' />
+                  </p>
+                  <p className='detail__seller-react'>
+                    {seller[0]?.accBadVote}
+                    <AiFillDislike className='detail__seller-react--dislike' />
+                  </p>
+                </p>
+              </div>
+              <div className='detail__bidder'>
+                <p className='detail__bidder-name'>
+                  Người đặt giá cao nhất: <span>Phạm Thị Ngọc Hạnh</span>
+                </p>
+                <p className='detail__bidder-rate'>
+                  <p className='detail__bidder-react'>
+                    12 <AiFillLike className='detail__bidder-react--like' />
+                  </p>
+                  <p className='detail__bidder-react'>
+                    20{' '}
+                    <AiFillDislike className='detail__bidder-react--dislike' />
+                  </p>
+                </p>
+              </div>
+              <Offer
+                days={days}
+                currentPrice={currenPrice}
+                stepPrice={prodStepPrice}
+                sellerID={sellerID}
+                prodId={prodId}
+                // loading={load}
+              />
             </div>
-          )}
-          <div className='detail__seller'>
-            <p className='detail__seller-name'>
-              Người bán:{' '}
-              {seller.map((s) => (
-                <span> {s.accName}</span>
-              ))}
-            </p>
-            <p className='detail__seller-rate'>
-              <p className='detail__seller-react'>
-                {seller[0]?.accGoodVote}
-                <AiFillLike className='detail__seller-react--like' />
-              </p>
-              <p className='detail__seller-react'>
-                {seller[0]?.accBadVote}
-                <AiFillDislike className='detail__seller-react--dislike' />
-              </p>
-            </p>
           </div>
-          <div className='detail__bidder'>
-            <p className='detail__bidder-name'>
-              Người đặt giá cao nhất: <span>Phạm Thị Ngọc Hạnh</span>
-            </p>
-            <p className='detail__bidder-rate'>
-              <p className='detail__bidder-react'>
-                12 <AiFillLike className='detail__bidder-react--like' />
-              </p>
-              <p className='detail__bidder-react'>
-                20 <AiFillDislike className='detail__bidder-react--dislike' />
-              </p>
-            </p>
+          <Description description={description} sellerID={sellerID} />
+          <History />
+          <div className='detail__relate'>
+            <h5 className='detail__relate-title'>Sản phẩm tương tự</h5>
+            <hr />
+            <div className='relate'>
+              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
+              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
+              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
+              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
+              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
+            </div>
           </div>
-          <Offer currentPrice={currenPrice} stepPrice={prodStepPrice} />
         </div>
-      </div>
-      <Description description={description} sellerID={sellerID} />
-      <History />
-      <div className='detail__relate'>
-        <h5 className='detail__relate-title'>Sản phẩm tương tự</h5>
-        <hr />
-        <div className='relate'>
-          <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-          <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-          <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-          <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-          <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
 
@@ -243,12 +267,36 @@ function RelateItem({ src, seller, price, name }) {
   );
 }
 
-function AddToWishList() {
+function AddToWishList({ prodId }) {
+  const {
+    user: { accessToken },
+  } = useSelector((state) => state.currentUser);
+
+  prodId = parseInt(prodId);
+  async function handleAddToWishList() {
+    try {
+      const res = await axios.post(
+        'https://onlineauctionserver.herokuapp.com/api/watch-list/add',
+        {
+          prodId,
+        },
+        { headers: { authorization: accessToken } }
+      );
+
+      console.log(res);
+    } catch (err) {
+      console.log(err.response);
+    }
+  }
+
   return (
     <>
-      {role === 'BID' ? (
+      {role !== '' ? (
         <div className='detail__wishList'>
-          <button className='detail__wishList-btn'>
+          <button
+            className='detail__wishList-btn'
+            onClick={handleAddToWishList}
+          >
             <AiOutlineHeart />
             <p className='detail__wishList-text'>Thêm vào yêu thích</p>
           </button>
@@ -260,25 +308,81 @@ function AddToWishList() {
   );
 }
 
-function Offer({ currentPrice, stepPrice }) {
+function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
+  const defaultPrice = currentPrice + stepPrice;
+  const [offer, setOffer] = useState(0);
+
+  function handleOnChange(e) {
+    const value = e.target.value;
+
+    // console.log(value);
+    setOffer(value);
+  }
+
+  useEffect(() => {
+    setOffer(defaultPrice);
+  }, [defaultPrice]);
+
+  async function handleMakeBet(e) {
+    e.preventDefault();
+
+    if (role === 'SEL' && accId === sellerID) {
+      return swal('Lỗi', 'Người bán không thể đấu giá!', 'error');
+    }
+
+    const data = {
+      prodId,
+      aucPriceOffer: parseFloat(offer).toFixed(3),
+    };
+
+    try {
+      const res = await axios.post(
+        'https://onlineauctionserver.herokuapp.com/api/bidder/offer',
+        data,
+        {
+          header: {
+            authorization: accessToken,
+          },
+        }
+      );
+
+      console.log(res);
+    } catch (error) {
+      console.log(error.response);
+    }
+    // swal(
+    //   'Thành công',
+    //   `Đấu giá thành công với số tiền ${formatCurrency(parseFloat(offer))}`,
+    //   'success'
+    // );
+  }
+
   return (
     <form className='detail__offer'>
       <label for='offer'>Giá đề nghị:</label>
       <input
+        type='number'
         id='offer'
         name='offer'
         className='detail__offer-input'
-        value={formatCurrency(currentPrice + stepPrice)}
-        disabled
+        value={offer}
+        onChange={handleOnChange}
       />
       <hr />
-      {role === '' ? (
+      {days < 0 ? (
+        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
+          Thời gian đấu giá đã kết thúc
+        </p>
+      ) : role === '' ? (
         <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
           Hãy đăng nhập để đấu giá sản phẩm này
         </p>
       ) : (
-        <button className='detail__offer-btn'>Ra giá</button>
+        <button className='detail__offer-btn' onClick={handleMakeBet}>
+          Ra giá
+        </button>
       )}
+      {}
     </form>
   );
 }
