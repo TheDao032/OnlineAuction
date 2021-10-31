@@ -1,15 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FaUser } from "react-icons/fa";
-import './DropDownMenu.scss';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import { logOut } from '../../redux/actions/userAction';
+import './DropDownMenu.scss';
 
 
 DropDownMenu.propTypes = {};
 
-const selectUser = state => state.currentUser;
 
 const Profile = {
   Bidder() {
@@ -50,18 +48,16 @@ const Profile = {
   },
 }
 
-function DropDownMenu({ }) {
+function DropDownMenu() {
   const dispatch = useDispatch()
-  const userInfo = useSelector(selectUser)
+  const history = useHistory()
   const dataUser = JSON.parse(localStorage.getItem('@user'))
   let role = dataUser === null ? '' : dataUser?.user?.role
-
-
-  // console.log(userInfo)
 
   function handleLogout() {
     dispatch(logOut())
     localStorage.clear()
+    history.push('/')
   }
 
   return <div className='menu-signin'>
