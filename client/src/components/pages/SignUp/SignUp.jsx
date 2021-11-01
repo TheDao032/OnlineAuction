@@ -11,7 +11,7 @@ import { setLoading } from '../../../redux/actions/loadingAction';
 import Loading from '../../Loading/Loading';
 import { useDispatch, useSelector } from 'react-redux';
 import swal from 'sweetalert';
-
+import ReCAPTCHA from "react-google-recaptcha";
 
 import './SignUp.scss';
 
@@ -20,6 +20,9 @@ function SignUp() {
   const loadingState = useSelector(state => state.loading)
   const history = useHistory();
   const [err, setErr] = useState('');
+  const [reCaptCha, setReCaptCha] = useState(false)
+  const [reErr, setReErr] = useState(false)
+  const SITE_KEY = '6LeKiAkdAAAAAH5r5Us-hjlTA7zWNjTNQCze_b0Z'
 
   const schema = yup.object().shape({
     accEmail: yup
@@ -54,6 +57,11 @@ function SignUp() {
     history.push(`/sign-in`);
   }
 
+  function handleOnChangeRecaptCha(value) {
+    setReCaptCha(true)
+    setReErr(false)
+  }
+
   const handleOnSubmit = async (data) => {
     console.log(data);
 
@@ -64,35 +72,45 @@ function SignUp() {
       "accPhoneNumber": data.accPhoneNumber.toString(),
     }
 
-    dispatch(setLoading(true))
-    try {
-      const res = await axios
-        .post(
-          'https://onlineauctionserver.herokuapp.com/api/authentication/register',
-          postData
-        )
-      setErr('')
-      console.log("Response", res);
-      dispatch(setLoading(false))
-      swal("Thành công!", "Đăng ký thành công!", "success")
-        .then(() => {
-          history.push('/sign-in')
-        });
-    } catch (error) {
-      console.log(error.response)
-      let errMess = error.response.data.errorMessage
-      if (errMess === 'Email Has Already Existed') errMess = 'Tài khoản đã tồn tại'
-      else if (errMess.startsWith('must')) {
-        errMess = 'Thử với email khác'
+    if (reCaptCha) {
+      dispatch(setLoading(true))
+      try {
+        const res = await axios
+          .post(
+            'https://onlineauctionserver.herokuapp.com/api/authentication/register',
+            postData
+          )
+        setErr('')
+        console.log("Response", res);
+        dispatch(setLoading(false))
+        swal("Thành công!", "Đăng ký thành công!", "success")
+          .then(() => {
+            history.push('/sign-in')
+          });
+        setReCaptCha(false)
+
+      } catch (error) {
+        console.log(error.response)
+        let errMess = error.response.data.errorMessage
+        if (errMess === 'Email Has Already Existed') errMess = 'Tài khoản đã tồn tại'
+        else if (errMess.startsWith('must')) {
+          errMess = 'Thử với email khác'
+        }
+        setErr(errMess)
+        dispatch(setLoading(false))
+        swal("Thất bại!", "Có lỗi xảy ra, vui lòng thử lại!", "error")
+        setReCaptCha(false)
       }
-      setErr(errMess)
-      dispatch(setLoading(false))
-      swal("Thất bại!", "Có lỗi xảy ra, vui lòng thử lại!", "error")
     }
+    else {
+      console.log('lỗii');
+      setReErr(true)
+    }
+
 
   };
 
-  console.log('tải ', loadingState);
+
 
 
   return (
@@ -138,6 +156,14 @@ function SignUp() {
                 label='Số điện thoại'
                 labelClass='form__group-label'
               />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <ReCAPTCHA
+                  sitekey={SITE_KEY}
+                  onChange={handleOnChangeRecaptCha}
+                />
+                <p className={reErr ? 'signUp__err--true' : 'signUp__err'}>RECAPTCHA không đúng!</p>
+              </div>
+
               <input type='submit' className='signUp__button' value='Đăng ký' />
               <p className='signUp__res'>
                 Đã có tài khoản? <span onClick={directSignIn}>Đăng nhập ngay</span>

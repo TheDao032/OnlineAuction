@@ -36,6 +36,7 @@
     border-radius: 3px;
     width: 100%;
     border: none;
+    margin-top: 10px;
     cursor: pointer;
   }
 
@@ -113,5 +114,19 @@
   &__title {
     color: #fff;
     font-size: 14px;
+  }
+
+  &__err {
+    margin: 5px 0;
+    font-size: 12px;
+    color: red;
+    display: none;
+
+    &--true {
+      display: block;
+      margin: 5px 0;
+      font-size: 12px;
+      color: red;
+    }
   }
 }

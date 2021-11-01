@@ -4,6 +4,7 @@ import { Route, Switch, useRouteMatch, useHistory } from 'react-router';
 import CreatePost from './components/CreatePost';
 import './scss/index.scss'
 import ManageItem from './components/ManageItem';
+import WishList from './components/WishList/WishList';
 
 SellerFeature.propTypes = {};
 
@@ -24,6 +25,9 @@ function SellerFeature(props) {
       </Route>
       <Route path={`${url}/manage`}>
         <ManageItem />
+      </Route>
+      <Route path={`${url}/wish-list`}>
+        <WishList />
       </Route>
     </Switch>
   </div>;
@@ -48,6 +52,10 @@ function SellerAction() {
     history.push(`${url}/manage`)
   }
 
+  const handleWishList = () => {
+    history.push(`${url}/wish-list`)
+  }
+
   const ButtonSeller = {
     CreateItemButton() {
       return (
@@ -64,6 +72,11 @@ function SellerAction() {
         <button className='seller__btn seller__btn-manage' onClick={handleManageItem}>Quản lí hồ sơ</button>
       )
     },
+    WishList() {
+      return (
+        <button className='seller__btn seller__btn-manage' onClick={handleWishList}>Danh sách yêu thích</button>
+      )
+    },
   }
 
 
@@ -75,21 +88,34 @@ function SellerAction() {
           <>
             <ButtonSeller.CreateItemButton />
             <ButtonSeller.ManageItem />
+            <ButtonSeller.WishList />
           </>
           : (currentUrl[4] === 'create-post' && currentUrl[3] === 'seller'
             ?
             <>
               <ButtonSeller.ManageItem />
+              <ButtonSeller.WishList />
               <ButtonSeller.BackButton />
             </>
             :
-            <>
-              <ButtonSeller.CreateItemButton />
-              <ButtonSeller.BackButton />
-            </>
+            (
+              currentUrl[4] === 'wish-list' && currentUrl[3] === 'seller'
+                ? <>
+                  <ButtonSeller.CreateItemButton />
+                  <ButtonSeller.ManageItem />
+                  <ButtonSeller.BackButton />
+                </>
+                :
+                <>
+                  <ButtonSeller.CreateItemButton />
+                  <ButtonSeller.WishList />
+                  <ButtonSeller.BackButton />
+                </>
+            )
+
           )
       }
-    </div>
+    </div >
   )
 }
 

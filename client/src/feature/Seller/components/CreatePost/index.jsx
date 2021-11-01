@@ -93,9 +93,15 @@ function CreatePost(props) {
   }
 
   const handleOnSubmit = async (data) => {
+
+    // console.log(image)
     if (value.image.length >= 3) {
+      const image = value.image.map((item) => {
+        return { src: item.src }
+      })
+
       data = {
-        prodImage: value.image,
+        prodImage: image,
         prodDescription: value.prodDescription,
         prodIsAutoRenew: value.prodIsAutoRenew,
         prodName: data.prodName,
@@ -119,7 +125,7 @@ function CreatePost(props) {
             window.location.reload()
           });
       } catch (error) {
-        console.log(error.response);
+        console.log(error.request);
         swal("Thất bại!", "Đã xảy ra lỗi, vui lòng thử lại!", "error");
 
       }
