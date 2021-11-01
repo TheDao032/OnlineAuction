@@ -13,6 +13,11 @@
       background-color: #fff;
       color: #3c99dc;
       border: 1px solid #3c99dc;
+
+      &.seller__btn--active {
+        background-color: #3c99dc;
+        color: #fff;
+      }
     }
   }
 
@@ -29,11 +34,6 @@
     border-radius: 5px;
     padding: 12px;
     transition: transform 0.2s linear;
-
-    &:hover {
-      transform: scale(1.1);
-      cursor: pointer;
-    }
 
     &.ended-item {
       cursor: auto;
