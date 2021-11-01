@@ -5,6 +5,7 @@ import {
   AiFillHeart,
   AiFillLike,
   AiOutlineHeart,
+  AiFillEdit,
 } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router';
@@ -14,6 +15,8 @@ import formatCurrency from '../../../util/formatCurrency';
 import formatTime from '../../../util/formatTime';
 import Loading from '../../Loading/Loading';
 import './Detail.scss';
+import { imagePlaceholder } from '../../../util/imagePlaceholder';
+import getFullDay from '../../../util/getFullDay';
 
 const dataUser = JSON.parse(localStorage.getItem('@user'));
 let role = dataUser === null ? '' : dataUser?.user?.role;
@@ -29,6 +32,8 @@ export default function Detail() {
   const [product, setProduct] = useState([]);
   const [seller, setSeller] = useState([]);
   const [userRole, setUserRole] = useState('');
+  const [description, setDescription] = useState([]);
+  const [relatedProduct, setRelatedProduct] = useState([]);
 
   useEffect(() => {
     setUserRole(role);
@@ -45,27 +50,20 @@ export default function Detail() {
         .catch((err) => {
           console.log('Err', err.response);
         });
+
+      // console.log();
       setProduct(response.data.productDetail[0]);
       setSeller(response.data.productDetail[0].seller);
+      setDescription(response.data.productDetail[0].prodDescription);
+      setRelatedProduct(response.data.productDetail[0].relatedProduct);
       dispatch(setLoading(false));
     } catch (error) {
-      console.log(error.response);
+      console.log(error);
       dispatch(setLoading(false));
     }
   };
 
-  if (product.length !== 0) {
-    console.log('Product detail abc: ', product.prodImages);
-    // console.log('product image: ', product.prodImages[0].prodImgSrc);
-    // linkne = product?.prodImages[0].prodImgSrc;
-    // var binaryData = [];
-    // binaryData.push(src);
-    // console.log('product image: ', src);
-    // const imgSrc = window.URL.createObjectURL(
-    //   new Blob(binaryData, { type: 'application/image' })
-    // );
-    // console.log('đường dẫn: ', imgSrc);
-  }
+  console.log('Product detail abc: ', product);
 
   const sellerID = seller[0]?.accId;
 
@@ -93,14 +91,6 @@ export default function Detail() {
     mins: minSell,
   } = formatTime(createDate);
 
-  const description = `<p style="text-align:left;"><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: 17px;font-family: Tahoma;">Số là khi chiếc Bentley đắt đỏ vừa về Việt Nam, rich kid có lên sóng một video cận cảnh chiếc xe. Bên dưới comment, Lệ Quyên cũng góp vui:</span><span style="font-family: Tahoma;"> </span><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: inherit;font-family: Tahoma;"><em>"Lúc nào cho mẹ đi ké Bo nha"</em></span><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: 17px;font-family: Tahoma;">. Dù không lên tiếng trả lời lại, song story của Lệ Quyên cho thấy Anthony đã thực hiện điều mẹ mong muốn rồi đây.</span></p>
-<p style="text-align:left;"></p>
-<p style="text-align:left;"></p>
-<div style="text-align:none;"><img src="https://kenh14cdn.com/thumb_w/620/203336854389633024/2021/10/22/photo-1-1634907369720988878706.jpg" alt="Quý tử Lệ Quyên đem siêu xe 30 tỷ được bố tặng thực hiện điều đặc biệt mẹ mong mỏi bấy lâu - Ảnh 3." style="height: ;width: 580px"/></div>
-<p style="text-align:left;"></p>
-<p style="text-align:left;"><span style="color: rgb(102,102,102);background-color: rgb(242,242,242);font-size: 17px;font-family: Tahoma;"><em>Chiếc "xế hộp" hạng sang có giá khoảng 30 tỷ đại gia Đức Huy tặng riêng cho con trai</em></span><span style="font-family: Tahoma;"> </span></p>
-`;
-
   return (
     <>
       {loadingState.loading ? (
@@ -112,28 +102,24 @@ export default function Detail() {
               <div
                 className='detail__image-item detail__image-item--big'
                 style={{
-                  backgroundImage: `url('')`,
+                  backgroundImage: `url(${
+                    product.prodImages
+                      ? product.prodImages[0]?.prodImgSrc
+                      : imagePlaceholder
+                  })`,
                 }}
               ></div>
               <div className='detail__image-sub'>
-                <div
-                  className='detail__image-item detail__image-item--small'
-                  style={{
-                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-                  }}
-                ></div>
-                <div
-                  className='detail__image-item detail__image-item--small'
-                  style={{
-                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-                  }}
-                ></div>
-                <div
-                  className='detail__image-item detail__image-item--small'
-                  style={{
-                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-                  }}
-                ></div>
+                {!product.prodImages
+                  ? ''
+                  : product.prodImages.slice(0, 3).map((item) => (
+                      <div
+                        className='detail__image-item detail__image-item--small'
+                        style={{
+                          backgroundImage: `url(${item.prodImgSrc})`,
+                        }}
+                      ></div>
+                    ))}
               </div>
             </div>
             <div className='detail__info'>
@@ -226,16 +212,60 @@ export default function Detail() {
             <h5 className='detail__relate-title'>Sản phẩm tương tự</h5>
             <hr />
             <div className='relate'>
-              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
+              {relatedProduct.slice(0, 5).map((item) => {
+                if (item.prodOfferNumber === null) item.prodOfferNumber = 0;
+
+                const currentPrice =
+                  prodBeginPrice + prodOfferNumber * prodStepPrice;
+
+                const ended =
+                  formatTime(item.expireDate).days < 0 ? true : false;
+
+                return (
+                  <RelateItem
+                    src={item.prodImages[0]?.prodImgSrc}
+                    seller={
+                      item.seller[0]?.accName === ''
+                        ? 'Unknown seller'
+                        : item.seller?.accName
+                    }
+                    name={item.prodName}
+                    price={currentPrice}
+                    isEnd={ended}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
       )}
     </>
+  );
+}
+
+function RelateItem({ src, seller, price, name, isEnd }) {
+  return (
+    <div className='relate__item'>
+      <div
+        className='relate__item-img'
+        style={{ backgroundImage: `url(${src})` }}
+      />
+      <p className='relate__item-name'>{name}</p>
+      <p className='relate__item-seller'>
+        <span>By</span>
+        {seller}
+      </p>
+      <p className='relate__item-price'>{formatCurrency(price)}</p>
+      {isEnd ? (
+        <p className='relate__item-noti relate__item-noti--ended'>
+          Đã kết thúc
+        </p>
+      ) : (
+        <p className='relate__item-noti relate__item-noti--inprocess'>
+          Đang diễn ra
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -265,26 +295,6 @@ function DayLeft({ days, hours, mins }) {
       ) : (
         <TimeLeft days={days} hours={hours} mins={mins} />
       )}
-    </div>
-  );
-}
-
-function RelateItem({ src, seller, price, name }) {
-  return (
-    <div className='relate__item'>
-      <div
-        className='relate__item-img'
-        style={{ backgroundImage: `url(${src})` }}
-      />
-      <p className='relate__item-name'>
-        Nồi Chiên Không Dầu Điện Tử Lock&Lock EJF357BLK (5.2 Lít) - Hàng Chính
-        Hãng
-      </p>
-      <p className='relate__item-seller'>
-        <span>By</span>Nguyễn Thế Đạo
-      </p>
-      <p className='relate__item-price'>{formatCurrency(120000000)}</p>
-      <p className='relate__item-noti'>Đang diễn ra</p>
     </div>
   );
 }
@@ -321,7 +331,7 @@ function AddToWishList({ prodId, userRole }) {
           },
         }
       );
-      console.log(res.data);
+      // console.log(res.data);
       if (!res.data.errorMessage) {
         setWishItem(res.data.listWatch);
       }
@@ -542,10 +552,30 @@ function Description({ description, sellerID, userRole }) {
         )}
       </div>
       <hr />
-      <p
-        className='detail__info-description'
-        dangerouslySetInnerHTML={{ __html: description }}
-      ></p>
+      {description.length === 0 ? (
+        <p>Sản phẩm này chưa có mô tả</p>
+      ) : (
+        <>
+          {description?.map((item, index) => {
+            return (
+              <>
+                {index !== 0 ? (
+                  <div className='detail__info-description-day'>
+                    <AiFillEdit />
+                    <p>{getFullDay(item.prod_desc_updated_date)}</p>
+                  </div>
+                ) : (
+                  ''
+                )}
+                <p
+                  className='detail__info-description'
+                  dangerouslySetInnerHTML={{ __html: item.prod_desc_content }}
+                ></p>
+              </>
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }
