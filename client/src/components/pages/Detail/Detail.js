@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import { useHistory, useParams } from 'react-router';
-import { useEffect } from 'react';
 import axios from 'axios';
-import './Detail.scss';
-import { AiFillLike, AiFillDislike } from 'react-icons/ai';
+import React, { useEffect, useState } from 'react';
+import {
+  AiFillDislike,
+  AiFillHeart,
+  AiFillLike,
+  AiOutlineHeart,
+} from 'react-icons/ai';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory, useParams } from 'react-router';
+import swal from 'sweetalert';
+import { setLoading } from '../../../redux/actions/loadingAction';
 import formatCurrency from '../../../util/formatCurrency';
 import formatTime from '../../../util/formatTime';
-import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
-import swal from 'sweetalert';
-import { useDispatch, useSelector } from 'react-redux';
-import { setLoading } from '../../../redux/actions/loadingAction';
 import Loading from '../../Loading/Loading';
+import './Detail.scss';
 
 const dataUser = JSON.parse(localStorage.getItem('@user'));
 let role = dataUser === null ? '' : dataUser?.user?.role;
@@ -23,7 +26,7 @@ export default function Detail() {
 
   const loadingState = useSelector((state) => state.loading);
 
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState([]);
   const [seller, setSeller] = useState([]);
   const [userRole, setUserRole] = useState('');
 
@@ -51,7 +54,19 @@ export default function Detail() {
     }
   };
 
-  console.log('Product detail abc: ', product);
+  if (product.length !== 0) {
+    console.log('Product detail abc: ', product.prodImages);
+    // console.log('product image: ', product.prodImages[0].prodImgSrc);
+    // linkne = product?.prodImages[0].prodImgSrc;
+    // var binaryData = [];
+    // binaryData.push(src);
+    // console.log('product image: ', src);
+    // const imgSrc = window.URL.createObjectURL(
+    //   new Blob(binaryData, { type: 'application/image' })
+    // );
+    // console.log('đường dẫn: ', imgSrc);
+  }
+
   const sellerID = seller[0]?.accId;
 
   const {
@@ -97,7 +112,7 @@ export default function Detail() {
               <div
                 className='detail__image-item detail__image-item--big'
                 style={{
-                  backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
+                  backgroundImage: `url('')`,
                 }}
               ></div>
               <div className='detail__image-sub'>
@@ -277,6 +292,7 @@ function RelateItem({ src, seller, price, name }) {
 function AddToWishList({ prodId, userRole }) {
   prodId = parseInt(prodId);
 
+  const dispatch = useDispatch();
   const history = useHistory();
 
   const [isLogin, setIsLogin] = useState(false);
@@ -305,13 +321,16 @@ function AddToWishList({ prodId, userRole }) {
           },
         }
       );
-      setWishItem(res.data.listWatch);
+      console.log(res.data);
+      if (!res.data.errorMessage) {
+        setWishItem(res.data.listWatch);
+      }
     } catch (error) {
       console.log('Danh sách Watch list lỗi: ', error.response);
     }
   }
 
-  console.log('sản phảm đã thích là: ', wishItem);
+  // console.log('sản phảm đã thích là: ', wishItem);
 
   // console.log('item check: ', isWish);
 
@@ -331,13 +350,14 @@ function AddToWishList({ prodId, userRole }) {
         }
       }
     };
-
     checkItem();
   }, [wishItem, prodId]);
 
   async function handleAddToWishList() {
     if (isLogin) {
       try {
+        dispatch(setLoading(true));
+
         const res = await axios.post(
           'https://onlineauctionserver.herokuapp.com/api/watch-list/add',
           {
@@ -351,9 +371,12 @@ function AddToWishList({ prodId, userRole }) {
           isWish: true,
           watchId: res.data.watchId,
         });
+        dispatch(setLoading(false));
+
         swal('Thành công!', 'Sản phẩm đã được thêm vào yêu thích!', 'success');
       } catch (err) {
         console.log(err.response);
+        dispatch(setLoading(false));
         swal(
           'Thất bại!',
           'Có lỗi khi thêm sản phẩm vào yêu thích, vui lòng thử lại!',
@@ -368,6 +391,8 @@ function AddToWishList({ prodId, userRole }) {
   async function handleRemoveToWishList() {
     let { watchId } = wish;
     try {
+      dispatch(setLoading(true));
+
       const res = await axios.post(
         'https://onlineauctionserver.herokuapp.com/api/watch-list/delete',
         {
@@ -377,9 +402,13 @@ function AddToWishList({ prodId, userRole }) {
       );
 
       console.log(res);
+      dispatch(setLoading(false));
+
       swal('Thành công!', 'Đã xóa khỏi danh sách yêu thích!', 'success');
     } catch (err) {
       console.log(err.response);
+      dispatch(setLoading(false));
+
       swal(
         'Thất bại!',
         'Có lỗi khi xóa sản phẩm khỏi yêu thích, vui lòng thử lại!',

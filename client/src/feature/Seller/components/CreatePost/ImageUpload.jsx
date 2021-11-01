@@ -13,13 +13,20 @@ function ImageUpload({ file = [], onUploadImage = null, onDeleteImage = null }) 
 
     let image = e.target.files
 
+    let reader = new FileReader()
     if (image && image[0]) {
       const prefix = image[0].type.split('/')
       // console.log(prefix)
       // console.log(image[0].type)
 
       if (prefix[0] === 'image') {
-        onUploadImage(window.URL.createObjectURL(e.target.files[0]))
+        reader.readAsDataURL(e.target.files[0])
+        reader.onload = (e) => {
+          // console.warn('ảnh khi chọn: ', e.target.result)
+          onUploadImage(e.target.result)
+        }
+        // onUploadImage(window.URL.createObjectURL(e.target.files[0]))
+
         e.target.value = null;
       }
     }
