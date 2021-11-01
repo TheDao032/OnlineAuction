@@ -26,6 +26,14 @@ export default function Detail() {
   const [product, setProduct] = useState({});
   const [seller, setSeller] = useState([]);
   const [userRole, setUserRole] = useState('');
+  const [image,setImage] = useState([]);
+  const [description, setDescription] = useState([]);
+  const [relatedProduct, setRelatedProduct] = useState([]);
+  
+  
+
+
+ 
 
   useEffect(() => {
     setUserRole(role);
@@ -44,6 +52,9 @@ export default function Detail() {
         });
       setProduct(response.data.productDetail[0]);
       setSeller(response.data.productDetail[0].seller);
+      setImage(response.data.productDetail[0].prodImages);
+      setDescription(response.data.productDetail[0].prodDescription);
+      setRelatedProduct(response.data.productDetail[0].relatedProduct);
       dispatch(setLoading(false));
     } catch (error) {
       console.log(error.response);
@@ -52,6 +63,9 @@ export default function Detail() {
   };
 
   console.log('Product detail abc: ', product);
+  console.log('cai quan que',relatedProduct);
+  console.log('hinh anh:',image);
+  console.log('mo ta',description);
   const sellerID = seller[0]?.accId;
 
   const {
@@ -78,13 +92,18 @@ export default function Detail() {
     mins: minSell,
   } = formatTime(createDate);
 
-  const description = `<p style="text-align:left;"><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: 17px;font-family: Tahoma;">Số là khi chiếc Bentley đắt đỏ vừa về Việt Nam, rich kid có lên sóng một video cận cảnh chiếc xe. Bên dưới comment, Lệ Quyên cũng góp vui:</span><span style="font-family: Tahoma;"> </span><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: inherit;font-family: Tahoma;"><em>"Lúc nào cho mẹ đi ké Bo nha"</em></span><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: 17px;font-family: Tahoma;">. Dù không lên tiếng trả lời lại, song story của Lệ Quyên cho thấy Anthony đã thực hiện điều mẹ mong muốn rồi đây.</span></p>
-<p style="text-align:left;"></p>
-<p style="text-align:left;"></p>
-<div style="text-align:none;"><img src="https://kenh14cdn.com/thumb_w/620/203336854389633024/2021/10/22/photo-1-1634907369720988878706.jpg" alt="Quý tử Lệ Quyên đem siêu xe 30 tỷ được bố tặng thực hiện điều đặc biệt mẹ mong mỏi bấy lâu - Ảnh 3." style="height: ;width: 580px"/></div>
-<p style="text-align:left;"></p>
-<p style="text-align:left;"><span style="color: rgb(102,102,102);background-color: rgb(242,242,242);font-size: 17px;font-family: Tahoma;"><em>Chiếc "xế hộp" hạng sang có giá khoảng 30 tỷ đại gia Đức Huy tặng riêng cho con trai</em></span><span style="font-family: Tahoma;"> </span></p>
-`;
+//   const description = `<p style="text-align:left;"><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: 17px;font-family: Tahoma;">Số là khi chiếc Bentley đắt đỏ vừa về Việt Nam, rich kid có lên sóng một video cận cảnh chiếc xe. Bên dưới comment, Lệ Quyên cũng góp vui:</span><span style="font-family: Tahoma;"> </span><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: inherit;font-family: Tahoma;"><em>"Lúc nào cho mẹ đi ké Bo nha"</em></span><span style="color: rgb(34,34,34);background-color: rgb(255,255,255);font-size: 17px;font-family: Tahoma;">. Dù không lên tiếng trả lời lại, song story của Lệ Quyên cho thấy Anthony đã thực hiện điều mẹ mong muốn rồi đây.</span></p>
+// <p style="text-align:left;"></p>
+// <p style="text-align:left;"></p>
+// <div style="text-align:none;"><img src="https://kenh14cdn.com/thumb_w/620/203336854389633024/2021/10/22/photo-1-1634907369720988878706.jpg" alt="Quý tử Lệ Quyên đem siêu xe 30 tỷ được bố tặng thực hiện điều đặc biệt mẹ mong mỏi bấy lâu - Ảnh 3." style="height: ;width: 580px"/></div>
+// <p style="text-align:left;"></p>
+// <p style="text-align:left;"><span style="color: rgb(102,102,102);background-color: rgb(242,242,242);font-size: 17px;font-family: Tahoma;"><em>Chiếc "xế hộp" hạng sang có giá khoảng 30 tỷ đại gia Đức Huy tặng riêng cho con trai</em></span><span style="font-family: Tahoma;"> </span></p>
+// `;
+
+
+  const hinh1 = image[0]?.prodImgSrc;
+  console.log("hinh 1:",hinh1);
+ 
 
   return (
     <>
@@ -94,31 +113,24 @@ export default function Detail() {
         <div className='detail grid wide'>
           <div className='detail__container'>
             <div className='detail__image'>
+              
               <div
                 className='detail__image-item detail__image-item--big'
                 style={{
-                  backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
+                  backgroundImage: `url(${hinh1})`,
+                  // backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
                 }}
               ></div>
               <div className='detail__image-sub'>
-                <div
-                  className='detail__image-item detail__image-item--small'
-                  style={{
-                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-                  }}
-                ></div>
-                <div
-                  className='detail__image-item detail__image-item--small'
-                  style={{
-                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-                  }}
-                ></div>
-                <div
-                  className='detail__image-item detail__image-item--small'
-                  style={{
-                    backgroundImage: `url('https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=')`,
-                  }}
-                ></div>
+
+                {image.map(im => (
+                  <div
+                    className='detail__image-item detail__image-item--small'
+                    style={{
+                      backgroundImage: `url(${im?.prodImgSrc})`,
+                    }}
+                  ></div>
+                ))}              
               </div>
             </div>
             <div className='detail__info'>
@@ -202,7 +214,7 @@ export default function Detail() {
             </div>
           </div>
           <Description
-            description={description}
+              description={description[0]?.prod_desc_content}
             sellerID={sellerID}
             userRole={userRole}
           />
@@ -211,11 +223,14 @@ export default function Detail() {
             <h5 className='detail__relate-title'>Sản phẩm tương tự</h5>
             <hr />
             <div className='relate'>
+                {relatedProduct.map(re => (
+                  <RelateItem name={re.prodName} seller={re.seller[0].accEmail} price={re.prodBeginPrice}  src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
+                ))}
+              
+              {/* <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
               <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
               <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
-              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' />
+              <RelateItem src='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI=' /> */}
             </div>
           </div>
         </div>
@@ -255,6 +270,7 @@ function DayLeft({ days, hours, mins }) {
 }
 
 function RelateItem({ src, seller, price, name }) {
+  console.log("sellerrrrr",seller);
   return (
     <div className='relate__item'>
       <div
@@ -262,13 +278,12 @@ function RelateItem({ src, seller, price, name }) {
         style={{ backgroundImage: `url(${src})` }}
       />
       <p className='relate__item-name'>
-        Nồi Chiên Không Dầu Điện Tử Lock&Lock EJF357BLK (5.2 Lít) - Hàng Chính
-        Hãng
+        {name}
       </p>
       <p className='relate__item-seller'>
-        <span>By</span>Nguyễn Thế Đạo
+        <span>By</span>{seller}
       </p>
-      <p className='relate__item-price'>{formatCurrency(120000000)}</p>
+      <p className='relate__item-price'>{price}</p>
       <p className='relate__item-noti'>Đang diễn ra</p>
     </div>
   );
@@ -319,21 +334,21 @@ function AddToWishList({ prodId, userRole }) {
     getWatchList();
   }, []);
 
-  useEffect(() => {
-    const checkItem = () => {
-      for (let i of wishItem) {
-        if (prodId === i.prodId) {
-          setWish({
-            isWish: true,
-            watchId: i.watchId,
-          });
-          return;
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const checkItem = () => {
+  //     for (let i of wishItem) {
+  //       if (prodId === i.prodId) {
+  //         setWish({
+  //           isWish: true,
+  //           watchId: i.watchId,
+  //         });
+  //         return;
+  //       }
+  //     }
+  //   };
 
-    checkItem();
-  }, [wishItem, prodId]);
+  //   checkItem();
+  // }, []);
 
   async function handleAddToWishList() {
     if (isLogin) {
