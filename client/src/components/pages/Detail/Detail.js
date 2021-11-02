@@ -8,15 +8,17 @@ import {
   AiFillEdit,
 } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router';
+import { useHistory, useParams, useRouteMatch } from 'react-router';
 import swal from 'sweetalert';
 import { setLoading } from '../../../redux/actions/loadingAction';
 import formatCurrency from '../../../util/formatCurrency';
 import formatTime from '../../../util/formatTime';
 import Loading from '../../Loading/Loading';
-import './Detail.scss';
+import './scss/index.scss';
 import { imagePlaceholder } from '../../../util/imagePlaceholder';
 import getFullDay from '../../../util/getFullDay';
+import { Route, Switch, useLocation } from 'react-router-dom';
+import AddDescription from './AddDescription';
 
 const dataUser = JSON.parse(localStorage.getItem('@user'));
 let role = dataUser === null ? '' : dataUser?.user?.role;
@@ -51,14 +53,14 @@ export default function Detail() {
           console.log('Err', err.response);
         });
 
-      // console.log();
-      setProduct(response.data.productDetail[0]);
-      setSeller(response.data.productDetail[0].seller);
-      setDescription(response.data.productDetail[0].prodDescription);
-      setRelatedProduct(response.data.productDetail[0].relatedProduct);
+      console.log(response.data.productDetail[0]);
+      setProduct(response.data?.productDetail[0]);
+      setSeller(response.data?.productDetail[0].seller);
+      setDescription(response.data?.productDetail[0].prodDescription);
+      setRelatedProduct(response.data?.productDetail[0].relatedProduct);
       dispatch(setLoading(false));
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
       dispatch(setLoading(false));
     }
   };
@@ -165,7 +167,10 @@ export default function Detail() {
                 <p className='detail__seller-name'>
                   Người bán:{' '}
                   {seller.map((s) => (
-                    <span> {s.accName}</span>
+                    <span>
+                      {' '}
+                      {s.accName === '' ? 'Unknown Seller' : s.accName}
+                    </span>
                   ))}
                 </p>
                 <p className='detail__seller-rate'>
@@ -180,18 +185,27 @@ export default function Detail() {
                 </p>
               </div>
               <div className='detail__bidder'>
-                <p className='detail__bidder-name'>
-                  Người đặt giá cao nhất: <span>Phạm Thị Ngọc Hạnh</span>
-                </p>
-                <p className='detail__bidder-rate'>
-                  <p className='detail__bidder-react'>
-                    12 <AiFillLike className='detail__bidder-react--like' />
+                {product.biggestBidder === null ? (
+                  <p className='detail__bidder-name'>
+                    Sản phẩm chưa có người đặt cao nhất
                   </p>
-                  <p className='detail__bidder-react'>
-                    20{' '}
-                    <AiFillDislike className='detail__bidder-react--dislike' />
-                  </p>
-                </p>
+                ) : (
+                  <>
+                    <p className='detail__bidder-name'>
+                      Người đặt giá cao nhất:{' '}
+                      <span>{product.biggestBidder}</span>
+                    </p>
+                    <p className='detail__bidder-rate'>
+                      <p className='detail__bidder-react'>
+                        12 <AiFillLike className='detail__bidder-react--like' />
+                      </p>
+                      <p className='detail__bidder-react'>
+                        20{' '}
+                        <AiFillDislike className='detail__bidder-react--dislike' />
+                      </p>
+                    </p>
+                  </>
+                )}
               </div>
               <Offer
                 days={days}
@@ -202,40 +216,54 @@ export default function Detail() {
               />
             </div>
           </div>
-          <Description
-            description={description}
-            sellerID={sellerID}
-            userRole={userRole}
-          />
+          <Description description={description} sellerID={sellerID} />
           <History />
           <div className='detail__relate'>
             <h5 className='detail__relate-title'>Sản phẩm tương tự</h5>
             <hr />
-            <div className='relate'>
-              {relatedProduct.slice(0, 5).map((item) => {
-                if (item.prodOfferNumber === null) item.prodOfferNumber = 0;
 
-                const currentPrice =
-                  prodBeginPrice + prodOfferNumber * prodStepPrice;
+            {
+              <>
+                {relatedProduct
+                  .slice(0, 5)
+                  .filter((item) => item.prodId !== parseInt(prodId)).length ===
+                0 ? (
+                  <p>Không có sản phẩm tương tự</p>
+                ) : (
+                  <div className='relate'>
+                    {relatedProduct
+                      .slice(0, 5)
+                      .filter((item) => item.prodId !== parseInt(prodId))
+                      .map((newItem) => {
+                        const currentPrice =
+                          prodBeginPrice + prodOfferNumber * prodStepPrice;
+                        const ended =
+                          formatTime(newItem.expireDate).days < 0
+                            ? true
+                            : false;
 
-                const ended =
-                  formatTime(item.expireDate).days < 0 ? true : false;
+                        if (newItem.prodOfferNumber === null)
+                          newItem.prodOfferNumber = 0;
 
-                return (
-                  <RelateItem
-                    src={item.prodImages[0]?.prodImgSrc}
-                    seller={
-                      item.seller[0]?.accName === ''
-                        ? 'Unknown seller'
-                        : item.seller?.accName
-                    }
-                    name={item.prodName}
-                    price={currentPrice}
-                    isEnd={ended}
-                  />
-                );
-              })}
-            </div>
+                        return (
+                          <RelateItem
+                            src={newItem.prodImages[0]?.prodImgSrc}
+                            seller={
+                              newItem.seller[0]?.accName === ''
+                                ? 'Unknown seller'
+                                : newItem.seller?.accName
+                            }
+                            name={newItem.prodName}
+                            price={currentPrice}
+                            isEnd={ended}
+                            prodId={newItem.prodId}
+                          />
+                        );
+                      })}
+                  </div>
+                )}
+              </>
+            }
           </div>
         </div>
       )}
@@ -243,9 +271,81 @@ export default function Detail() {
   );
 }
 
-function RelateItem({ src, seller, price, name, isEnd }) {
+function Description({ description, sellerID }) {
+  const currentUser = useSelector((state) => state.currentUser);
+  const userRole = currentUser?.user?.user?.role;
+  const loggedIn = currentUser?.loggedIn;
+  const accId = currentUser?.user?.user?.accId;
+
+  const [isEdit, setIsEdit] = useState(false);
+
+  function onAddDescription() {
+    setIsEdit(true);
+  }
+
+  function onCancel(value) {
+    setIsEdit(value);
+  }
   return (
-    <div className='relate__item'>
+    <>
+      <div className='detail__description'>
+        <div className='detail__description-header'>
+          <h5 className='detail__description-title'>Mô tả sản phẩm</h5>
+          {userRole === 'SEL' && accId === sellerID && loggedIn === true ? (
+            <button
+              className='detail__description-btn'
+              onClick={onAddDescription}
+            >
+              Thêm mô tả
+            </button>
+          ) : (
+            ''
+          )}
+        </div>
+        <hr />
+        {description.length === 0 ? (
+          <p>Sản phẩm này chưa có mô tả</p>
+        ) : (
+          <>
+            {isEdit ? <AddDescription onCancel={onCancel} /> : ''}
+
+            {description?.map((item, index) => {
+              return (
+                <>
+                  {index !== 0 ? (
+                    <div className='detail__info-description-day'>
+                      <AiFillEdit />
+                      <p>{getFullDay(item.prod_desc_updated_date)}</p>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  <p
+                    className='detail__info-description'
+                    dangerouslySetInnerHTML={{ __html: item.prod_desc_content }}
+                  ></p>
+                </>
+              );
+            })}
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+function RelateItem({ src, seller, price, name, isEnd }) {
+  const { prodId } = useParams();
+  const { pathname } = useLocation();
+  const history = useHistory();
+
+  function onClickRelate() {
+    history.push(`/detail/${prodId}`);
+    console.log(prodId, pathname);
+  }
+
+  return (
+    <div className='relate__item' onClick={onClickRelate}>
       <div
         className='relate__item-img'
         style={{ backgroundImage: `url(${src})` }}
@@ -322,28 +422,29 @@ function AddToWishList({ prodId, userRole }) {
   }, [loggedIn]);
 
   async function getWatchList() {
-    try {
-      const res = await axios.get(
-        'https://onlineauctionserver.herokuapp.com/api/watch-list/list',
-        {
-          headers: {
-            authorization: accessToken,
-          },
+    if (loggedIn) {
+      try {
+        const res = await axios.get(
+          'https://onlineauctionserver.herokuapp.com/api/watch-list/list',
+          {
+            headers: {
+              authorization: accessToken,
+            },
+          }
+        );
+        // console.log(res.data);
+        if (!res.data.errorMessage) {
+          setWishItem(res.data.listWatch);
         }
-      );
-      // console.log(res.data);
-      if (!res.data.errorMessage) {
-        setWishItem(res.data.listWatch);
+      } catch (error) {
+        console.log('Danh sách Watch list lỗi: ', error.response);
       }
-    } catch (error) {
-      console.log('Danh sách Watch list lỗi: ', error.response);
     }
   }
 
   // console.log('sản phảm đã thích là: ', wishItem);
 
   // console.log('item check: ', isWish);
-
   useEffect(() => {
     getWatchList();
   }, []);
@@ -402,7 +503,6 @@ function AddToWishList({ prodId, userRole }) {
     let { watchId } = wish;
     try {
       dispatch(setLoading(true));
-
       const res = await axios.post(
         'https://onlineauctionserver.herokuapp.com/api/watch-list/delete',
         {
@@ -537,46 +637,6 @@ function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
       )}
       {}
     </form>
-  );
-}
-
-function Description({ description, sellerID, userRole }) {
-  return (
-    <div className='detail__description'>
-      <div className='detail__description-header'>
-        <h5 className='detail__description-title'>Mô tả sản phẩm</h5>
-        {userRole === 'SEL' && accId === sellerID ? (
-          <button className='detail__description-btn'>Thêm mô tả</button>
-        ) : (
-          ''
-        )}
-      </div>
-      <hr />
-      {description.length === 0 ? (
-        <p>Sản phẩm này chưa có mô tả</p>
-      ) : (
-        <>
-          {description?.map((item, index) => {
-            return (
-              <>
-                {index !== 0 ? (
-                  <div className='detail__info-description-day'>
-                    <AiFillEdit />
-                    <p>{getFullDay(item.prod_desc_updated_date)}</p>
-                  </div>
-                ) : (
-                  ''
-                )}
-                <p
-                  className='detail__info-description'
-                  dangerouslySetInnerHTML={{ __html: item.prod_desc_content }}
-                ></p>
-              </>
-            );
-          })}
-        </>
-      )}
-    </div>
   );
 }
 

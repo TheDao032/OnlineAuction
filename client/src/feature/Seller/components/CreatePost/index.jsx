@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { v4 as uuidv4 } from 'uuid';
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import InputField from '../../../../components/formComtrol/inputField';
-import { useForm } from "react-hook-form";
-import NumberField from '../../../../components/formComtrol/numberField';
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from 'axios';
+import React, { useState } from 'react';
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from 'react-redux';
+import swal from 'sweetalert';
+import { v4 as uuidv4 } from 'uuid';
 import * as yup from "yup";
+import InputField from '../../../../components/formComtrol/inputField';
+import NumberField from '../../../../components/formComtrol/numberField';
+import SelectField from '../../../../components/formComtrol/selectField';
+import { setLoading } from '../../../../redux/actions/loadingAction';
+import SelectChildCateFiled from '../selectChild';
+import AutoRenew from './AutoRenew';
+import BuyNowField from './BuyNowField';
 import EditorField from './Editor';
 import ImageUpload from './ImageUpload';
-import BuyNowField from './BuyNowField';
-import AutoRenew from './AutoRenew';
-import SelectField from '../../../../components/formComtrol/selectField';
-import axios from 'axios';
-import { useSelector, useDispatch } from 'react-redux';
-import SelectChildCateFiled from '../selectChild';
-import { setLoading } from '../../../../redux/actions/loadingAction'
-import swal from 'sweetalert';
 
 
 CreatePost.propTypes = {};
@@ -25,7 +24,6 @@ CreatePost.propTypes = {};
 
 function CreatePost(props) {
   const { user: { accessToken } } = useSelector(state => state.currentUser)
-  const loading = useSelector(state => state.loading)
 
   const dispatch = useDispatch()
 

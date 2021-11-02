@@ -34,7 +34,6 @@ function ManageItem(props) {
       product: []
     }
   )
-  const history = useHistory()
   const dispatch = useDispatch()
 
   useEffect(() => {
