@@ -34,7 +34,7 @@ function App() {
           <SignIn />
         </Route>
         <Route path='/search/:text' component={Search} />
-        <Route path='/detail/:prodId' component={Detail} />
+        <Route exact path='/detail/:prodId' component={Detail} />
         <Route path='/admin'>
           <AdminFeature />
         </Route>
