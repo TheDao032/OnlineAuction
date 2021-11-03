@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router';
 
 InprocessItem.propTypes = {
   url: PropTypes.string,
   name: PropTypes.number,
   price: PropTypes.string,
   timeLeft: PropTypes.string,
-  onClick: PropTypes.func,
 };
 
 function InprocessItem({
@@ -14,9 +14,16 @@ function InprocessItem({
   name = 'Sản phẩm đấu giá',
   price = '',
   timeLeft = 'Chưa có dữ liệu',
-  onClick = null,
+  prodId
 }) {
+
+  const history = useHistory()
+
+  function handleClickDetail() {
+    history.push(`/detail/${prodId}`)
+  }
   return (
+
     <div className='seller__item'>
       <div
         className='seller__item-img'
@@ -32,7 +39,7 @@ function InprocessItem({
       <p className='seller__item-time'>
         Còn lại: <span>{timeLeft}</span>
       </p>
-      <button className='seller__item-btn seller__item-btn--detail'>Xem chi tiết</button>
+      <button className='seller__item-btn seller__item-btn--detail' onClick={handleClickDetail}>Xem chi tiết</button>
     </div>
   );
 }

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { AiFillLike, AiFillDislike } from "react-icons/ai";
 import swal from 'sweetalert'
+import { setLoading } from '../../../../redux/actions/loadingAction'
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios'
 
 EndedItem.propTypes = {
   url: PropTypes.string,
@@ -13,7 +16,7 @@ function Button({ suffix, onClick, children }) {
   )
 }
 
-function EndedItem({ url, name }) {
+function EndedItem({ url, name, winner = {}, prodId }) {
   const [isOpen, setIsOpen] = useState(false)
   const [like, setLike] = useState({
     isLike: false,
@@ -24,13 +27,20 @@ function EndedItem({ url, name }) {
     dislikeCount: 0
   })
   const [data, setData] = useState({
-    status: 0, //0: k like k dislike, 1: like, -1: dislike
-    comment: ''
+    cmtVote: 0, //0: k like k dislike, 1: like, -1: dislike
+    cmtContent: '',
+    prodId,
+    toId: winner?.accId
+
   })
+
+  const { user: { accessToken } } = useSelector(state => state.currentUser)
+  const dispatch = useDispatch()
+
 
   function handleOpenComment() {
     if (isOpen) {
-      setData({ ...data, comment: '' })
+      setData({ ...data, cmtContent: '' })
     }
     setIsOpen(!isOpen)
   }
@@ -39,20 +49,20 @@ function EndedItem({ url, name }) {
     if (like.isLike) {
       like.likeCount -= 1
       setLike({ ...like, isLike: false })
-      setData({ ...data, status: 0 })
+      setData({ ...data, cmtVote: 0 })
     }
     else if (dislike.isDislike) {
       like.likeCount += 1
       dislike.dislikeCount -= 1
       setLike({ ...like, isLike: true })
       setDislike({ ...dislike, isDislike: false })
-      setData({ ...data, status: 1 })
+      setData({ ...data, cmtVote: 1 })
 
     }
     else {
       like.likeCount += 1
       setLike({ ...like, isLike: true })
-      setData({ ...data, status: 1 })
+      setData({ ...data, cmtVote: 1 })
 
     }
   }
@@ -61,20 +71,20 @@ function EndedItem({ url, name }) {
     if (dislike.isDislike) {
       dislike.dislikeCount -= 1
       setDislike({ ...dislike, isDislike: false })
-      setData({ ...data, status: 0 })
+      setData({ ...data, cmtVote: 0 })
     }
     else if (like.isLike) {
       like.likeCount -= 1
       dislike.dislikeCount += 1
       setLike({ ...like, isLike: false })
       setDislike({ ...dislike, isDislike: true })
-      setData({ ...data, status: -1 })
+      setData({ ...data, cmtVote: -1 })
 
     }
     else {
       dislike.dislikeCount += 1
       setDislike({ ...dislike, isDislike: true })
-      setData({ ...data, status: -1 })
+      setData({ ...data, cmtVote: -1 })
     }
   }
 
@@ -88,14 +98,35 @@ function EndedItem({ url, name }) {
   function handleSubmit(e) {
     e.preventDefault()
 
+
+    if (data.cmtVote === 0)
+      swal("Thất bại", "Vui lòng like hoặc dislike!", "error");
+
+    try {
+      dispatch(setLoading(true))
+
+      const res = axios.post('https://onlineauctionserver.herokuapp.com/api/comment/new-comment', data, {
+        headers: {
+          authorization: accessToken
+        }
+      })
+
+      dispatch(setLoading(false))
+      swal("Thành công", "Đã nhận xét bidder thành công", "success");
+
+    } catch (error) {
+      console.log(error.response)
+      dispatch(setLoading(false))
+      swal("Thất bại", "Có lỗi khi nhận xét bidder, vui lòng thử lại", "error");
+    }
     console.log("Data: ", data)
   }
 
   function handleCancel(e) {
     e.preventDefault()
     const cancelData = {
-      status: -1,
-      comment: 'Người thắng không thanh toán'
+      cmtVote: -1,
+      cmtContent: 'Người thắng không thanh toán'
     }
     swal("Thành công", "Đã huy giao dịch!", "success");
     console.log(cancelData)
@@ -110,7 +141,7 @@ function EndedItem({ url, name }) {
       {name}
     </p>
     <br />
-    <p className='seller__item-winner'>Người thắng: <span>Bùi Hồng Ân</span></p>
+    <p className='seller__item-winner'>Người thắng: <span>{winner.accName === null ? 'Unknow Seller' : winner?.accName}</span></p>
     <form className='seller__item-form'>
       <div className='seller__item-react'>
         <div className='seller__item-like' onClick={handleLike}>
@@ -128,7 +159,7 @@ function EndedItem({ url, name }) {
           placeholder='Nhận xét của bạn..' />
       }
       <div className='seller__item-action'>
-        {data.status === 1 || data.status === -1 || data.comment !== ''
+        {data.cmtVote === 1 || data.cmtVote === -1 || data.cmtContent !== ''
           ? <Button suffix='save' onClick={handleSubmit}>Lưu</Button>
           : ''
         }

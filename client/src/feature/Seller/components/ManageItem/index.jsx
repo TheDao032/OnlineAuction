@@ -48,6 +48,7 @@ function ManageItem(props) {
 
         console.log(res)
         setProduct(res.data.listProducts)
+        setInprocessProduct({ isActive: true, product: res.data.listProducts.filter(item => formatTime(item.expireDate).days >= 0) })
         dispatch(setLoading(false))
       } catch (error) {
         console.log(error.response)
@@ -63,14 +64,16 @@ function ManageItem(props) {
 
   function handleGetItemEnded() {
     console.log('ended item')
-    setExpiredProduct({ ...expiredProduct, isActive: true })
-    setInprocessProduct({ ...inprocessProduct, isActive: false })
+    setExpiredProduct({ ...expiredProduct, isActive: true, product: product.filter(item => formatTime(item.expireDate).days < 0) })
+    setInprocessProduct({ isActive: false })
   }
+
+  console.log(product)
 
   function handleGetItemProcess() {
     console.log('In process item')
-    setExpiredProduct({ ...expiredProduct, isActive: false })
-    setInprocessProduct({ ...inprocessProduct, isActive: true })
+    setExpiredProduct({ isActive: false })
+    setInprocessProduct({ ...inprocessProduct, isActive: true, product: product.filter(item => formatTime(item.expireDate).days >= 0) })
   }
 
 
@@ -81,23 +84,41 @@ function ManageItem(props) {
     </div>
     <div className='seller__container'>
       {
-        product.map(item => {
-          // let expired = checkExpired(formatTime(item.expireDate).days)
-          // if (expired) {
+        expiredProduct.isActive ? expiredProduct.product.map(item => {
+          return <EndedItem url={item.prodImages[0]?.prodImgSrc}
+            name={item.prodName}
+            winner={item.biggestBidder !== null ? item.biggestBidder : {}}
+            prodId={item.prodId}
+          />
+        }) : inprocessProduct.product.map(item => {
+          if (item.prodOfferNumber === null) {
+            item.prodOfferNumber = 0
+          }
+          const objTime = formatTime(item.expireDate)
+          let timeLeftLabel = ''
+          console.log(formatTime(item.expireDate))
+          if (objTime.days < 0) {
+            if (objTime.hours < 0) {
+              timeLeftLabel = `${objTime.mins} phút`
+            }
+            else {
+              timeLeftLabel = `${objTime.hours} giờ ${objTime.mins} phút`
+            }
+          }
+          else {
+            timeLeftLabel = `${objTime.days} ngày ${objTime.hours} giờ ${objTime.mins} phút`
+          }
 
-          // }
-          // else {
-          //   console.log('còn hạn')
-          // }
+          return <InprocessItem url={item.prodImages[0]?.prodImgSrc}
+            name={item.prodName}
+            price={item.prodBeginPrice + item.prodOfferNumber * item.prodStepPrice}
+            timeLeft={timeLeftLabel}
+            prodId={item.prodId}
+          />
         })
       }
-      <InprocessItem url='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI='
-        name='Apple Watch series 7 mại dô mọi người ơiiiii mua về mà xài nè'
-        price='600'
-        timeLeft='1 giờ 20 phút'
-      />
-      <EndedItem url='https://media.istockphoto.com/photos/apple-watch-sport-42mm-silver-aluminum-case-with-black-band-picture-id498433288?k=20&m=498433288&s=612x612&w=0&h=5pHvphNX0hies1n4lwfJmZNWuEb9HWSAzPqrdwHKkRI='
-        name='Apple Watch series 7 mại dô mọi người ơiiiii mua về mà xài nè' />
+
+
     </div>
   </div>;
 }
