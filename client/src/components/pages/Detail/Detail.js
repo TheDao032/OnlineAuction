@@ -65,7 +65,6 @@ export default function Detail() {
   };
 
   console.log('Product detail abc: ', product);
-
   const sellerID = seller[0]?.accId;
 
   const {
@@ -103,24 +102,23 @@ export default function Detail() {
               <div
                 className='detail__image-item detail__image-item--big'
                 style={{
-                  backgroundImage: `url(${
-                    product.prodImages
+                  backgroundImage: `url(${product.prodImages
                       ? product.prodImages[0]?.prodImgSrc
                       : imagePlaceholder
-                  })`,
+                    })`,
                 }}
               ></div>
               <div className='detail__image-sub'>
                 {!product.prodImages
                   ? ''
                   : product.prodImages.slice(0, 3).map((item) => (
-                      <div
-                        className='detail__image-item detail__image-item--small'
-                        style={{
-                          backgroundImage: `url(${item.prodImgSrc})`,
-                        }}
-                      ></div>
-                    ))}
+                    <div
+                      className='detail__image-item detail__image-item--small'
+                      style={{
+                        backgroundImage: `url(${item.prodImgSrc})`,
+                      }}
+                    ></div>
+                  ))}
               </div>
             </div>
             <div className='detail__info'>
@@ -131,8 +129,8 @@ export default function Detail() {
                   {daysSell > 0
                     ? `${daysSell} ngày trước`
                     : hours > 0
-                    ? `${hoursSell} giờ trước`
-                    : `${minSell} phút trước`}
+                      ? `${hoursSell} giờ trước`
+                      : `${minSell} phút trước`}
                 </p>
                 <AddToWishList prodId={prodId} userRole={userRole} />
               </div>
@@ -226,7 +224,7 @@ export default function Detail() {
                 {relatedProduct
                   .slice(0, 5)
                   .filter((item) => item.prodId !== parseInt(prodId)).length ===
-                0 ? (
+                  0 ? (
                   <p>Không có sản phẩm tương tự</p>
                 ) : (
                   <div className='relate'>
@@ -359,7 +357,7 @@ function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
           Hãy đăng nhập để đấu giá sản phẩm này
         </p>
       )}
-      {}
+      { }
     </form>
   );
 }
