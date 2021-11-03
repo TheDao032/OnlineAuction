@@ -65,7 +65,6 @@ export default function Detail() {
   };
 
   console.log('Product detail abc: ', product);
-
   const sellerID = seller[0]?.accId;
 
   const {
@@ -100,6 +99,7 @@ export default function Detail() {
         <div className='detail grid wide'>
           <div className='detail__container'>
             <div className='detail__image'>
+              
               <div
                 className='detail__image-item detail__image-item--big'
                 style={{
