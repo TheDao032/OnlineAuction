@@ -23,7 +23,6 @@ import AddDescription from './AddDescription';
 const dataUser = JSON.parse(localStorage.getItem('@user'));
 let role = dataUser === null ? '' : dataUser?.user?.role;
 let accId = dataUser === null ? '' : dataUser?.user?.accId;
-const accessToken = dataUser === null ? null : dataUser?.accessToken;
 
 export default function Detail() {
   const { prodId } = useParams();
@@ -268,6 +267,100 @@ export default function Detail() {
         </div>
       )}
     </>
+  );
+}
+
+function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
+  const defaultPrice = currentPrice + stepPrice;
+  const [offer, setOffer] = useState(0);
+  const [isLogin, setIsLogin] = useState(false);
+
+  let { loggedIn } = useSelector((state) => state.currentUser);
+  const {
+    user: { accessToken },
+  } = useSelector((state) => state.currentUser);
+
+  function handleOnChange(e) {
+    const value = e.target.value;
+
+    // console.log(value);
+    setOffer(value);
+  }
+
+  useEffect(() => {
+    setIsLogin(loggedIn);
+  }, [loggedIn]);
+
+  useEffect(() => {
+    setOffer(defaultPrice);
+  }, [defaultPrice]);
+
+  async function handleMakeBet(e) {
+    e.preventDefault();
+
+    if (role === 'SEL' && accId === sellerID) {
+      return swal('Lỗi', 'Người bán không thể đấu giá!', 'error');
+    }
+
+    const data = {
+      prodId,
+      aucPriceOffer: parseFloat(offer).toFixed(3),
+    };
+
+    try {
+      const res = await axios.post(
+        'https://onlineauctionserver.herokuapp.com/api/bidder/offer',
+        data,
+        {
+          header: {
+            authorization: accessToken,
+          },
+        }
+      );
+
+      console.log(res);
+    } catch (error) {
+      console.log(error.response);
+      swal(
+        'Không thành công',
+        `Có lỗi khi đấu giá sản phẩm này, vui lòng thử lại!`,
+        'error'
+      );
+    }
+    // swal(
+    //   'Thành công',
+    //   `Đấu giá thành công với số tiền ${formatCurrency(parseFloat(offer))}`,
+    //   'success'
+    // );
+  }
+
+  return (
+    <form className='detail__offer'>
+      <label for='offer'>Giá đề nghị:</label>
+      <input
+        type='number'
+        id='offer'
+        name='offer'
+        className='detail__offer-input'
+        value={offer}
+        onChange={handleOnChange}
+      />
+      <hr />
+      {days < 0 ? (
+        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
+          Thời gian đấu giá đã kết thúc
+        </p>
+      ) : isLogin ? (
+        <button className='detail__offer-btn' onClick={handleMakeBet}>
+          Ra giá
+        </button>
+      ) : (
+        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
+          Hãy đăng nhập để đấu giá sản phẩm này
+        </p>
+      )}
+      {}
+    </form>
   );
 }
 
@@ -551,92 +644,6 @@ function AddToWishList({ prodId, userRole }) {
         </div>
       )}
     </>
-  );
-}
-
-function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
-  const defaultPrice = currentPrice + stepPrice;
-  const [offer, setOffer] = useState(0);
-  const [isLogin, setIsLogin] = useState(false);
-
-  let { loggedIn } = useSelector((state) => state.currentUser);
-
-  function handleOnChange(e) {
-    const value = e.target.value;
-
-    // console.log(value);
-    setOffer(value);
-  }
-
-  useEffect(() => {
-    setIsLogin(loggedIn);
-  }, [loggedIn]);
-
-  useEffect(() => {
-    setOffer(defaultPrice);
-  }, [defaultPrice]);
-
-  async function handleMakeBet(e) {
-    e.preventDefault();
-
-    if (role === 'SEL' && accId === sellerID) {
-      return swal('Lỗi', 'Người bán không thể đấu giá!', 'error');
-    }
-
-    const data = {
-      prodId,
-      aucPriceOffer: parseFloat(offer).toFixed(3),
-    };
-
-    try {
-      const res = await axios.post(
-        'https://onlineauctionserver.herokuapp.com/api/bidder/offer',
-        data,
-        {
-          header: {
-            authorization: accessToken,
-          },
-        }
-      );
-
-      console.log(res);
-    } catch (error) {
-      console.log(error.response);
-    }
-    // swal(
-    //   'Thành công',
-    //   `Đấu giá thành công với số tiền ${formatCurrency(parseFloat(offer))}`,
-    //   'success'
-    // );
-  }
-
-  return (
-    <form className='detail__offer'>
-      <label for='offer'>Giá đề nghị:</label>
-      <input
-        type='number'
-        id='offer'
-        name='offer'
-        className='detail__offer-input'
-        value={offer}
-        onChange={handleOnChange}
-      />
-      <hr />
-      {days < 0 ? (
-        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
-          Thời gian đấu giá đã kết thúc
-        </p>
-      ) : isLogin ? (
-        <button className='detail__offer-btn' onClick={handleMakeBet}>
-          Ra giá
-        </button>
-      ) : (
-        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
-          Hãy đăng nhập để đấu giá sản phẩm này
-        </p>
-      )}
-      {}
-    </form>
   );
 }
 

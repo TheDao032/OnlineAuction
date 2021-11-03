@@ -121,7 +121,7 @@ function WatchItem({ name, currentPrice, cateId, watchId, prodId, handleRemove }
     return cateName
   })
 
-  async function onHandleRemove() {
+  function onHandleRemove() {
     if (!handleRemove) return;
     handleRemove(watchId)
   }
