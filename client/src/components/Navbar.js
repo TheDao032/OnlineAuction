@@ -6,14 +6,17 @@ import { getCategory } from '../redux/actions/categoryAction';
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { list_search } from '../redux/actions/productAction';
-import DropDownMenu from './DropdownMenu/DropDownMenu';
+// import DropDownMenu from './DropdownMenu/DropDownMenu';
 import { setLoading } from '../redux/actions/loadingAction';
 import Loading from './Loading/Loading';
+import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const selectAllCategory = (state) => state.allCategorys;
 const currentUser = (state) => state.currentUser;
 
-function Navbar() {
+function Navbar1() {
   const dispatch = useDispatch();
   const loadingState = useSelector((state) => state.loading);
 
@@ -88,71 +91,60 @@ function Navbar() {
   }, []);
 
   return (
-    <>
-      {loadingState.loading ? (
-        <Loading />
-      ) : (
-        <div className='container'>
-          <div className='logo'>
-            <a href>
-              <h3>Epic</h3>
-              <p>Econon Service</p>
-            </a>
-          </div>
-          <div className='menu-bar'>
-            <ul>
+    <div className="menu-new">
+      <div className="menu-main-new">
+        <Navbar expand="lg" className="menu-main-wrap-new">
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+
+            <Nav className="me-auto">
               {allCategory.map((cat) => (
-                <li className='active'>
-                  {' '}
-                  <Link to='/services' className='a'>
-                    {cat.cateName}
-                  </Link>
-                  <div className='sub-menu-1'>
-                    <ul>
-                      {cat.subCategories.map((sub) => (
-                        <li>
-                          <Link to='/services' className='a'>
-                            {sub.cateName}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
+                <NavDropdown className="item-new" title={cat.cateName} id="basic-nav-dropdown">
+                  {cat.subCategories.map((sub) => (
+                    <NavDropdown.Item href="#action/3.1"> {sub.cateName}</NavDropdown.Item>
+                  ))}
+                  
+                </NavDropdown>
               ))}
-            </ul>
-          </div>
-          <div className='form_div'>
-            <form onSubmit={handleSubmit}>
-              <div className='pseudo-search'>
-                <input
-                  onChange={(e) => handle(e)}
-                  onKeyPress={KeyPress}
-                  id='value'
-                  type='text'
-                  placeholder='Search...'
-                  autofocus
-                  required
-                />
-                <button className='fa fa-search' type='submit'>
-                  tìm
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className='button-login'>
-            {userInfo.loggedIn ? (
-              <DropDownMenu />
-            ) : (
-              <Link to='/sign-in' className='button-33'>
-                Đăng Nhập
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+             
+              {/* <Nav.Item className="item-new">
+                <Link
+                  to="/job-position"
+                >
+                  Vị Trí Ứng Tuyển
+                </Link>
+              </Nav.Item>
+              <Nav.Item className="item-new">
+                <Link
+                  to="https://intern-career.unicloud.com.vn"
+                  target="_blank"
+                >
+                  Dành cho sinh viên
+                </Link>
+              </Nav.Item>
+              <Nav.Item className="item-new">
+                <Link to="/news" >
+                  Tin Tức
+                </Link>
+              </Nav.Item>
+              <Nav.Item className="item-new-last">
+                <Link
+                  to="/about"
+                >
+                  Liên Hệ
+                </Link>
+              </Nav.Item> */}
+            </Nav>
+
+            <div className="btn-container">
+              <button className="btn-ut">Ứng Tuyển Ngay</button>
+            </div>
+          </Navbar.Collapse>
+        </Navbar>
+      </div>
+    </div>
+      
   );
 }
 
-export default Navbar;
+export default Navbar1;

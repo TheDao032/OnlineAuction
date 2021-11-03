@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import './App.css';
 import './asset/css/grid.css';
-import Navbar from './components/Navbar';
+import Navbar1 from './components/Navbar';
 import Detail from './components/pages/Detail/Detail';
 import Home from './components/pages/Home';
 import Register from './components/pages/Register';
@@ -13,6 +13,7 @@ import AdminFeature from './feature/Admin';
 import BidderFeature from './feature/Bidder';
 import SellerFeature from './feature/Seller';
 import { logIn } from './redux/actions/userAction';
+import Header from './components/Header';
 
 function App() {
   const dispatch = useDispatch();
@@ -26,7 +27,8 @@ function App() {
 
   return (
     <>
-      {pathname === '/signup' || pathname === '/sign-in' ? '' : <Navbar />}
+    <Header></Header>
+      {pathname === '/signup' || pathname === '/sign-in' ? '' : <Navbar1 />}
       <Switch>
         <Route path='/' exact component={Home} />
         <Route path='/signup' component={Register} />
