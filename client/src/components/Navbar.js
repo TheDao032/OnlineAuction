@@ -68,17 +68,17 @@ function Navbar1() {
 
   const history = useHistory();
 
-  const KeyPress = (target) => {
-    const value = data.value;
-    if (target.charCode === 13) {
-      history.push("/search", { update: value });
-    }
-  };
+  // const KeyPress = (target) => {
+  //   const value = data.value;
+  //   if (target.charCode === 13) {
+  //     history.push("/search", { update: value });
+  //   }
+  // };
 
-  const handleSubmit = () => {
-    const value = data.value;
-    history.push(`/search/${value}`);
-  };
+  // const handleSubmit = () => {
+  //   const value = data.value;
+  //   history.push(`/search/${value}`);
+  // };
   // const Tim = () => {
   //     useEffect(() => {
   //         searchProduct();

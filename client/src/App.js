@@ -14,6 +14,7 @@ import BidderFeature from './feature/Bidder';
 import SellerFeature from './feature/Seller';
 import { logIn } from './redux/actions/userAction';
 import Header from './components/Header';
+// import SearchResult from './components/SearchResult';
 
 function App() {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ function App() {
 
   return (
     <>
-      {/* <Header></Header> */}
+      <Header></Header>
       {pathname === '/signup' || pathname === '/sign-in' ? '' : <Navbar1 />}
       <Switch>
         <Route path='/' exact component={Home} />

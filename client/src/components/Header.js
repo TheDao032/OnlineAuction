@@ -1,7 +1,21 @@
 import React from 'react';
 import '../asset/css/Navbar.css';
+import { useHistory } from "react-router-dom";
 
 export default function Header() {
+  const history = useHistory();
+
+  var dataSearch = "";
+  const handleChange = (e) => {
+    dataSearch = e.target.value;
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      history.push(`/search/${dataSearch}`);
+    }
+  }
+
   return (
     <div className='page-new'>
       <div className='container-new'>
@@ -9,24 +23,15 @@ export default function Header() {
           <div className='header-logo'>
             <img
               className='logo'
-              src='../../logo-white.png'
+              src='logo-new.svg'
               alt=''
               height='45px'
             />
           </div>
           <div className='header-list-item'>
-            <div className='img-container'>
-              <img className='item-last' alt='' />
-            </div>
-            <div className='img-container'>
-              <img className='item-last' alt='' />
-            </div>
-            <div className='img-container'>
-              <img className='item-last' alt='' />
-            </div>
-            <div className='img-container-last'>
-              <img className='item-last' alt='' />
-            </div>
+            <form class="search-container">
+              <input type="text" id="search-bar" onKeyPress={handleKeyPress} onChange={handleChange} placeholder="Search" />
+            </form>
           </div>
         </div>
       </div>
