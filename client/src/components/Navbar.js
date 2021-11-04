@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import '../asset/css/Navbar.css';
-import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
-import { getCategory } from '../redux/actions/categoryAction';
-import { Link } from 'react-router-dom';
-import { useHistory } from 'react-router-dom';
-import { list_search } from '../redux/actions/productAction';
+import React, { useEffect, useState } from "react";
+import "../asset/css/Navbar.css";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { getCategory } from "../redux/actions/categoryAction";
+import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import { list_search } from "../redux/actions/productAction";
 // import DropDownMenu from './DropdownMenu/DropDownMenu';
-import { setLoading } from '../redux/actions/loadingAction';
-import Loading from './Loading/Loading';
-import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { setLoading } from "../redux/actions/loadingAction";
+import Loading from "./Loading/Loading";
+import { Navbar, Nav, NavDropdown } from "react-bootstrap";
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import DropDownMenu from "../components/DropdownMenu/DropDownMenu";
 
 const selectAllCategory = (state) => state.allCategorys;
 const currentUser = (state) => state.currentUser;
@@ -20,9 +21,9 @@ function Navbar1() {
   const loadingState = useSelector((state) => state.loading);
 
   const allCategory = useSelector(selectAllCategory).categorys;
-  console.log('store la`', allCategory);
+  console.log("store la`", allCategory);
   const [data, setData] = useState({
-    value: '',
+    value: "",
   });
 
   const userInfo = useSelector(currentUser);
@@ -38,13 +39,13 @@ function Navbar1() {
 
     try {
       const response = await axios
-        .get('https://onlineauctionserver.herokuapp.com/api/categories/list')
+        .get("https://onlineauctionserver.herokuapp.com/api/categories/list")
         .catch((err) => {
-          console.log('Err', err);
+          console.log("Err", err);
         });
       dispatch(getCategory(response.data.listCategories));
 
-      console.log('API ve', response.data.listCategories);
+      console.log("API ve", response.data.listCategories);
     } catch (error) {
       console.log(error.response);
     }
@@ -54,14 +55,14 @@ function Navbar1() {
 
   const searchProduct = async () => {
     const response = await axios
-      .post('https://onlineauctionserver.herokuapp.com/api/product/search', {
-        text: 'Nghệ thuật',
+      .post("https://onlineauctionserver.herokuapp.com/api/product/search", {
+        text: "Nghệ thuật",
         orderMode: 0,
       })
       .catch((err) => {
-        console.log('Err', err);
+        console.log("Err", err);
       });
-    console.log('fdsfdsfds');
+    console.log("fdsfdsfds");
     dispatch(list_search(response.data.listProducts));
   };
 
@@ -70,7 +71,7 @@ function Navbar1() {
   const KeyPress = (target) => {
     const value = data.value;
     if (target.charCode === 13) {
-      history.push('/search', { update: value });
+      history.push("/search", { update: value });
     }
   };
 
@@ -94,65 +95,42 @@ function Navbar1() {
       {loadingState.loading ? (
         <Loading />
       ) : (
-        <div className='menu-new'>
-          <div className='menu-main-new'>
-            <Navbar expand='lg' className='menu-main-wrap-new'>
-              <Navbar.Toggle aria-controls='basic-navbar-nav' />
-              <Navbar.Collapse id='basic-navbar-nav'>
-                <Nav className='me-auto'>
-                  {allCategory.map((cat) => (
-                    <NavDropdown
-                      className='item-new'
-                      title={cat.cateName}
-                      id='basic-nav-dropdown'
-                    >
-                      {cat.subCategories.map((sub) => (
-                        <NavDropdown.Item href='#action/3.1'>
-                          {' '}
-                          {sub.cateName}
-                        </NavDropdown.Item>
-                      ))}
-                    </NavDropdown>
-                  ))}
+        ""
+        // <div className="menu-new">
+        //   <div className="menu-main-new">
+        //     <Navbar expand="lg" className="menu-main-wrap-new">
+        //       <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        //       <Navbar.Collapse id="basic-navbar-nav">
+        //         <Nav className="me-auto">
+        //           {allCategory.map((cat) => (
+        //             <NavDropdown
+        //               className="item-new"
+        //               title={cat.cateName}
+        //               id="basic-nav-dropdown"
+        //             >
+        //               {cat.subCategories.map((sub) => (
+        //                 <NavDropdown.Item href="#action/3.1">
+        //                   {" "}
+        //                   {sub.cateName}
+        //                 </NavDropdown.Item>
+        //               ))}
+        //             </NavDropdown>
+        //           ))}
+        //         </Nav>
 
-                  {/* <Nav.Item className="item-new">
-                <Link
-                  to="/job-position"
-                >
-                  Vị Trí Ứng Tuyển
-                </Link>
-              </Nav.Item>
-              <Nav.Item className="item-new">
-                <Link
-                  to="https://intern-career.unicloud.com.vn"
-                  target="_blank"
-                >
-                  Dành cho sinh viên
-                </Link>
-              </Nav.Item>
-              <Nav.Item className="item-new">
-                <Link to="/news" >
-                  Tin Tức
-                </Link>
-              </Nav.Item>
-              <Nav.Item className="item-new-last">
-                <Link
-                  to="/about"
-                >
-                  Liên Hệ
-                </Link>
-              </Nav.Item> */}
-                </Nav>
-
-                <div className='btn-container'>
-                  <Link to='/sign-in' className='btn-ut'>
-                    Đăng nhập
-                  </Link>
-                </div>
-              </Navbar.Collapse>
-            </Navbar>
-          </div>
-        </div>
+        //         <div className="btn-container">
+        //           {userInfo.loggedIn ? (
+        //             <DropDownMenu />
+        //           ) : (
+        //             <Link to="/sign-in" className="btn-ut">
+        //               Đăng nhập
+        //             </Link>
+        //           )}
+        //         </div>
+        //       </Navbar.Collapse>
+        //     </Navbar>
+        //   </div>
+        // </div>
       )}
     </>
   );
