@@ -447,6 +447,7 @@
 }
 
 .slider-container {
+  overflow: hidden;
   margin: auto;
   padding-bottom: 196px;
   margin-left: 20px !important;
