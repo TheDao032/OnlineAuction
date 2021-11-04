@@ -7,13 +7,25 @@ const newProduct = (req, res, next) => {
 		type: 'object',
 		properties: {
 			prodName: { type: 'string', maxLength: 100 },
-			prodCateId: { type: 'string', pattern: '^\\d+$' },
+			prodImage: { 
+				type: 'array',
+				items: [{ 
+					type: 'object',
+					properties: {
+						src: { type: 'string' }
+					},
+					required: ['src'],
+					additionalProperties: true
+				}]
+			},
+			prodCateId: { type: 'integer' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodDescription: { type: 'string' },
+			prodExpired: { type: 'integer' },
 		},
-		required: ['prodName', 'prodCateId', 'prodStepPrice'],
+		required: ['prodName', 'prodCateId', 'prodStepPrice', 'prodExpired'],
 		additionalProperties: true
 	}
 
@@ -39,8 +51,8 @@ const updateProduct = (req, res, next) => {
 		type: 'object',
 		properties: {
 			prodId: { type: 'integer' },
-			prodName: { type: 'string', maxLength: 60 },
-			prodCateId: { type: 'string', pattern: '^\\d+$' },
+			prodName: { type: 'string', maxLength: 100 },
+			prodCateId: { type: 'integer' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
@@ -70,7 +82,7 @@ const updateImage = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			prodId: { type: 'string', pattern: '^\\d+$' },
+			prodId: { type: 'integer' },
 		},
 		required: ['prodId'],
 		additionalProperties: true
@@ -97,7 +109,18 @@ const addImage = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			prodId: { type: 'string', pattern: '^\\d+$' },
+			prodId: { type: 'integer' },
+			prodImage: { 
+				type: 'array',
+				items: [{ 
+					type: 'object',
+					properties: {
+						src: { type: 'string' }
+					},
+					required: ['src'],
+					additionalProperties: true
+				}]
+			},
 		},
 		required: ['prodId'],
 		additionalProperties: true
@@ -286,6 +309,60 @@ const takePermission = (req, res, next) => {
 	next()
 }
 
+const listPermission = (req, res, next) => {
+	const shema = {
+		type: 'object',
+		properties: {
+			prodId: { type: 'integer' }
+		},
+		required: ['prodId'],
+		additionalProperties: true
+	}
+
+	const ajv = new ajvLib({
+		allErrors: true
+	})
+
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
+
+	if (!valid) {
+		return res.status(400).json({
+			errorMessage: validator.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	next()
+}
+
+const cancel = (req, res, next) => {
+	const shema = {
+		type: 'object',
+		properties: {
+			prodId: { type: 'integer' },
+		},
+		required: ['prodId'],
+		additionalProperties: true
+	}
+
+	const ajv = new ajvLib({
+		allErrors: true
+	})
+
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
+
+	if (!valid) {
+		return res.status(400).json({
+			errorMessage: validator.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	next()
+}
+
 module.exports = {
 	deleteProduct,
 	myProduct,
@@ -296,5 +373,7 @@ module.exports = {
 	newProduct,
 	banBidder,
 	givePermission,
-	takePermission
+	takePermission,
+	listPermission,
+	cancel
 }

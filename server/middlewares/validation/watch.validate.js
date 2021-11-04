@@ -34,9 +34,9 @@ const addWatch = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		watchId: { type: 'integer' }
+    		prodId: { type: 'integer' }
   		},
-		required: ['watchId'],
+		required: ['prodId'],
 		additionalProperties: true
 	}
 
@@ -99,9 +99,9 @@ const deleteWatch = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-			cartId: { type: 'integer' }
+			watchId: { type: 'integer' }
   		},
-		required: ['cartId'],
+		required: ['watchId'],
 		additionalProperties: true
 	}
 
