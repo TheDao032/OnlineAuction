@@ -10,8 +10,6 @@ import { get_top_5_biggest_offer } from '../redux/actions/productAction';
 import { get_top_5_biggest_price } from '../redux/actions/productAction';
 const selectTop5AlmostOver = (state) => state.top5Almost;
 
-
-
 export default function Info() {
   const dispatch = useDispatch();
 
@@ -52,31 +50,30 @@ export default function Info() {
   var sum = 0;
 
   return (
-    <div className="page-an">
-      <div className="banner">
-        <div className="banner-contain">
-          <h1 className="h1-banner">
-            Dẫn đầu kĩ nguyên đấu giá thông minh
-          </h1>
-          <div className="btn-container-tht">
-            <button className="btn-tht">Đăng ký ngay</button>
+    <div className='page-an'>
+      <div className='banner'>
+        <div className='banner-contain'>
+          <h1 className='h1-banner'>Dẫn đầu kĩ nguyên đấu giá thông minh</h1>
+          <div className='btn-container-tht'>
+            <Link to='/signup' className='btn-tht'>
+              Đăng ký ngay
+            </Link>
           </div>
         </div>
       </div>
 
-      <div className="page">
-        <div className="page-info">
-          <div className="contain-info">
-           
-            <h2 className="h2-top">Top 5 sản phẩm bán chạy nhất</h2>
+      <div className='page'>
+        <div className='page-info'>
+          <div className='contain-info'>
+            <h2 className='h2-top'>Top 5 sản phẩm bán chạy nhất</h2>
 
-            <div className="slider-container">
+            <div className='slider-container'>
               <Swiper
                 watchSlidesProgress={true}
                 slidesPerView={3}
-                className="mySwiper"
+                className='mySwiper'
               >
-                <SwiperSlide className="sl">
+                <SwiperSlide className='sl'>
                   <h1>01</h1>
                   <h5>Job Title</h5>
                   <p>
@@ -91,7 +88,7 @@ export default function Info() {
                   <h6>Xem Chi Tiết</h6>
                 </SwiperSlide>
 
-                <SwiperSlide className="sl">
+                <SwiperSlide className='sl'>
                   <h1>02</h1>
                   <h5>Job Title</h5>
                   <p>
@@ -105,7 +102,7 @@ export default function Info() {
                   </p>
                   <h6>Xem Chi Tiết</h6>
                 </SwiperSlide>
-                <SwiperSlide className="sl">
+                <SwiperSlide className='sl'>
                   <h1>03</h1>
                   <h5>Job Title</h5>
                   <p>
@@ -120,7 +117,7 @@ export default function Info() {
                   </p>
                   <h6>Xem Chi Tiết</h6>
                 </SwiperSlide>
-                <SwiperSlide className="sl">
+                <SwiperSlide className='sl'>
                   <h1>04</h1>
                   <h5>Job Title</h5>
                   <p>
@@ -139,20 +136,21 @@ export default function Info() {
             </div>
           </div>
 
-          <div className="page-info-1">
-            <div className="contain-info-1">
-              <h2 className="h2-top">Top 5 sản phẩm giá được offer nhiều nhất</h2>
+          <div className='page-info-1'>
+            <div className='contain-info-1'>
+              <h2 className='h2-top'>
+                Top 5 sản phẩm giá được offer nhiều nhất
+              </h2>
 
-              <div className="slider-container">
+              <div className='slider-container'>
                 <Swiper
                   watchSlidesProgress={true}
                   slidesPerView={3}
-                  className="mySwiper"
+                  className='mySwiper'
                 >
-
                   {top5Offer.map((product) => (
-                    <SwiperSlide className="sl">
-                      <h1>0{sum = sum + 1}</h1>
+                    <SwiperSlide className='sl'>
+                      <h1>0{(sum = sum + 1)}</h1>
                       <h5>{product.prodName}</h5>
                       <p>
                         Leverage agile frameworks to provide a robust <br />
@@ -163,28 +161,28 @@ export default function Info() {
                         value proposition.Organically grow the <br />
                         holistic world view of disruptive innovation..
                       </p>
-                        <Link to={`/detail/${product.prodId}`}><h6>Xem Chi Tiết</h6></Link>
+                      <Link to={`/detail/${product.prodId}`}>
+                        <h6>Xem Chi Tiết</h6>
+                      </Link>
                     </SwiperSlide>
-                   ))}
+                  ))}
                 </Swiper>
               </div>
-
             </div>
           </div>
 
-          <div className="contain-info">
+          <div className='contain-info'>
+            <h2 className='h2-top'>Top 5 sản phẩm có giá cao nhất</h2>
 
-            <h2 className="h2-top">Top 5 sản phẩm có giá cao nhất</h2>
-
-            <div className="slider-container">
+            <div className='slider-container'>
               <Swiper
                 watchSlidesProgress={true}
                 slidesPerView={3}
-                className="mySwiper"
+                className='mySwiper'
               >
                 {top5Price.map((product) => (
-                  <SwiperSlide className="sl">
-                    <h1>0{sum = sum + 1}</h1>
+                  <SwiperSlide className='sl'>
+                    <h1>0{(sum = sum + 1)}</h1>
                     <h5>{product.prodName}</h5>
                     <p>
                       Leverage agile frameworks to provide a robust <br />
@@ -195,7 +193,9 @@ export default function Info() {
                       value proposition.Organically grow the <br />
                       holistic world view of disruptive innovation..
                     </p>
-                    <Link to={`/detail/${product.prodId}`}><h6>Xem Chi Tiết</h6></Link>
+                    <Link to={`/detail/${product.prodId}`}>
+                      <h6>Xem Chi Tiết</h6>
+                    </Link>
                   </SwiperSlide>
                 ))}
               </Swiper>
@@ -212,4 +212,3 @@ export default function Info() {
     </div>
   );
 }
-

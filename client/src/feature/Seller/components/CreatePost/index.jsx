@@ -55,9 +55,9 @@ function CreatePost(props) {
   const form = useForm({
     defaultValues: {
       prodName: '',
-      prodBeginPrice: 0,
-      prodStepPrice: 0,
-      prodBuyPrice: 0,
+      prodBeginPrice: "0",
+      prodStepPrice: "0",
+      prodBuyPrice: "0",
       prodExpired: 1
     },
 
@@ -98,17 +98,31 @@ function CreatePost(props) {
         return { src: item.src }
       })
 
-      data = {
-        prodImage: image,
-        prodDescription: value.prodDescription,
-        prodIsAutoRenew: value.prodIsAutoRenew,
-        prodName: data.prodName,
-        prodBeginPrice: data.prodBeginPrice.toString(),
-        prodStepPrice: data.prodStepPrice.toString(),
-        prodBuyPrice: data.prodBuyPrice.toString(),
-        prodCateId: parseInt(data.prodCateId),
-        prodExpired: parseInt(data.prodExpired)
+      if (data.prodBuyPrice === "") {
+        data = {
+          prodImage: image,
+          prodDescription: value.prodDescription,
+          prodIsAutoRenew: value.prodIsAutoRenew,
+          prodName: data.prodName,
+          prodBeginPrice: data.prodBeginPrice.toString(),
+          prodStepPrice: data.prodStepPrice.toString(),
+          prodCateId: parseInt(data.prodCateId),
+          prodExpired: parseInt(data.prodExpired)
+        }
+      } else {
+        data = {
+          prodImage: image,
+          prodDescription: value.prodDescription,
+          prodIsAutoRenew: value.prodIsAutoRenew,
+          prodName: data.prodName,
+          prodBeginPrice: data.prodBeginPrice.toString(),
+          prodStepPrice: data.prodStepPrice.toString(),
+          prodBuyPrice: data.prodBuyPrice.toString(),
+          prodCateId: parseInt(data.prodCateId),
+          prodExpired: parseInt(data.prodExpired)
+        }
       }
+
 
       console.log(data)
       dispatch(setLoading(true));
@@ -123,8 +137,9 @@ function CreatePost(props) {
             window.location.reload()
           });
       } catch (error) {
-        console.log(error.request);
-        swal("Thất bại!", "Đã xảy ra lỗi, vui lòng thử lại!", "error");
+        console.log(error.response.data.errorMessage);
+        if (error.response.data.errorMessage)
+          swal("Unsucessful!", error.response.data.errorMessage, "error");
 
       }
 

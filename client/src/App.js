@@ -27,7 +27,7 @@ function App() {
 
   return (
     <>
-    <Header></Header>
+      {/* <Header></Header> */}
       {pathname === '/signup' || pathname === '/sign-in' ? '' : <Navbar1 />}
       <Switch>
         <Route path='/' exact component={Home} />

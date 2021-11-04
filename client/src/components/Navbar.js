@@ -12,7 +12,6 @@ import Loading from './Loading/Loading';
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
 const selectAllCategory = (state) => state.allCategorys;
 const currentUser = (state) => state.currentUser;
 
@@ -91,23 +90,32 @@ function Navbar1() {
   }, []);
 
   return (
-    <div className="menu-new">
-      <div className="menu-main-new">
-        <Navbar expand="lg" className="menu-main-wrap-new">
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-
-            <Nav className="me-auto">
-              {allCategory.map((cat) => (
-                <NavDropdown className="item-new" title={cat.cateName} id="basic-nav-dropdown">
-                  {cat.subCategories.map((sub) => (
-                    <NavDropdown.Item href="#action/3.1"> {sub.cateName}</NavDropdown.Item>
+    <>
+      {loadingState.loading ? (
+        <Loading />
+      ) : (
+        <div className='menu-new'>
+          <div className='menu-main-new'>
+            <Navbar expand='lg' className='menu-main-wrap-new'>
+              <Navbar.Toggle aria-controls='basic-navbar-nav' />
+              <Navbar.Collapse id='basic-navbar-nav'>
+                <Nav className='me-auto'>
+                  {allCategory.map((cat) => (
+                    <NavDropdown
+                      className='item-new'
+                      title={cat.cateName}
+                      id='basic-nav-dropdown'
+                    >
+                      {cat.subCategories.map((sub) => (
+                        <NavDropdown.Item href='#action/3.1'>
+                          {' '}
+                          {sub.cateName}
+                        </NavDropdown.Item>
+                      ))}
+                    </NavDropdown>
                   ))}
-                  
-                </NavDropdown>
-              ))}
-             
-              {/* <Nav.Item className="item-new">
+
+                  {/* <Nav.Item className="item-new">
                 <Link
                   to="/job-position"
                 >
@@ -134,16 +142,19 @@ function Navbar1() {
                   Liên Hệ
                 </Link>
               </Nav.Item> */}
-            </Nav>
+                </Nav>
 
-            <div className="btn-container">
-              <button className="btn-ut">Ứng Tuyển Ngay</button>
-            </div>
-          </Navbar.Collapse>
-        </Navbar>
-      </div>
-    </div>
-      
+                <div className='btn-container'>
+                  <Link to='/sign-in' className='btn-ut'>
+                    Đăng nhập
+                  </Link>
+                </div>
+              </Navbar.Collapse>
+            </Navbar>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

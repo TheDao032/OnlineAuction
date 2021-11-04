@@ -81,7 +81,7 @@ export default function Detail() {
 
   useEffect(() => {
     fetchProductDetail();
-  }, []);
+  }, [prodId]);
 
   const { days, hours, mins } = formatTime(expireDate);
 
@@ -147,7 +147,7 @@ export default function Detail() {
                   <DayLeft days={days} mins={mins} hours={hours} />
                 </div>
               </div>
-              {prodBuyPrice !== 0 && (
+              {prodBuyPrice !== null && (
                 <div className='buyNow'>
                   <p className='buyNow__text'>Mua ngay với giá chỉ</p>
                   <p className='buyNow__price'>
@@ -273,6 +273,7 @@ function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
   const [offer, setOffer] = useState(0);
   const [isLogin, setIsLogin] = useState(false);
 
+  const dispatch = useDispatch();
   let { loggedIn } = useSelector((state) => state.currentUser);
   const {
     user: { accessToken },
@@ -301,35 +302,38 @@ function Offer({ currentPrice, stepPrice, sellerID, prodId, days }) {
     }
 
     const data = {
-      prodId,
+      prodId: +prodId,
       aucPriceOffer: parseFloat(offer).toFixed(3),
     };
 
+    console.log(data);
+
     try {
+      dispatch(setLoading(true));
       const res = await axios.post(
         'https://onlineauctionserver.herokuapp.com/api/bidder/offer',
         data,
         {
-          header: {
+          headers: {
             authorization: accessToken,
           },
         }
       );
 
       console.log(res);
+      dispatch(setLoading(false));
+      swal(
+        'Thành công',
+        `Đấu giá thành công với số tiền ${formatCurrency(parseFloat(offer))}`,
+        'success'
+      );
     } catch (error) {
       console.log(error.response);
-      swal(
-        'Không thành công',
-        `Có lỗi khi đấu giá sản phẩm này, vui lòng thử lại!`,
-        'error'
-      );
+      dispatch(setLoading(false));
+
+      if (error.response.data.errorMessage)
+        swal('Unsuccessful', error.response.data.errorMessage, 'error');
     }
-    // swal(
-    //   'Thành công',
-    //   `Đấu giá thành công với số tiền ${formatCurrency(parseFloat(offer))}`,
-    //   'success'
-    // );
   }
 
   return (
@@ -425,14 +429,12 @@ function Description({ description, sellerID }) {
   );
 }
 
-function RelateItem({ src, seller, price, name, isEnd }) {
-  const { prodId } = useParams();
-  const { pathname } = useLocation();
+function RelateItem({ src, seller, price, name, isEnd, prodId }) {
   const history = useHistory();
 
   function onClickRelate() {
     history.push(`/detail/${prodId}`);
-    console.log(prodId, pathname);
+    window.scrollTo(0, 0);
   }
 
   return (
