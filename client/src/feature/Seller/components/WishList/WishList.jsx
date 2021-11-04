@@ -1,59 +1,61 @@
-import axios from 'axios';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom'
-import {
-  AiFillHeart
-} from 'react-icons/ai';
-import { useDispatch, useSelector } from 'react-redux';
-import swal from 'sweetalert';
-import { setLoading } from '../../../../redux/actions/loadingAction';
-import formatCurrency from '../../../../util/formatCurrency';
-import './WishList.scss';
+import axios from "axios";
+import React, { useEffect, useMemo, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { AiFillHeart } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import swal from "sweetalert";
+import { setLoading } from "../../../../redux/actions/loadingAction";
+import formatCurrency from "../../../../util/formatCurrency";
+import "./WishList.scss";
+import Empty from "../../../../components/Empty/Empty";
+import { imagePlaceholder } from "../../../../util/imagePlaceholder";
 
 WishList.propTypes = {};
 
 function WishList(props) {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const {
     user: { accessToken },
   } = useSelector((state) => state.currentUser);
 
   const [wishList, setWishList] = useState([]);
-  const [isEmpty, setIsEmpty] = useState(false)
+  const [isEmpty, setIsEmpty] = useState(false);
 
   async function getWatchList() {
     try {
-      dispatch(setLoading(true))
-      const res = await axios.get('https://onlineauctionserver.herokuapp.com/api/watch-list/list', {
-        headers: {
-          authorization: accessToken
+      dispatch(setLoading(true));
+      const res = await axios.get(
+        "https://onlineauctionserver.herokuapp.com/api/watch-list/list",
+        {
+          headers: {
+            authorization: accessToken,
+          },
         }
-      })
+      );
 
-      console.log(res.data.listWatch)
+      console.log(res.data.listWatch);
 
       if (res.data.listWatch) {
-        setWishList(res.data.listWatch)
+        setWishList(res.data.listWatch);
       } else {
-        setIsEmpty(true)
+        setIsEmpty(true);
       }
     } catch (error) {
       console.log(error.response);
     }
-    dispatch(setLoading(false))
+    dispatch(setLoading(false));
   }
 
   useEffect(() => {
-    getWatchList()
-
+    getWatchList();
   }, []);
 
   const handleRemoveItem = async (watchId) => {
     try {
       dispatch(setLoading(true));
       const res = await axios.post(
-        'https://onlineauctionserver.herokuapp.com/api/watch-list/delete',
+        "https://onlineauctionserver.herokuapp.com/api/watch-list/delete",
         {
           watchId,
         },
@@ -62,113 +64,108 @@ function WishList(props) {
 
       // console.log(res);
       dispatch(setLoading(false));
-      // Lát xét wishlist sau khi xóa
-      // setWishList()
-      swal('Thành công!', 'Đã xóa khỏi danh sách yêu thích!', 'success');
-      getWatchList()
-
+      swal("Thành công!", "Đã xóa khỏi danh sách yêu thích!", "success");
+      getWatchList();
     } catch (err) {
       console.log(err.response);
       dispatch(setLoading(false));
 
       swal(
-        'Thất bại!',
-        'Có lỗi khi xóa sản phẩm khỏi yêu thích, vui lòng thử lại!',
-        'error'
+        "Thất bại!",
+        "Có lỗi khi xóa sản phẩm khỏi yêu thích, vui lòng thử lại!",
+        "error"
       );
     }
-  }
-
-
+  };
 
   return (
     <>
-      {
-        (isEmpty
-          ? <Empty title={'Bạn chưa có sản phẩm yêu thích nào'} />
-          :
-          <div className='seller__container'>
-            {wishList.map(item => <WatchItem
+      {isEmpty ? (
+        <Empty title={"Bạn chưa có sản phẩm yêu thích nào"} />
+      ) : (
+        <div className="seller__container">
+          {wishList.map((item) => (
+            <WatchItem
               name={item.prodName}
-              currentPrice={item.prodBeginPrice + (item.prodOfferNumber * item.prodStepPrice)}
+              currentPrice={
+                item.prodBeginPrice + item.prodOfferNumber * item.prodStepPrice
+              }
               cateId={item.prodCateId}
               watchId={item.watchId}
               handleRemove={() => handleRemoveItem(item.watchId)}
               prodId={item.prodId}
-            />)}
-
-          </div>)
-      }
+              src={item.prodImage[0]?.prodImgSrc}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 }
 
-function WatchItem({ name, currentPrice, cateId, watchId, prodId, handleRemove }) {
-  const allCategories = useSelector(state => state.allCategorys)
-  const history = useHistory()
-  let cateName = ''
+function WatchItem({
+  name,
+  currentPrice,
+  cateId,
+  watchId,
+  prodId,
+  handleRemove,
+  src = imagePlaceholder,
+}) {
+  const allCategories = useSelector((state) => state.allCategorys);
+  const history = useHistory();
+  let cateName = "";
   // console.log(allCategories.categorys[0].subCategories[0].cateId);
 
-  allCategories.categorys.map(sub => {
-    sub.subCategories.map(item => {
+  allCategories.categorys.map((sub) => {
+    sub.subCategories.map((item) => {
       if (cateId === item.cateId) {
-        cateName = item.cateName
+        cateName = item.cateName;
       }
 
-      return cateName
-    })
+      return cateName;
+    });
 
-    return cateName
-  })
+    return cateName;
+  });
 
   function onHandleRemove() {
     if (!handleRemove) return;
-    handleRemove(watchId)
+    handleRemove(watchId);
   }
 
   const handleClickDetail = (prodId) => {
-    history.push(`/detail/${prodId}`)
-  }
+    history.push(`/detail/${prodId}`);
+  };
+
   return (
     <>
-      <div className='seller__wishList-item'>
+      <div className="seller__wishList-item">
         <div
           onClick={() => handleClickDetail(prodId)}
-          className='seller__wishList-item-img'
-          style={{ backgroundImage: `url(${'https://didongviet.vn/pub/media/catalog/product/a/p/apple-watch-series-6-40mm-gps-vien-nhom-bac-day-cao-su-full-vat-didongviet.jpg'})` }}
+          className="seller__wishList-item-img"
+          style={{
+            backgroundImage: `url(${src})`,
+          }}
         />
-        <p className='seller__wishList-item-name'
-          title={name}
-        >
+        <p className="seller__wishList-item-name" title={name}>
           {name}
         </p>
         <br />
-        <p className='seller__wishList-item-cate'>Loại: <span>{cateName}</span></p>
+        <p className="seller__wishList-item-cate">
+          Loại: <span>{cateName}</span>
+        </p>
 
-        <p className='seller__wishList-item-price'>Giá hiện tại: <span>{formatCurrency(currentPrice)}</span></p>
-        <button className='seller__wishList-item-btn' onClick={onHandleRemove}>
+        <p className="seller__wishList-item-price">
+          Giá hiện tại: <span>{formatCurrency(currentPrice)}</span>
+        </p>
+        <button className="seller__wishList-item-btn" onClick={onHandleRemove}>
           <AiFillHeart />
-          <p>
-            Gỡ khỏi yêu thích
-          </p>
+          <p>Gỡ khỏi yêu thích</p>
         </button>
       </div>
     </>
-  )
+  );
 }
 
-function Empty({ title }) {
-  const history = useHistory()
-  function toHomePage() {
-    history.push('/')
-  }
-  return (
-    <>
-      <div className='empty'>
-        <h2 className='empty__title'>{title}</h2>
-        <button className='empty__button' onClick={toHomePage}>Về trang chủ</button>
-      </div>
-    </>
-  )
-}
 export default WishList;

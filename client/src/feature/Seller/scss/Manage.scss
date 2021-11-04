@@ -3,6 +3,7 @@
     margin-top: 10px;
   }
   &__menu {
+    margin-bottom: 10px;
   }
 
   &__btn {
@@ -95,6 +96,15 @@
         border: 1px solid #3c99dc;
         color: #3c99dc;
         width: 100%;
+      }
+
+      &--list {
+        margin-top: 8px;
+        border: 1px solid #3c99dc;
+        color: #3c99dc;
+        width: 100%;
+        text-decoration: none;
+        display: block;
       }
 
       &--save {
