@@ -13,6 +13,7 @@
     background-color: rgba(0, 0, 0, 0.03);
     padding: 20px;
     min-height: 500px;
+    height: 75vh;
   }
 
   &__menu {
@@ -36,7 +37,7 @@
     }
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       height: 1px;
       background-color: rgba(0, 0, 0, 0.25);
