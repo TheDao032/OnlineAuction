@@ -168,23 +168,22 @@ select {
 
 .page-new {
   width: 100%;
-  background: linear-gradient(
-    112.68deg,
-    #00b4ee -13.62%,
-    #0094f1 25.66%,
-    #0064fa 57.48%,
-    #004cbd 81.92%,
-    #0045ac 100.82%
-  );
+  background: linear-gradient(112.68deg,
+      #00b4ee -13.62%,
+      #0094f1 25.66%,
+      #0064fa 57.48%,
+      #004cbd 81.92%,
+      #0045ac 100.82%);
   height: 80px;
 }
+
 .menu-new {
   max-width: 100%;
   background: rgba(0, 69, 172, 1);
 }
 
 .container-new {
-    max-width: 1440px;
+  max-width: 1440px;
   width: 100%;
   margin: auto;
 }
@@ -207,6 +206,7 @@ select {
 .img-container {
   padding-right: 24px;
 }
+
 .item-last {
   height: 32px;
   width: 32px;
@@ -228,6 +228,7 @@ select {
   max-height: 88px;
   margin: auto;
 }
+
 .menu-main-wrap-new {
   width: 100%;
   padding-right: 0px !important;
@@ -247,19 +248,22 @@ select {
   color: rgba(204, 204, 204, 1) !important;
   padding-right: 40px !important;
 }
-.dropdown-menu.show{
-    background-color: #0094f1!important;
+
+.dropdown-menu.show {
+  background-color: #0094f1 !important;
 }
 
 
-.dropdown-item:hover{
-    background-color: #0045ac !important;
+.dropdown-item:hover {
+  background-color: #0045ac !important;
 }
-.dropdown-item{
-    color: white !important;
+
+.dropdown-item {
+  color: white !important;
 }
-.dropdown-toggle::after{
-    display: none !important;
+
+.dropdown-toggle::after {
+  display: none !important;
 }
 
 .item-new-last {
@@ -352,7 +356,6 @@ select {
   height: 41px !important;
   width: 130px !important;
   border-radius: 16px !important;
-  font-family: Roboto !important;
   font-size: 14px !important;
   font-style: normal !important;
   font-weight: 500 !important;
@@ -361,13 +364,14 @@ select {
   background-color: rgba(247, 148, 29, 1);
   outline: none !important;
   border: none !important;
-  font-family: Roboto !important;
   font-size: 14px !important;
   font-style: normal;
   font-weight: 500 !important;
   line-height: 21px !important;
   letter-spacing: 0em;
   color: rgba(0, 62, 100, 1);
+  text-decoration: none;
+  padding: 10px 20px;
 }
 
 .page-footer {
@@ -454,14 +458,12 @@ select {
 .last {
   width: 100%;
   height: 112px;
-  background: linear-gradient(
-    112.68deg,
-    #00b4ee -13.62%,
-    #0094f1 25.66%,
-    #0064fa 57.48%,
-    #004cbd 81.92%,
-    #0045ac 100.82%
-  );
+  background: linear-gradient(112.68deg,
+      #00b4ee -13.62%,
+      #0094f1 25.66%,
+      #0064fa 57.48%,
+      #004cbd 81.92%,
+      #0045ac 100.82%);
 }
 
 .item-new:active {
