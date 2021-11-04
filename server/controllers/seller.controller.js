@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const knex = require('../utils/dbConnection')
-const moment = require('moment');
+const moment = require('moment')
 
 const imageproductValidation = require('../middlewares/validation/image.validate')
 
@@ -13,6 +13,7 @@ const auctionModel = require('../models/auction.model')
 const auctionStatusModel = require('../models/auctionStatus.model')
 const auctionPermissionModel = require('../models/auctionPermission.model')
 const accountModel = require('../models/account.model')
+const commentModel = require('../models/comment.model')
 
 const sellerValidation = require('../middlewares/validation/seller.validate')
 const productValidation = require('../middlewares/validation/product.validate')
@@ -26,13 +27,8 @@ const errorCode = 1
 
 router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 
-	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription } = req.body
-	const prodImage = req.files
-
-	let checkProdImage = false
-	if (prodImage) {
-		checkProdImage = prodImage.image ? true : false
-	}
+	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription, prodExpired, prodImage } = req.body
+	const { accId } = req.account
 
 	const convertStep = parseFloat(prodStepPrice)
 
@@ -82,13 +78,14 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
-	const expireDate = moment(new Date(moment().year(), moment().month(), moment().date() + 1, moment().hour(), moment().minute(), moment().second())).format('YYYY-MM-DD HH:mm:ss')
+	const expireDate = moment(new Date(moment().year(), moment().month(), moment().date() + prodExpired, moment().hour(), moment().minute(), moment().second())).format('YYYY-MM-DD HH:mm:ss')
 
 	const convertBegin = parseFloat(prodBeginPrice)
 
 	const newProd = {
 		prod_name: prodName,
 		prod_cate_id: prodCateId,
+		prod_acc_id: accId,
 		prod_begin_price: prodBeginPrice && convertBegin > 0 ? convertBegin : 0,
 		prod_step_price: convertStep,
 		prod_buy_price: prodBuyPrice ? parseFloat(prodBuyPrice) : null,
@@ -106,39 +103,30 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 		})
 	}
 
-	if (checkProdImage) {
-		if (prodImage.image.length > 5) {
+	if (prodImage) {
+		if (prodImage.length > 5) {
 			return res.status(400).json({
 				errorMessage: `Image, Maximum Image Is 5`,
 				statusCode: errorCode
 			})
 		}
 
-		let checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+		// let checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 
-		if (!checkValidImage) {
-			return res.status(400).json({
-				errorMessage: `Product's Images Type Is Invalid Or Product's Images Files Is Bigger Than 5`,
-				statusCode: errorCode
-			})
-		}
+		// if (!checkValidImage) {
+		// 	return res.status(400).json({
+		// 		errorMessage: `Product's Images Type Is Invalid Or Product's Images Files Is Bigger Than 5`,
+		// 		statusCode: errorCode
+		// 	})
+		// }
 
-		if (prodImage.image.length === undefined) {
+		for (let i = 0; i < prodImage.length; i++) {
 			const newProdImage = {
 				prod_img_product_id: returnInfo[0],
-				prod_img_data: prodImage.image
+				prod_img_src: prodImage[i].src
 			}
 	
 			await productImagesModel.create(newProdImage)
-		} else {
-			for (let i = 0; i < prodImage.image.length; i++) {
-				const newProdImage = {
-					prod_img_product_id: returnInfo[0],
-					prod_img_data: prodImage.image[i]
-				}
-		
-				await productImagesModel.create(newProdImage)
-			}
 		}
 	}
 
@@ -262,24 +250,18 @@ router.post('/update-product', sellerValidation.updateProduct, async (req, res) 
 })
 
 router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
-	const { prodId, prodImageId } = req.body
-	const prodImage = req.files
+	const { prodId, prodImageId, prodImage } = req.body
 
-	let checkProdImage = false
-	if (prodImage) {
-		checkProdImage = prodImage.image ? true : false
-	}
-
-	if (!checkProdImage) {
+	if (!prodImage || prodImage.length === 0) {
 		return res.status(400).json({
 			errorMessage: `Image Is Required`,
 			statusCode: errorCode
 		})
 	}
 
-	if (prodImage.image.length !== undefined) {
+	if (prodImage.length > 1) {
 		return res.status(400).json({
-			errorMessage: `Too Many Images Are Selected. Please Select 1 Image`,
+			errorMessage: `Only One Image Can Be Updated`,
 			statusCode: errorCode
 		})
 	}
@@ -302,17 +284,17 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 		})
 	}
 
-	const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+	// const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 	
-	if (!checkValidImage) {
-		return res.status(400).json({
-			errorMessage: `Product's Image Isn't Right Type`,
-			statusCode: errorCode
-		})
-	}
+	// if (!checkValidImage) {
+	// 	return res.status(400).json({
+	// 		errorMessage: `Product's Image Isn't Right Type`,
+	// 		statusCode: errorCode
+	// 	})
+	// }
 
 	const prodImageInfo = {
-		prod_img_data: prodImage.image
+		prod_img_src: prodImage[0].src
 	}
 
 	await productImagesModel.update(prodImageId, prodImageInfo)
@@ -323,15 +305,9 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 })
 
 router.post('/add-image', sellerValidation.addImage, async (req, res) => {
-	const { prodId } = req.body
-	const prodImage = req.files
+	const { prodId, prodImage } = req.body
 
-	let checkProdImage = false
-	if (prodImage) {
-		checkProdImage = prodImage.image ? true : false
-	}
-
-	if (!checkProdImage) {
+	if (!prodImage || prodImage.length === 0) {
 		return res.status(400).json({
 			errorMessage: `Image Is Required`,
 			statusCode: errorCode
@@ -349,38 +325,29 @@ router.post('/add-image', sellerValidation.addImage, async (req, res) => {
 
 	const checkExistProdImage = await productImagesModel.findByProdId(prodId)
 
-	if ((checkExistProdImage.length + prodImage.image.length) > 5) {
+	if ((checkExistProdImage.length + prodImage.length) > 5) {
 		return res.status(400).json({
 			errorMessage: `Already Have ${checkExistProdImage.length} Image, Maximum Image Is 5`,
 			statusCode: errorCode
 		})
 	}
 
-	const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+	// const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 	
-	if (!checkValidImage) {
-		return res.status(400).json({
-			errorMessage: `Product's Image Isn't Right Type`,
-			statusCode: errorCode
-		})
-	}
+	// if (!checkValidImage) {
+	// 	return res.status(400).json({
+	// 		errorMessage: `Product's Image Isn't Right Type`,
+	// 		statusCode: errorCode
+	// 	})
+	// }
 
-	if (prodImage.image.length === undefined) {
+	for (let i = 0; i < prodImage.length; i++) {
 		const newProdImage = {
 			prod_img_product_id: prodId,
-			prod_img_data: prodImage.image
+			prod_img_src: prodImage[i].src
 		}
 
 		await productImagesModel.create(newProdImage)
-	} else {
-		for (let i = 0; i < prodImage.image.length; i++) {
-			const newProdImage = {
-				prod_img_product_id: prodId,
-				prod_img_data: prodImage.image[i]
-			}
-	
-			await productImagesModel.create(newProdImage)
-		}
 	}
 	
 	return res.status(200).json({
@@ -416,27 +383,27 @@ router.post('/update-description', sellerValidation.updateDescription, async (re
     })
 })
 
-router.post('/ban-bidder', sellerValidation.banBidder, async (req, res) => {
-	const { bidderId, prodId } = req.body
+// router.post('/ban-bidder', sellerValidation.banBidder, async (req, res) => {
+// 	const { bidderId, prodId } = req.body
 
-	const checkExist = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
+// 	const checkExist = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
 
-	if (checkExist.length === 0) {
-		return res.status(400).json({
-			errorMessage: `Invalid Product Id Or Account Id`,
-			statusCode: errorCode
-		})
-	}
+// 	if (checkExist.length === 0) {
+// 		return res.status(400).json({
+// 			errorMessage: `Invalid Product Id Or Account Id`,
+// 			statusCode: errorCode
+// 		})
+// 	}
 
-	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+// 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
-	const updateAuctionStatus = {
-		stt_is_banned: 1,
-		stt_updated_date: presentDate
-	}
+// 	const updateAuctionStatus = {
+// 		stt_is_banned: 1,
+// 		stt_updated_date: presentDate
+// 	}
 
-	await productDescriptionModel.update(checkExist[0].stt_id, updateAuctionStatus)
-})
+// 	await productDescriptionModel.update(checkExist[0].stt_id, updateAuctionStatus)
+// })
 
 router.get('/my-product', productValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
@@ -446,13 +413,15 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
     const prodDescription = await productDescriptionModel.findAll()
     const prodImages = await productImagesModel.findAll()
 	const listProduct = await productModel.findByAccId(accId)
+	const listBidder = await auctionStatusModel.findAll()
+	const allAccount = await accountModel.findAll()
 
     const convertListProduct = listProduct.map((element) => {
         const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
             return {
                 prodImgId: info.prod_img_id,
                 prodImgProductId: info.prod_img_product_id,
-                prodImgData: info.prod_img_data
+                prodImgSrc: info.prod_img_src
             }
         })
 
@@ -463,6 +432,33 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
             }
         })
 
+		const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === element.prod_id)
+
+		if (biggestBidder) {
+			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
+				return {
+					accId: item.acc_id,
+					accName: item.acc_full_name,
+					accEmail: item.acc_email
+				}
+			})
+
+			return {
+				prodId: element.prod_id,
+				prodName: element.prod_name,
+				prodCateId: element.prod_cate_id,
+				prodOfferNumber: element.prod_offer_number,
+				prodBeginPrice: element.prod_begin_price,
+				prodStepPrice: element.prod_step_price,
+				prodBuyPrice: element.prod_buy_price,
+				prodImages: prodImageInfo || [],
+				biggestBidder: accountInfo[0] || null,
+				prodDescription: prodDescriptionOfItem || [],
+				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+			}
+		}
+
         return {
             prodId: element.prod_id,
             prodName: element.prod_name,
@@ -472,6 +468,7 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
             prodStepPrice: element.prod_step_price,
             prodBuyPrice: element.prod_buy_price,
             prodImages: prodImageInfo || [],
+			biggestBidder: null,
             prodDescription: prodDescriptionOfItem || [],
             createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
             expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
@@ -528,7 +525,7 @@ router.get('/list-bought-product', productValidation.queryInfo, async (req, res)
             return {
                 prodImgId: info.prod_img_id,
                 prodImgProductId: info.prod_img_product_id,
-                prodImgData: info.prod_img_data
+                prodImgSrc: info.prod_img_src
             }
         })
 
@@ -651,7 +648,7 @@ router.post('/give-permission', sellerValidation.givePermission, async (req, res
 	})
 })
 
-router.post('/take-permission', sellerValidation.givePermission, async (req, res) => {
+router.post('/take-permission', sellerValidation.takePermission, async (req, res) => {
 	const { bidderId, prodId } = req.body
 	
 	const permissionInfo = await auctionPermissionModel.findByBidderAndProduct(bidderId, prodId)
@@ -701,6 +698,127 @@ router.post('/take-permission', sellerValidation.givePermission, async (req, res
 	return res.status(200).json({
 		statusCode: successCode
 	})
+})
+
+router.post('/list-permission', sellerValidation.listPermission, async (req, res) => {
+	const { prodId } = req.body
+	const { accId } = req.account
+	const { page, limit } = req.query
+	
+	const prodInfo = await productModel.findBySellerAndProduct(accId, prodId)
+
+	if (prodInfo.length === 0) {
+		return res.status(200).json({
+			errorMessage: `Product Is Not Belong To Seller`,
+			statusCode: errorCode
+		})
+	}
+	const listPermissionInfo = await auctionPermissionModel.findBySellerAndProduct(accId, prodId)
+	const allAccount = await accountModel.findAll()
+
+
+	const convertListPermission = listPermissionInfo.map((element) => {
+		const bidderInfo = allAccount.find((item) => item.acc_id === element.per_bidder_id)
+		return {
+			perBidderId: element.per_bidder_id,
+			perBidderName: bidderInfo.acc_full_name || '',
+			perBidderEmail: bidderInfo.acc_email,
+			perCanAuction: element.per_can_auction,
+		}
+	})
+
+	if (convertListPermission) {
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(convertListPermission.length / parseInt(limit))
+
+			if (convertListPermission.length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+	
+			const paginationResult = convertListPermission.slice(startIndex, endIndex)
+	
+			return res.status(200).json({
+				totalPage,
+				listPermission: paginationResult,
+				statusCode: successCode
+			})
+		}
+		
+		return res.status(200).json({
+			listPermission: convertListPermission,
+			statusCode: successCode
+		})
+	}
+
+	return res.status(200).json({
+		listPermission: [],
+		statusCode: errorCode
+	})
+})
+
+router.post('/cancel-bidder', sellerValidation.cancel, async (req, res) => {
+	const { prodId, bidderId } = req.body
+	const { accId } = req.account
+
+	const checkBidderAuctionExist = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
+
+	const checkPermission = await auctionPermissionModel.findByBidderAndProduct(bidderId, prodId)
+
+	const productInfo = await productModel.findById(prodId)
+	const checkBiggest = checkBidderAuctionExist.find((item) => item.stt_is_biggest === 0)
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	if (moment(productInfo[0].prod_expired_date) > moment()) {
+		return res.status(400).json({
+			errorMessage: `This Product Still Not Expired`,
+			statusCode: errorCode
+		})
+	}
+
+	if (!checkBiggest) {
+		return res.status(400).json({
+			errorMessage: `This Bidder Isn't The Winner`,
+			statusCode: errorCode
+		})
+	}
+	
+	if (checkPermission.length !== 0) {
+		const permissionStatusInfo = {
+			per_is_cancel: 0,
+			per_updated_date: presentDate 
+		}
+
+		await auctionPermissionModel.update(checkPermission[0].per_id, permissionStatusInfo)
+	} else {
+		const auctionStatusInfo = {
+			per_seller_id: accId,
+			per_bidder_id: bidderId,
+			per_prod_id: prodId,
+			per_is_cancel: 0,
+			per_created_date: presentDate,
+			per_updated_date: presentDate 
+		}
+	
+		await auctionStatusModel.create(auctionStatusInfo)
+	}
+
+	const commentInfo = {
+		cmt_to_id: accId,
+		cmt_from_id: bidderId,
+		cmt_vote: -1,
+		cmt_content: 'Khách Hàng Không Thanh Toán',
+		cmt_created_date: presentDate,
+		cmt_updated_date: presentDate
+	}
+
+	await commentModel.create(commentInfo)
+
+	return res.status(200).json({
+		statusCode: successCode
+	})
+
 })
 
 module.exports = router

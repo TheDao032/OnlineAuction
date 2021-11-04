@@ -1,4 +1,5 @@
 const express = require('express') 
+const moment = require('moment')
 
 const router = express.Router()
 const knex = require('../utils/dbConnection')
@@ -7,6 +8,8 @@ const accountValidation = require('../middlewares/validation/account.validate')
 const accountModel = require('../models/account.model')
 const productModel = require('../models/product.model')
 const watchModel = require('../models/watch.model')
+const productImageModel = require('../models/productImage.model')
+
 
 const watchValidation = require('../middlewares/validation/watch.validate')
 
@@ -18,6 +21,7 @@ router.get('/list', watchValidation.queryInfo, async (req, res) => {
 	const { accId } = req.account
 
 	const listWatch = await watchModel.findByAcc(accId)
+	const prodImages = await productImageModel.findAll()
 
 	if (listWatch.length === 0) {
 		return res.status(200).json({
@@ -30,8 +34,17 @@ router.get('/list', watchValidation.queryInfo, async (req, res) => {
 		listWatch.map((item) => {
 			const productInfo = listProduct.find((info) => info.prod_id === item.watch_prod_id)
 
+			const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === productInfo.prod_id).map((info) => {
+				return {
+					prodImgId: info.prod_img_id,
+					prodImgProductId: info.prod_img_product_id,
+					prodImgSrc: info.prod_img_src
+				}
+			})
+
 			if (productInfo) {
 				return {
+					watchId: item.watch_id,
 					prodId: productInfo.prod_id,
 					prodName: productInfo.prod_name,
 					prodCateId: productInfo.prod_cate_id,
@@ -39,6 +52,7 @@ router.get('/list', watchValidation.queryInfo, async (req, res) => {
 					prodBeginPrice: productInfo.prod_begin_price,
 					prodStepPrice: productInfo.prod_step_price,
 					prodBuyPrice: productInfo.prod_buy_price,
+					prodImage: prodImageInfo || [],
 					createDate: moment(productInfo.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 					expireDate: moment(productInfo.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
