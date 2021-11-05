@@ -121,7 +121,7 @@ function ListPermission(props) {
                   }
                   price={item.sttBiggestPrice}
                   time={item.createdDate}
-                  bidderId={item.sttId}
+                  bidderId={item.sttBidderId}
                 />
               );
             })
@@ -234,9 +234,8 @@ function ListAuctionItem({ name, price, time, bidderId }) {
       <h6 className="listPermission__item-name">
         Bidder: <span>{name}</span> đấu giá sản phẩm với giá{" "}
         <span>{formatCurrency(price)}</span> lúc{" "}
-        <span>{`${getFullDay(time.split(" ")[0])} - ${
-          time.split(" ")[1]
-        }`}</span>
+        <span>{`${getFullDay(time.split(" ")[0])} - ${time.split(" ")[1]
+          }`}</span>
       </h6>
       <div className="listPermission__item-action">
         <button className="listPermission__item-btn listPermission__item-btn--no">
