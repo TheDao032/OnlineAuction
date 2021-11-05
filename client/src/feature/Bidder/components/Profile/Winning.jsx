@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import swal from 'sweetalert';
+import { useDispatch, useSelector } from 'react-redux'
+import axios from 'axios'
+import { setLoading } from '../../../../redux/actions/loadingAction'
+import { imagePlaceholder } from '../../../../util/imagePlaceholder'
 
 Winning.propTypes = {
   url: PropTypes.string,
@@ -19,6 +23,33 @@ function Button({ suffix, onClick, children }) {
 }
 
 function Winning() {
+  const dispatch = useDispatch()
+  const { user: { accessToken } } = useSelector(state => state.currentUser)
+
+  const [listWin, setListWin] = useState([])
+
+  async function getWinList() {
+    try {
+      dispatch(setLoading(true))
+      const res = await axios.get('https://onlineauctionserver.herokuapp.com/api/bidder/win-auction', {
+        headers: {
+          authorization: accessToken,
+        },
+      })
+
+      dispatch(setLoading(false))
+      console.log(res.data.listProducts)
+      setListWin(res.data.listProducts)
+    } catch (error) {
+      dispatch(setLoading(false))
+      console.log(error.response);
+    }
+  }
+
+  useEffect(() => {
+    getWinList()
+  }, [])
+
   return (
     <>
       <div className='profile__title'>
@@ -27,19 +58,22 @@ function Winning() {
         <hr />
       </div>
       <div className='winning__container'>
-        <WinningItem url='https://images.fpt.shop/unsafe/fit-in/585x390/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2020/9/19/637361523937032025_Apple%C2%A0Watch%20SE%20GPS%C2%A040mm-hong-2.png' name='Apple Watch nè' />
-        <WinningItem url='https://images.fpt.shop/unsafe/fit-in/585x390/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2020/9/19/637361523937032025_Apple%C2%A0Watch%20SE%20GPS%C2%A040mm-hong-2.png' name='Apple Watch nè' />
-        <WinningItem url='https://images.fpt.shop/unsafe/fit-in/585x390/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2020/9/19/637361523937032025_Apple%C2%A0Watch%20SE%20GPS%C2%A040mm-hong-2.png' name='Apple Watch nè' />
-        <WinningItem url='https://images.fpt.shop/unsafe/fit-in/585x390/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2020/9/19/637361523937032025_Apple%C2%A0Watch%20SE%20GPS%C2%A040mm-hong-2.png' name='Apple Watch nè' />
-        <WinningItem url='https://images.fpt.shop/unsafe/fit-in/585x390/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2020/9/19/637361523937032025_Apple%C2%A0Watch%20SE%20GPS%C2%A040mm-hong-2.png' name='Apple Watch nè' />
-        <WinningItem url='https://images.fpt.shop/unsafe/fit-in/585x390/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2020/9/19/637361523937032025_Apple%C2%A0Watch%20SE%20GPS%C2%A040mm-hong-2.png' name='Apple Watch nè' />
-        <WinningItem url='https://images.fpt.shop/unsafe/fit-in/585x390/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Originals/2020/9/19/637361523937032025_Apple%C2%A0Watch%20SE%20GPS%C2%A040mm-hong-2.png' name='Apple Watch nè' />
+        {
+          listWin.map(item => {
+            return (
+              <WinningItem url={item.prodImages.length === 0 || item.prodImages[0] === undefined ? imagePlaceholder : item.prodImages[0].prodImgSrc}
+                name={item.prodName}
+                seller={item.seller.accName === null || item.seller.accName === '' ? item.seller.accEmail : item.seller.accName}
+              />
+            )
+          })
+        }
       </div>
     </>
   );
 }
 
-function WinningItem({ url, name }) {
+function WinningItem({ url, name, seller }) {
   const [isOpen, setIsOpen] = useState(false);
   const [like, setLike] = useState({
     isLike: false,
@@ -110,7 +144,6 @@ function WinningItem({ url, name }) {
     console.log('Data: ', data);
   }
 
-  console.log(url)
   return (
     <div className='winning__item ended-item'>
       <div
@@ -122,7 +155,7 @@ function WinningItem({ url, name }) {
       </p>
       <br />
       <p className='winning__item-winner'>
-        Người bán: <span>Bùi Hồng Ân</span>
+        Người bán: <span>{seller}</span>
       </p>
       <form className='winning__item-form'>
         <div className='winning__item-react'>

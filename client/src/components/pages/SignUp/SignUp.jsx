@@ -12,6 +12,7 @@ import Loading from '../../Loading/Loading';
 import { useDispatch, useSelector } from 'react-redux';
 import swal from 'sweetalert';
 import ReCAPTCHA from "react-google-recaptcha";
+import { AiOutlineArrowLeft } from "react-icons/ai";
 
 import './SignUp.scss';
 
@@ -119,7 +120,10 @@ function SignUp() {
         ? <Loading />
         : <div className='signUp'>
           <div className='signUp__container'>
-            <h2>ĐĂNG KÝ</h2>
+            <div className='signIn__header'>
+              <AiOutlineArrowLeft onClick={() => history.goBack()} />
+              <h2>ĐĂNG KÝ</h2>
+            </div>
             <hr />
             {err !== '' && <p className='signUp__noti'>{err}</p>}
             <form

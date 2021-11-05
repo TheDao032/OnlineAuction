@@ -95,42 +95,42 @@ function Navbar1() {
       {loadingState.loading ? (
         <Loading />
       ) : (
-        ''
-        // <div className="menu-new">
-        //   <div className="menu-main-new">
-        //     <Navbar expand="lg" className="menu-main-wrap-new">
-        //       <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        //       <Navbar.Collapse id="basic-navbar-nav">
-        //         <Nav className="me-auto">
-        //           {allCategory.map((cat) => (
-        //             <NavDropdown
-        //               className="item-new"
-        //               title={cat.cateName}
-        //               id="basic-nav-dropdown"
-        //             >
-        //               {cat.subCategories.map((sub) => (
-        //                 <NavDropdown.Item href="#action/3.1">
-        //                   {" "}
-        //                   {sub.cateName}
-        //                 </NavDropdown.Item>
-        //               ))}
-        //             </NavDropdown>
-        //           ))}
-        //         </Nav>
+        // ''
+        <div className='menu-new'>
+          <div className='menu-main-new'>
+            <Navbar expand='lg' className='menu-main-wrap-new'>
+              <Navbar.Toggle aria-controls='basic-navbar-nav' />
+              <Navbar.Collapse id='basic-navbar-nav'>
+                <Nav className='me-auto'>
+                  {allCategory.map((cat) => (
+                    <NavDropdown
+                      className='item-new'
+                      title={cat.cateName}
+                      id='basic-nav-dropdown'
+                    >
+                      {cat.subCategories.map((sub) => (
+                        <NavDropdown.Item href='#action/3.1'>
+                          {' '}
+                          {sub.cateName}
+                        </NavDropdown.Item>
+                      ))}
+                    </NavDropdown>
+                  ))}
+                </Nav>
 
-        //         <div className="btn-container">
-        //           {userInfo.loggedIn ? (
-        //             <DropDownMenu />
-        //           ) : (
-        //             <Link to="/sign-in" className="btn-ut">
-        //               Đăng nhập
-        //             </Link>
-        //           )}
-        //         </div>
-        //       </Navbar.Collapse>
-        //     </Navbar>
-        //   </div>
-        // </div>
+                <div className='btn-container'>
+                  {userInfo.loggedIn ? (
+                    <DropDownMenu />
+                  ) : (
+                    <Link to='/sign-in' className='btn-ut'>
+                      Đăng nhập
+                    </Link>
+                  )}
+                </div>
+              </Navbar.Collapse>
+            </Navbar>
+          </div>
+        </div>
       )}
     </>
   );
