@@ -14,6 +14,7 @@ import BidderFeature from './feature/Bidder';
 import SellerFeature from './feature/Seller';
 import { logIn } from './redux/actions/userAction';
 import Header from './components/Header';
+import Forgot from './components/pages/Forgot/Forgot';
 // import SearchResult from './components/SearchResult';
 
 function App() {
@@ -28,13 +29,22 @@ function App() {
 
   return (
     <>
-      <Header></Header>
-      {pathname === '/signup' || pathname === '/sign-in' ? '' : <Navbar1 />}
+      {pathname.includes('/signup') || pathname.includes('/sign-in') ? (
+        ''
+      ) : (
+        <>
+          <Header />
+          <Navbar1 />
+        </>
+      )}
       <Switch>
         <Route path='/' exact component={Home} />
         <Route path='/signup' component={Register} />
-        <Route path='/sign-in'>
+        <Route exact path='/sign-in'>
           <SignIn />
+        </Route>
+        <Route path={`/sign-in/forgot-password`}>
+          <Forgot />
         </Route>
         <Route path='/search/:text' component={Search} />
         <Route exact path='/detail/:prodId' component={Detail} />

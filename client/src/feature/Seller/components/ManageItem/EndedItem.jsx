@@ -95,23 +95,30 @@ function EndedItem({ url, name, winner = {}, prodId }) {
     setData({ ...data, [name]: value })
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
 
 
     if (data.cmtVote === 0)
       swal("Thất bại", "Vui lòng like hoặc dislike!", "error");
 
+    const reqBody = {
+      cmtVote: data.cmtVote,
+      cmtContent: data.comment,
+      prodId: data.prodId,
+      toId: data.toId
+    }
     try {
       dispatch(setLoading(true))
 
-      const res = axios.post('https://onlineauctionserver.herokuapp.com/api/comment/new-comment', data, {
+      const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/comment/new-comment', reqBody, {
         headers: {
           authorization: accessToken
         }
       })
 
       dispatch(setLoading(false))
+      console.log(res)
       swal("Thành công", "Đã nhận xét bidder thành công", "success");
 
     } catch (error) {
@@ -119,7 +126,7 @@ function EndedItem({ url, name, winner = {}, prodId }) {
       dispatch(setLoading(false))
       swal("Thất bại", "Có lỗi khi nhận xét bidder, vui lòng thử lại", "error");
     }
-    console.log("Data: ", data)
+    console.log("Data: ", reqBody)
   }
 
   function handleCancel(e) {

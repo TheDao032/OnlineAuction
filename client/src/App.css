@@ -170,3 +170,8 @@ button {
   border: unset;
   cursor: pointer;
 }
+
+a {
+  cursor: pointer;
+  text-decoration: none;
+}

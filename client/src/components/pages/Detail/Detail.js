@@ -124,9 +124,6 @@ export default function Detail() {
 
   const { days, hours, mins } = formatTime(expireDate);
 
-  // Lấy giá hiện tại
-
-  // console.log('giá hiện tại: ', biggestPrice);
   const {
     days: daysSell,
     hours: hoursSell,
