@@ -7,6 +7,7 @@ import "./scss/index.scss";
 import Empty from "../../Empty/Empty";
 import { imagePlaceholder } from "../../../util/imagePlaceholder";
 import formatTime from "../../../util/formatTime";
+import formatCurrency from "../../../util/formatCurrency";
 import {
   AiFillDislike,
   AiFillHeart,
@@ -71,6 +72,12 @@ function Category(props) {
                     createDate={item.createDate}
                     loading={loading}
                     setLoading={setLoading}
+                    buyNow={
+                      item.prodBuyPrice === null || item.prodBuyPrice === "0"
+                        ? 0
+                        : item.prodBuyPrice
+                    }
+                    expireDate={item.expireDate}
                   />
                 );
               })}
@@ -82,12 +89,20 @@ function Category(props) {
   );
 }
 
-function CategoryItem({ src, name, createDate, prodId, loading, setLoading }) {
+function CategoryItem({
+  src,
+  name,
+  createDate,
+  prodId,
+  loading,
+  setLoading,
+  buyNow,
+  expireDate,
+}) {
   const history = useHistory();
   const { days } = formatTime(createDate);
 
   prodId = parseInt(prodId);
-  const dispatch = useDispatch();
 
   const [isLogin, setIsLogin] = useState(false);
   const [wishItem, setWishItem] = useState([]);
@@ -95,6 +110,8 @@ function CategoryItem({ src, name, createDate, prodId, loading, setLoading }) {
     isWish: false,
     watchId: null,
   });
+
+  console.log("expireDate: ", expireDate, "format: ", formatTime(expireDate));
 
   const {
     user: { accessToken },
@@ -209,6 +226,8 @@ function CategoryItem({ src, name, createDate, prodId, loading, setLoading }) {
     }
   }
 
+  const { days: dayExpire, hours, mins } = formatTime(expireDate);
+
   return (
     <div className="category__item">
       <div
@@ -219,6 +238,7 @@ function CategoryItem({ src, name, createDate, prodId, loading, setLoading }) {
         onClick={() => history.push(`/detail/${prodId}`)}
       ></div>
       <p className="category__item-name">{name}</p>
+
       <div className="category__item-info">
         <p className="category__item-time">Đăng {Math.abs(days)} ngày trước</p>
         {!wish.isWish ? (
@@ -227,6 +247,21 @@ function CategoryItem({ src, name, createDate, prodId, loading, setLoading }) {
           <AiFillHeart onClick={handleRemoveToWishList} />
         )}
       </div>
+
+      {buyNow === 0 ? (
+        ""
+      ) : (
+        <p className="category__item-buy">
+          Mua ngay: <span>{formatCurrency(buyNow)}</span>
+        </p>
+      )}
+
+      <p className="category__item-expire">
+        {dayExpire}
+        {hours}
+        {mins}
+      </p>
+
       <button
         className="category__item-button"
         onClick={() => history.push(`/detail/${prodId}`)}
