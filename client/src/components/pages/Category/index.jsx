@@ -7,6 +7,7 @@ import "./scss/index.scss";
 import Empty from "../../Empty/Empty";
 import { imagePlaceholder } from "../../../util/imagePlaceholder";
 import formatTime from "../../../util/formatTime";
+import getTimeLeft from "../../../util/getTimeLeft";
 import formatCurrency from "../../../util/formatCurrency";
 import {
   AiFillDislike,
@@ -63,7 +64,7 @@ function Category(props) {
                   <CategoryItem
                     src={
                       item.prodImages.length === 0 ||
-                      item.prodImages[0] === undefined
+                        item.prodImages[0] === undefined
                         ? imagePlaceholder
                         : item.prodImages[0].prodImgSrc
                     }
@@ -100,7 +101,7 @@ function CategoryItem({
   expireDate,
 }) {
   const history = useHistory();
-  const { days } = formatTime(createDate);
+  const { days, mins, hours } = formatTime(createDate);
 
   prodId = parseInt(prodId);
 
@@ -110,8 +111,6 @@ function CategoryItem({
     isWish: false,
     watchId: null,
   });
-
-  console.log("expireDate: ", expireDate, "format: ", formatTime(expireDate));
 
   const {
     user: { accessToken },
@@ -226,10 +225,19 @@ function CategoryItem({
     }
   }
 
-  const { days: dayExpire, hours, mins } = formatTime(expireDate);
+  const { days: dayExpire, hours: hoursExpire, mins: minsExpire } = getTimeLeft(expireDate);
 
+
+  console.log(dayExpire, hoursExpire, minsExpire)
   return (
     <div className="category__item">
+      {days === 0 && hours === 0 && mins <= 30
+        ?
+        <div className='category__new'>
+          NEW
+        </div>
+        : ""
+      }
       <div
         className="category__item-img"
         style={{
@@ -257,17 +265,18 @@ function CategoryItem({
       )}
 
       <p className="category__item-expire">
-        {dayExpire}
-        {hours}
-        {mins}
+        {
+          dayExpire < 0 ? <p>Đã hết hạn</p> : (dayExpire > 0 ? `Còn: ${dayExpire} ngày` : (hoursExpire <= 0 ? `Còn: ${minsExpire} phút` : `Còn: ${hoursExpire} giờ`))
+        }
       </p>
 
-      <button
-        className="category__item-button"
-        onClick={() => history.push(`/detail/${prodId}`)}
-      >
-        Xem chi tiết
-      </button>
+      <div className="category__item-button">
+        <button
+          onClick={() => history.push(`/detail/${prodId}`)}
+        >
+          Xem chi tiết
+        </button>
+      </div>
     </div>
   );
 }

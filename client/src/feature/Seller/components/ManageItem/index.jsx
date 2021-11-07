@@ -15,9 +15,8 @@ ManageItem.propTypes = {};
 function Button({ suffix, onClick, children, active }) {
   return (
     <button
-      className={`seller__btn seller__btn-${suffix} ${
-        active ? "seller__btn--active" : ""
-      }`}
+      className={`seller__btn seller__btn-${suffix} ${active ? "seller__btn--active" : ""
+        }`}
       onClick={onClick}
     >
       {children}
@@ -62,7 +61,7 @@ function ManageItem(props) {
         setInprocessProduct({
           isActive: true,
           product: res.data.listProducts.filter(
-            (item) => formatTime(item.expireDate).days >= 0
+            (item) => formatTime(item.expireDate).days >= 0 || formatTime(item.expireDate).hours >= 0 || formatTime(item.expireDate).mins >= 0
           ),
         });
         dispatch(setLoading(false));
@@ -77,7 +76,7 @@ function ManageItem(props) {
     setExpiredProduct({
       ...expiredProduct,
       isActive: true,
-      product: product.filter((item) => formatTime(item.expireDate).days < 0),
+      product: product.filter((item) => formatTime(item.expireDate).days < 0 && formatTime(item.expireDate).hours < 0 && formatTime(item.expireDate).mins < 0),
     });
     setInprocessProduct({ isActive: false });
   }
@@ -87,7 +86,7 @@ function ManageItem(props) {
     setInprocessProduct({
       ...inprocessProduct,
       isActive: true,
-      product: product.filter((item) => formatTime(item.expireDate).days >= 0),
+      product: product.filter((item) => formatTime(item.expireDate).days >= 0 || formatTime(item.expireDate).hours >= 0 || formatTime(item.expireDate).mins >= 0),
     });
   }
 

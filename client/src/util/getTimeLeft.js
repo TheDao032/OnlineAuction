@@ -10,7 +10,7 @@ export default function formatTime(dayTime = '') {
   const dateNow = `${date} ${time}`;
   const getDayNow = new Date(dateNow).getTime();
 
-  let diff = getDayNow - getDayTime;
+  let diff = getDayTime - getDayNow;
   let days = Math.floor(diff / (1000 * 60 * 60 * 24));
   diff -= days * (1000 * 60 * 60 * 24);
 
