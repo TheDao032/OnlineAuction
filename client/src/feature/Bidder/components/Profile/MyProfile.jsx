@@ -1,14 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Switch, useRouteMatch, useHistory } from 'react-router';
+import { useSelector } from "react-redux";
+
+const selectUser = (state) => state.currentUser;
 Wishlist.propTypes = {};
 
 function Wishlist(props) {
   const { url } = useRouteMatch()
   const history = useHistory()
-  const currentUrl = window.location.href.split('/')
+  const currentUrl = window.location.href.split('/');
+  
+  const userInfo = useSelector(selectUser).user;
 
-  console.log(url)
+  console.log("thong tin user la", userInfo.user);
+
+  // console.log(url)
   function handleChangeName() {
     history.push(`${url}/name`)
   }
@@ -22,6 +29,9 @@ function Wishlist(props) {
     history.push(`${url}/email`)
 
   }
+
+
+  
   return (
     <>
       <div className='profile__title'>
@@ -33,7 +43,7 @@ function Wishlist(props) {
       </div>
       <div className='profile__name profile__box'>
         <span className='profile__label'>Họ tên:</span>
-        <p>Phan Vũ Thanh Đạo</p>
+        <p>{userInfo.user.accName}</p>
         <button className='profile__btnChange' onClick={handleChangeName}>Thay đổi</button>
       </div>
       <div className='profile__password profile__box'>
@@ -43,7 +53,7 @@ function Wishlist(props) {
       </div>
       <div className='profile__email profile__box'>
         <span className='profile__label'>Email:</span>
-        <p>pv****@gmail.com</p>
+        <p>{userInfo.user.accEmail}</p>
         <button className='profile__btnChange' onClick={handleChangeEmail}>Thay đổi</button>
       </div>
     </>
