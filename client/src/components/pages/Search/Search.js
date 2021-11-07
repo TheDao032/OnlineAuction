@@ -21,7 +21,13 @@ export default function Search() {
   const { text } = useParams();
   console.log("nguoi dung nhap la:", text);
   const [dataSearch, setData] = useState([]);
+  const [dataPagination, setDataPagination] = useState([]);
+  const [pageCurrent, setPageCurrent] = useState(3);
+  const [itemLimit, setImtemLimit] = useState(2);
+  const [maxPage, setMaxPage] = useState(1);
   const [loading, setLoading] = useState(false);
+
+
 
   const fetchProductSearch = async () => {
     try {
@@ -36,6 +42,8 @@ export default function Search() {
       setLoading(false);
       console.log("dl lieu sau khi search", response.data.listProducts);
       setData(response.data.listProducts);
+
+      console.log("dl lieu sau khi phan trang", dataPagination);
     } catch (error) {
       console.log(error.response);
       setLoading(false);
@@ -46,34 +54,76 @@ export default function Search() {
     fetchProductSearch();
   }, []);
 
-  if (loading) return <Loading />;
+  useEffect(() => {
+    console.log('dataSearch', dataSearch)
+    console.log((pageCurrent - 1) * itemLimit)
+    console.log(pageCurrent * itemLimit)
+    console.log(dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit))
+    setDataPagination(dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit));
+    setMaxPage(Math.ceil(dataSearch.length / itemLimit));
+  }, [dataSearch])
 
+  useEffect(() => {
+    setDataPagination(dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit));
+  }, [pageCurrent])
+
+  var dataPage = "";
+  const handleChange = (e) => {
+    dataPage = e.target.value;
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      if (parseInt(dataPage) < 1 || parseInt(dataPage) > maxPage){
+        alert("Số trang không phù hợp")
+      }
+      else{
+        setPageCurrent(dataPage);
+      }
+    }
+  };
+
+
+
+  if (loading) return <Loading />;
+  console.log(dataSearch);
   return (
-    <div className="search grid wide">
-      {dataSearch.length === 0 ? (
-        <Empty title="Không tìm thấy sản phẩm" />
-      ) : (
-        <div className="search__container">
-          {dataSearch.map((item) => {
-            return (
-              <SearchItem
-                src={
-                  item.prodImages.length === 0 ||
-                  item.prodImages[0] === undefined
-                    ? imagePlaceholder
-                    : item.prodImages[0].prodImgSrc
-                }
-                name={item.prodName}
-                prodId={item.prodId}
-                createDate={item.createDate}
-                loading={loading}
-                setLoading={setLoading}
-              />
-            );
-          })}
-        </div>
-      )}
+    <div>
+      <div className="search grid wide">
+        {dataSearch.length === 0 ? (
+          <Empty title="Không tìm thấy sản phẩm" />
+        ) : (
+          <div className="search__container">
+            {dataPagination.map((item) => {
+              return (
+                <SearchItem
+                  src={
+                    item.prodImages.length === 0 ||
+                      item.prodImages[0] === undefined
+                      ? imagePlaceholder
+                      : item.prodImages[0].prodImgSrc
+                  }
+                  name={item.prodName}
+                  prodId={item.prodId}
+                  createDate={item.createDate}
+                  loading={loading}
+                  setLoading={setLoading}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <div className="pagination">
+        <button className="pagination-button" disabled={pageCurrent === 1} onClick={() => setPageCurrent(pageCurrent - 1)}>Prev</button>
+        <br />
+        <input onChange={handleChange} onKeyPress={handleKeyPress} type="number" className="pagination-input" placeholder={pageCurrent} />
+        <span className="pagination-span" >/</span>
+        <p className="pagination-p">{maxPage}</p>
+        <button className="pagination-button" disabled={pageCurrent === maxPage} onClick={() => setPageCurrent(pageCurrent + 1)}>Next</button>
+      </div>
     </div>
+
   );
 }
 
