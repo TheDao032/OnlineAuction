@@ -100,7 +100,7 @@ function Wishlist(props) {
               item.prodOfferNumber === null
                 ? item.prodBeginPrice
                 : item.prodBeginPrice +
-                  item.prodOfferNumber * item.prodStepPrice
+                item.prodOfferNumber * item.prodStepPrice
             }
             handleRemove={handleRemove}
             watchId={item.watchId}
@@ -120,7 +120,6 @@ function WishListItem({
   handleRemove,
   src,
 }) {
-  const { days, hours, mins } = formatTime(expireDate);
   const {
     days: daysSell,
     hours: hoursSell,
@@ -151,9 +150,9 @@ function WishListItem({
           Đăng lúc:{" "}
           {daysSell > 0
             ? `${daysSell} ngày trước`
-            : hours > 0
-            ? `${hoursSell} giờ trước`
-            : `${minSell} phút trước`}
+            : hoursSell > 0
+              ? `${hoursSell} giờ trước`
+              : `${minSell} phút trước`}
         </p>
         <h3 className="wishlist__name">{name}</h3>
         <p className="wishlist__price">

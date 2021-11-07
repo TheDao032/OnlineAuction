@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
-import axios from "axios";
-import Empty from "../../Empty/Empty";
-import Loading from "../../Loading/Loading";
-import { imagePlaceholder } from "../../../util/imagePlaceholder";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
+import axios from 'axios';
+import Empty from '../../Empty/Empty';
+import Loading from '../../Loading/Loading';
+import { imagePlaceholder } from '../../../util/imagePlaceholder';
 import {
   AiFillDislike,
   AiFillHeart,
   AiFillLike,
   AiOutlineHeart,
   AiFillEdit,
-} from "react-icons/ai";
-import { useHistory } from "react-router";
-import { useDispatch, useSelector } from "react-redux";
-import swal from "sweetalert";
-import formatTime from "../../../util/formatTime";
-import "./Search.scss";
+} from 'react-icons/ai';
+import { useHistory } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import swal from 'sweetalert';
+import formatTime from '../../../util/formatTime';
+import './Search.scss';
 
 export default function Search() {
   const { text } = useParams();
-  console.log("nguoi dung nhap la:", text);
+  console.log('nguoi dung nhap la:', text);
   const [dataSearch, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -27,14 +27,14 @@ export default function Search() {
     try {
       setLoading(true);
       const response = await axios.post(
-        "https://onlineauctionserver.herokuapp.com/api/product/search",
+        'https://onlineauctionserver.herokuapp.com/api/product/search',
         {
           text: text,
           orderMode: 0,
         }
       );
       setLoading(false);
-      console.log("dl lieu sau khi search", response.data.listProducts);
+      console.log('dl lieu sau khi search', response.data.listProducts);
       setData(response.data.listProducts);
     } catch (error) {
       console.log(error.response);
@@ -49,11 +49,11 @@ export default function Search() {
   if (loading) return <Loading />;
 
   return (
-    <div className="search grid wide">
+    <div className='search grid wide'>
       {dataSearch.length === 0 ? (
-        <Empty title="Không tìm thấy sản phẩm" />
+        <Empty title='Không tìm thấy sản phẩm' />
       ) : (
-        <div className="search__container">
+        <div className='search__container'>
           {dataSearch.map((item) => {
             return (
               <SearchItem
@@ -79,7 +79,7 @@ export default function Search() {
 
 function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
   const history = useHistory();
-  const { days } = formatTime(createDate);
+  const { days, mins, hours } = formatTime(createDate);
 
   prodId = parseInt(prodId);
   const dispatch = useDispatch();
@@ -104,7 +104,7 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
     if (loggedIn) {
       try {
         const res = await axios.get(
-          "https://onlineauctionserver.herokuapp.com/api/watch-list/list",
+          'https://onlineauctionserver.herokuapp.com/api/watch-list/list',
           {
             headers: {
               authorization: accessToken,
@@ -116,7 +116,7 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
           setWishItem(res.data.listWatch);
         }
       } catch (error) {
-        console.log("Danh sách Watch list lỗi: ", error.response);
+        console.log('Danh sách Watch list lỗi: ', error.response);
       }
     }
   }
@@ -145,7 +145,7 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
       try {
         setLoading(true);
         const res = await axios.post(
-          "https://onlineauctionserver.herokuapp.com/api/watch-list/add",
+          'https://onlineauctionserver.herokuapp.com/api/watch-list/add',
           {
             prodId,
           },
@@ -159,19 +159,19 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
           watchId: res.data.watchId,
         });
 
-        swal("Thành công!", "Sản phẩm đã được thêm vào yêu thích!", "success");
+        swal('Thành công!', 'Sản phẩm đã được thêm vào yêu thích!', 'success');
       } catch (err) {
         console.log(err.response);
         setLoading(false);
 
         swal(
-          "Thất bại!",
-          "Có lỗi khi thêm sản phẩm vào yêu thích, vui lòng thử lại!",
-          "error"
+          'Thất bại!',
+          'Có lỗi khi thêm sản phẩm vào yêu thích, vui lòng thử lại!',
+          'error'
         );
       }
     } else {
-      history.push("/sign-in");
+      history.push('/sign-in');
     }
   }
 
@@ -181,7 +181,7 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
       setLoading(true);
 
       const res = await axios.post(
-        "https://onlineauctionserver.herokuapp.com/api/watch-list/delete",
+        'https://onlineauctionserver.herokuapp.com/api/watch-list/delete',
         {
           watchId,
         },
@@ -190,43 +190,47 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
 
       setLoading(false);
 
-      swal("Thành công!", "Đã xóa khỏi danh sách yêu thích!", "success");
+      swal('Thành công!', 'Đã xóa khỏi danh sách yêu thích!', 'success');
     } catch (err) {
       console.log(err.response);
       setLoading(false);
 
       swal(
-        "Thất bại!",
-        "Có lỗi khi xóa sản phẩm khỏi yêu thích, vui lòng thử lại!",
-        "error"
+        'Thất bại!',
+        'Có lỗi khi xóa sản phẩm khỏi yêu thích, vui lòng thử lại!',
+        'error'
       );
     }
   }
 
   return (
-    <div className="search__item">
+    <div className='search__item'>
+      {days === 0 && hours === 0 && mins <= 30 ? (
+        <div className='search__new'>NEW</div>
+      ) : (
+        ''
+      )}
       <div
-        className="search__item-img"
+        className='search__item-img'
         style={{
           backgroundImage: `url(${src})`,
         }}
         onClick={() => history.push(`/detail/${prodId}`)}
       ></div>
-      <p className="search__item-name">{name}</p>
-      <div className="search__item-info">
-        <p className="search__item-time">Đăng {Math.abs(days)} ngày trước</p>
+      <p className='search__item-name'>{name}</p>
+      <div className='search__item-info'>
+        <p className='search__item-time'>Đăng {Math.abs(days)} ngày trước</p>
         {!wish.isWish ? (
           <AiOutlineHeart onClick={handleAddToWishList} />
         ) : (
           <AiFillHeart onClick={handleRemoveToWishList} />
         )}
       </div>
-      <button
-        className="search__item-button"
-        onClick={() => history.push(`/detail/${prodId}`)}
-      >
-        Xem chi tiết
-      </button>
+      <div className='search__item-button'>
+        <button onClick={() => history.push(`/detail/${prodId}`)}>
+          Xem chi tiết
+        </button>
+      </div>
     </div>
   );
 }

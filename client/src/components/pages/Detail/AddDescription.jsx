@@ -33,7 +33,7 @@ function AddDescription({ onCancel }) {
       prodDescription,
     };
 
-    if (prodDescription === "") {
+    if (prodDescription ===                                                                                                                                                                                 "") {
       swal("Thất bại!", "Vui lòng nhập mô tả", "error");
     } else {
       try {

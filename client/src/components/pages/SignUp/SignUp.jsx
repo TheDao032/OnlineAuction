@@ -64,7 +64,7 @@ function SignUp() {
   }
 
   const handleOnSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
 
     const postData = {
       "accEmail": data.accEmail.toString(),
@@ -72,6 +72,8 @@ function SignUp() {
       "accFullName": data.accFullName.toString(),
       "accPhoneNumber": data.accPhoneNumber.toString(),
     }
+
+    console.log(postData)
 
     if (reCaptCha) {
       dispatch(setLoading(true))
