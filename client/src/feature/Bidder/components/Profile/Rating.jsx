@@ -4,6 +4,7 @@ import { AiFillLike, AiFillDislike } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { setLoading } from '../../../../redux/actions/loadingAction'
+import Empty from '../../../../components/Empty/Empty';
 
 Rating.propTypes = {};
 
@@ -47,25 +48,30 @@ function Rating(props) {
         </p>
         <hr />
       </div>
-      <div className='rating__general'>
-        <h3>Đánh giá của bạn:</h3>
-        <div className='rating__general-rate'>
-          <p>
-            10 <AiFillLike className='rating__general-like' /> và 31 <AiFillDislike className='rating__general-dislike' /> ({(10 * 100 / (10 + 31)).toFixed(2)}%)
-          </p>
-        </div>
-      </div>
-      <div className="rating__detail">
-        <h3>Chi tiết đánh giá</h3>
-        <div className="rating__box">
-          {ratingList.map(item => {
-            return (
-              <RatingItem comment={item.cmtContent} status={item.cmtVote} />
-            )
-          })}
+      {
+        ratingList.length === 0 ? <Empty title='Bạn chưa có đánh giá' /> :
+          <>
+            <div className='rating__general'>
+              <h3>Đánh giá của bạn:</h3>
+              <div className='rating__general-rate'>
+                <p>
+                  10 <AiFillLike className='rating__general-like' /> và 31 <AiFillDislike className='rating__general-dislike' /> ({(10 * 100 / (10 + 31)).toFixed(2)}%)
+                </p>
+              </div>
+            </div>
+            <div className="rating__detail">
+              <h3>Chi tiết đánh giá</h3>
+              <div className="rating__box">
+                {ratingList.map(item => {
+                  return (
+                    <RatingItem comment={item.cmtContent} status={item.cmtVote} />
+                  )
+                })}
 
-        </div>
-      </div>
+              </div>
+            </div>
+          </>
+      }
     </div>
   </>)
     ;

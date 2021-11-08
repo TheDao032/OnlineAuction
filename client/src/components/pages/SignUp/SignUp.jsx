@@ -38,7 +38,13 @@ function SignUp() {
     retype_pw: yup
       .string()
       .oneOf([yup.ref('accPassword')], 'Mật khẩu không khớp'),
-    accFullName: yup.string().max(100, 'Tối đa 100 kí tự'),
+    accFullName: yup
+      .string()
+      .required('Tên không thể trống')
+      .max(100, 'Tối đa 100 kí tự')
+      .test("Have two word", "Nhập họ và tên", (value) => {
+        return value.trim().split(" ").length >= 2;
+      }),
     accPhoneNumber: yup.string().max(15, 'Tối đa 15 kí tự'),
   });
 

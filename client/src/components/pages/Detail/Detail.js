@@ -17,6 +17,7 @@ import Loading from '../../Loading/Loading';
 import './scss/index.scss';
 import { imagePlaceholder } from '../../../util/imagePlaceholder';
 import getFullDay from '../../../util/getFullDay';
+import getTimeLeft from '../../../util/getTimeLeft';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import AddDescription from './AddDescription';
 
@@ -72,8 +73,6 @@ export default function Detail() {
     }
   };
 
-  console.log('Time: ', formatTime(product.expireDate));
-
   async function getListAuction() {
     try {
       dispatch(setLoading(true));
@@ -126,7 +125,7 @@ export default function Detail() {
     }
   }
 
-  const { days, hours, mins } = formatTime(expireDate);
+  const { days, hours, mins } = getTimeLeft(expireDate);
 
   const {
     days: daysSell,
@@ -481,7 +480,7 @@ function Offer({
         onChange={handleOnChange}
       />
       <hr />
-      {days < 0 && hours < 0 && mins < 0 ? (
+      {days < 0 ? (
         <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
           Thời gian đấu giá đã kết thúc
         </p>
@@ -598,6 +597,8 @@ function RelateItem({ src, seller, price, name, isEnd, prodId }) {
 }
 
 function TimeLeft({ days, hours, mins }) {
+  console.log(days, hours, mins);
+
   return (
     <div className='currentPrice__timeleft-item'>
       <p className='currentPrice__daysleft'>{days} ngày</p>
@@ -608,20 +609,22 @@ function TimeLeft({ days, hours, mins }) {
 }
 
 function DayLeft({ days, hours, mins }) {
+  console.log(days, hours, mins);
+
   return (
     <div className='currentPrice__timeEnd'>
-      {days <= 3 && days > 0 ? (
-        <p className='currentPrice__timeleft'>Còn {days} ngày nữa!</p>
-      ) : days <= 0 ? (
-        hours !== 0 ? (
-          <p className='currentPrice__timeleft'>Còn {hours} giờ nữa</p>
-        ) : (
-          <p className='currentPrice__timeleft'>Còn {mins} phút nữa</p>
-        )
-      ) : days < 0 && hours < 0 && mins < 0 ? (
-        <p className='currentPrice__ended'>Đã kết thúc</p>
-      ) : (
+      {days >= 3 && (hours >= 0 || mins >= 0) ? (
         <TimeLeft days={days} hours={hours} mins={mins} />
+      ) : days < 0 ? (
+        <p className='currentPrice__ended'>Đã kết thúc</p>
+      ) : days <= 3 ? (
+        <p className='currentPrice__timeleft'>Còn {days} ngày nữa</p>
+      ) : days === 0 && hours > 0 ? (
+        <p className='currentPrice__timeleft'>Còn {hours} giờ nữa</p>
+      ) : days === 0 && hours === 0 ? (
+        <p className='currentPrice__timeleft'>Còn {mins} phút nữa</p>
+      ) : (
+        ''
       )}
     </div>
   );

@@ -15,7 +15,9 @@ import { useHistory } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import swal from 'sweetalert';
 import formatTime from '../../../util/formatTime';
+import getTimeLeft from '../../../util/getTimeLeft';
 import './Search.scss';
+import formatCurrency from '../../../util/formatCurrency';
 
 export default function Search() {
   const { text } = useParams();
@@ -26,8 +28,6 @@ export default function Search() {
   const [itemLimit, setImtemLimit] = useState(2);
   const [maxPage, setMaxPage] = useState(1);
   const [loading, setLoading] = useState(false);
-
-
 
   const fetchProductSearch = async () => {
     try {
@@ -43,7 +43,7 @@ export default function Search() {
       console.log('dl lieu sau khi search', response.data.listProducts);
       setData(response.data.listProducts);
 
-      console.log("dl lieu sau khi phan trang", dataPagination);
+      console.log('dl lieu sau khi phan trang', dataPagination);
     } catch (error) {
       console.log(error.response);
       setLoading(false);
@@ -55,51 +55,54 @@ export default function Search() {
   }, []);
 
   useEffect(() => {
-    console.log('dataSearch', dataSearch)
-    console.log((pageCurrent - 1) * itemLimit)
-    console.log(pageCurrent * itemLimit)
-    console.log(dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit))
-    setDataPagination(dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit));
+    console.log('dataSearch', dataSearch);
+    console.log((pageCurrent - 1) * itemLimit);
+    console.log(pageCurrent * itemLimit);
+    console.log(
+      dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit)
+    );
+    setDataPagination(
+      dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit)
+    );
     setMaxPage(Math.ceil(dataSearch.length / itemLimit));
-  }, [dataSearch])
+  }, [dataSearch]);
 
   useEffect(() => {
-    setDataPagination(dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit));
-  }, [pageCurrent])
+    setDataPagination(
+      dataSearch.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit)
+    );
+  }, [pageCurrent]);
 
-  var dataPage = "";
+  var dataPage = '';
   const handleChange = (e) => {
     dataPage = e.target.value;
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      if (parseInt(dataPage) < 1 || parseInt(dataPage) > maxPage){
-        alert("Số trang không phù hợp")
-      }
-      else{
+    if (e.key === 'Enter') {
+      if (parseInt(dataPage) < 1 || parseInt(dataPage) > maxPage) {
+        swal('Lỗi', 'Số trang không hợp lệ', 'error');
+      } else {
         setPageCurrent(dataPage);
       }
     }
   };
 
-
-
   if (loading) return <Loading />;
   console.log(dataSearch);
   return (
     <div>
-      <div className="search grid wide">
+      <div className='search grid wide'>
         {dataSearch.length === 0 ? (
-          <Empty title="Không tìm thấy sản phẩm" />
+          <Empty title='Không tìm thấy sản phẩm' />
         ) : (
-          <div className="search__container">
+          <div className='search__container'>
             {dataPagination.map((item) => {
               return (
                 <SearchItem
                   src={
                     item.prodImages.length === 0 ||
-                      item.prodImages[0] === undefined
+                    item.prodImages[0] === undefined
                       ? imagePlaceholder
                       : item.prodImages[0].prodImgSrc
                   }
@@ -108,26 +111,64 @@ export default function Search() {
                   createDate={item.createDate}
                   loading={loading}
                   setLoading={setLoading}
+                  expireDate={item.expireDate}
+                  buyNow={
+                    item.prodBuyPrice === null || item.prodBuyPrice === '0'
+                      ? 0
+                      : item.prodBuyPrice
+                  }
+                  price={item.prodBeginPrice}
+                  offerTimes={item.prodOfferNumber}
+                  biggestBidder={item.biggestBidder}
                 />
               );
             })}
           </div>
         )}
       </div>
-      <div className="pagination">
-        <button className="pagination-button" disabled={pageCurrent === 1} onClick={() => setPageCurrent(pageCurrent - 1)}>Prev</button>
+
+      <div className='pagination'>
+        <button
+          className='pagination-button'
+          disabled={pageCurrent === 1}
+          onClick={() => setPageCurrent(pageCurrent - 1)}
+        >
+          Prev
+        </button>
         <br />
-        <input onChange={handleChange} onKeyPress={handleKeyPress} type="number" className="pagination-input" placeholder={pageCurrent} />
-        <span className="pagination-span" >/</span>
-        <p className="pagination-p">{maxPage}</p>
-        <button className="pagination-button" disabled={pageCurrent === maxPage} onClick={() => setPageCurrent(pageCurrent + 1)}>Next</button>
+        <input
+          onChange={handleChange}
+          onKeyPress={handleKeyPress}
+          type='number'
+          className='pagination-input'
+          placeholder={pageCurrent}
+        />
+        <span className='pagination-span'>/</span>
+        <p className='pagination-p'>{maxPage}</p>
+        <button
+          className='pagination-button'
+          disabled={pageCurrent === maxPage}
+          onClick={() => setPageCurrent(pageCurrent + 1)}
+        >
+          Next
+        </button>
       </div>
     </div>
-
   );
 }
 
-function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
+function SearchItem({
+  src,
+  name,
+  createDate,
+  prodId,
+  setLoading,
+  expireDate,
+  buyNow,
+  price,
+  offerTimes,
+  biggestBidder,
+}) {
   const history = useHistory();
   const { days, mins, hours } = formatTime(createDate);
 
@@ -253,6 +294,12 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
     }
   }
 
+  const {
+    days: dayExpire,
+    hours: hoursExpire,
+    mins: minsExpire,
+  } = getTimeLeft(expireDate);
+
   return (
     <div className='search__item'>
       {days === 0 && hours === 0 && mins <= 30 ? (
@@ -260,6 +307,7 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
       ) : (
         ''
       )}
+
       <div
         className='search__item-img'
         style={{
@@ -267,15 +315,66 @@ function SearchItem({ src, name, createDate, prodId, loading, setLoading }) {
         }}
         onClick={() => history.push(`/detail/${prodId}`)}
       ></div>
+
       <p className='search__item-name'>{name}</p>
+
       <div className='search__item-info'>
-        <p className='search__item-time'>Đăng {Math.abs(days)} ngày trước</p>
+        <p className='search__item-time'>
+          {days > 0
+            ? `Đăng ${Math.abs(days)} ngày trước`
+            : hours > 0
+            ? `Đăng ${Math.abs(hours)} giờ trước`
+            : `Đăng ${Math.abs(mins)} phút trước`}
+        </p>
         {!wish.isWish ? (
           <AiOutlineHeart onClick={handleAddToWishList} />
         ) : (
           <AiFillHeart onClick={handleRemoveToWishList} />
         )}
       </div>
+
+      <p className='search__item-expire'>
+        {dayExpire < 0 ? (
+          <p className='search__item-expire-end'>Đã hết hạn</p>
+        ) : dayExpire > 0 ? (
+          <p className='search__item-expire-still'>Còn: {dayExpire} ngày</p>
+        ) : hoursExpire <= 0 ? (
+          <p className='search__item-expire-still'>Còn: {minsExpire} phút</p>
+        ) : (
+          <p className='search__item-expire-still'>Còn: {hoursExpire} giờ</p>
+        )}
+      </p>
+
+      <p className='search__item-price'>
+        Giá: <span>{formatCurrency(price)}</span>
+      </p>
+
+      {buyNow === 0 || buyNow === null || buyNow === undefined ? (
+        ''
+      ) : (
+        <p className='search__item-buy'>
+          Mua ngay: <span>{formatCurrency(buyNow)}</span>
+        </p>
+      )}
+
+      {biggestBidder === null || biggestBidder.length === 0 ? (
+        <p className='search__item-biggestBidder'>
+          Chưa có người đặt giá cao nhất
+        </p>
+      ) : (
+        <p className='search__item-biggestBidder'>
+          Đặt cao nhất: <span>{biggestBidder[0].accName}</span>
+        </p>
+      )}
+
+      {offerTimes === null || offerTimes === 0 ? (
+        <p className='search__item-offerTime'>Chưa có lượt ra giá nào</p>
+      ) : (
+        <p className='search__item-offerTime'>
+          <span>{offerTimes}</span> lượt ra giá
+        </p>
+      )}
+
       <div className='search__item-button'>
         <button onClick={() => history.push(`/detail/${prodId}`)}>
           Xem chi tiết
