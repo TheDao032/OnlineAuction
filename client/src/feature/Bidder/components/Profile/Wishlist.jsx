@@ -9,6 +9,7 @@ import axios from "axios";
 import { AiFillHeart } from "react-icons/ai";
 import { useHistory } from "react-router";
 import { imagePlaceholder } from "../../../../util/imagePlaceholder";
+import Empty from '../../../../components/Empty/Empty'
 
 Wishlist.propTypes = {};
 
@@ -85,28 +86,31 @@ function Wishlist(props) {
         </p>
         <hr />
       </div>
-      {wish.map((item) => {
-        return (
-          <WishListItem
-            src={
-              item.prodImage === undefined || item.prodImage?.length === 0
-                ? imagePlaceholder
-                : item.prodImage[0].prodImgSrc
-            }
-            prodId={item.prodId}
-            name={item.prodName}
-            expireDate={item.expireDate}
-            currentPrice={
-              item.prodOfferNumber === null
-                ? item.prodBeginPrice
-                : item.prodBeginPrice +
-                item.prodOfferNumber * item.prodStepPrice
-            }
-            handleRemove={handleRemove}
-            watchId={item.watchId}
-          />
-        );
-      })}
+      {
+        wish.length === 0 ? <Empty title='Bạn chưa có sản phẩm yêu thích' /> : wish.map((item) => {
+          return (
+            <WishListItem
+              src={
+                item.prodImage === undefined || item.prodImage?.length === 0
+                  ? imagePlaceholder
+                  : item.prodImage[0].prodImgSrc
+              }
+              prodId={item.prodId}
+              name={item.prodName}
+              expireDate={item.expireDate}
+              currentPrice={
+                item.prodOfferNumber === null
+                  ? item.prodBeginPrice
+                  : item.prodBeginPrice +
+                  item.prodOfferNumber * item.prodStepPrice
+              }
+              handleRemove={handleRemove}
+              watchId={item.watchId}
+            />
+          );
+        })
+      }
+
     </div>
   );
 }

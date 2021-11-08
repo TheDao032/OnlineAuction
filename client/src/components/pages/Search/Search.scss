@@ -1,6 +1,6 @@
 .search {
   &__container {
-    margin-top: 20px;
+    margin: 20px 0;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-gap: 20px;
@@ -36,12 +36,12 @@
   }
 
   &__item {
-    position: relative;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 3px;
     padding: 5px;
     display: flex;
     flex-direction: column;
+    position: relative;
 
     &-img {
       background-position: center;
@@ -65,6 +65,15 @@
       line-height: 1.2;
       overflow: hidden;
       margin-bottom: 5px;
+    }
+
+    &-buy {
+      font-size: 14px;
+      margin-top: 5px;
+
+      & span {
+        font-weight: 500;
+      }
     }
 
     &-info {
@@ -106,23 +115,69 @@
         // transform: translateY(70%);
       }
     }
+
+    &-expire {
+      margin-top: 5px;
+      font-size: 12px;
+      text-align: center;
+
+      &-end {
+        display: block;
+        color: rgb(255, 67, 78);
+        border: 1px solid rgb(255, 67, 78);
+        padding: 5px;
+      }
+
+      &-still {
+        display: block;
+        color: #3d99dc;
+        border: 1px solid #3d99dc;
+        padding: 5px;
+      }
+    }
+
+    &-price {
+      margin-top: 8px;
+      font-size: 14px;
+
+      & span {
+        font-weight: 500;
+      }
+    }
+
+    &-offerTime {
+      font-size: 12px;
+      margin-top: 5px;
+
+      & span {
+        font-weight: 500;
+      }
+    }
+
+    &-biggestBidder {
+      margin-top: 8px;
+      font-size: 12px;
+
+      & span {
+        font-weight: 500;
+      }
+    }
   }
 }
 
-.pagination{
+.pagination {
   display: flex;
   text-align: center;
   justify-content: center;
   margin-top: 35px;
+  margin-bottom: 15px;
 }
 
-.pagination-button{
+.pagination-button {
   border: none;
   font-size: 0.8rem;
   border-radius: 8px;
-  transition:
-  background-color 400ms ease,
-  color 400ms ease;
+  transition: background-color 400ms ease, color 400ms ease;
   background-color: rgba(0, 69, 172, 1);
   color: #222222;
   margin-left: 15px;
@@ -132,7 +187,6 @@
   font-weight: bold;
 }
 
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -140,22 +194,22 @@ input::-webkit-inner-spin-button {
 }
 
 input:focus::-webkit-input-placeholder {
-    opacity: 0;
+  opacity: 0;
 }
 
-.pagination-input{
+.pagination-input {
   width: 25px;
   font-size: 16px;
   padding: 0px;
   text-align: center;
 }
 
-.pagination-span{
+.pagination-span {
   padding: 10px 0px;
   margin-left: 5px;
 }
 
-.pagination-p{
+.pagination-p {
   padding: 10px 0px;
   margin-left: 5px;
 }

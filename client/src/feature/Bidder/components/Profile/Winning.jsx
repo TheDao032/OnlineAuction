@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { setLoading } from '../../../../redux/actions/loadingAction'
 import { imagePlaceholder } from '../../../../util/imagePlaceholder'
+import Empty from '../../../../components/Empty/Empty'
 
 Winning.propTypes = {
   url: PropTypes.string,
@@ -57,18 +58,22 @@ function Winning() {
         <p className='profile__title-sub'>Chúa tể ra giá, kẻ chiếm lĩnh thị trường</p>
         <hr />
       </div>
-      <div className='winning__container'>
-        {
-          listWin.map(item => {
-            return (
-              <WinningItem url={item.prodImages.length === 0 || item.prodImages[0] === undefined ? imagePlaceholder : item.prodImages[0].prodImgSrc}
-                name={item.prodName}
-                seller={item.seller.accName === null || item.seller.accName === '' ? item.seller.accEmail : item.seller.accName}
-              />
-            )
-          })
-        }
-      </div>
+      {
+        listWin.length === 0 ? <Empty title='Bạn chưa thắng sản phẩm nào' /> :
+          <div className='winning__container'>
+            {
+              listWin.map(item => {
+                return (
+                  <WinningItem url={item.prodImages.length === 0 || item.prodImages[0] === undefined ? imagePlaceholder : item.prodImages[0].prodImgSrc}
+                    name={item.prodName}
+                    seller={item.seller.accName === null || item.seller.accName === '' ? item.seller.accEmail : item.seller.accName}
+                  />
+                )
+              })
+            }
+          </div>
+      }
+
     </>
   );
 }

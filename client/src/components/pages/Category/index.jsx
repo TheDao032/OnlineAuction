@@ -71,7 +71,6 @@ function Category(props) {
                     name={item.prodName}
                     prodId={item.prodId}
                     createDate={item.createDate}
-                    loading={loading}
                     setLoading={setLoading}
                     buyNow={
                       item.prodBuyPrice === null || item.prodBuyPrice === "0"
@@ -79,6 +78,9 @@ function Category(props) {
                         : item.prodBuyPrice
                     }
                     expireDate={item.expireDate}
+                    price={item.prodBeginPrice}
+                    offerTimes={item.prodOfferNumber}
+                    biggestBidder={item.biggestBidder}
                   />
                 );
               })}
@@ -91,14 +93,7 @@ function Category(props) {
 }
 
 function CategoryItem({
-  src,
-  name,
-  createDate,
-  prodId,
-  loading,
-  setLoading,
-  buyNow,
-  expireDate,
+  src, name, createDate, prodId, setLoading, buyNow, expireDate, price, offerTimes, biggestBidder
 }) {
   const history = useHistory();
   const { days, mins, hours } = formatTime(createDate);
@@ -227,8 +222,8 @@ function CategoryItem({
 
   const { days: dayExpire, hours: hoursExpire, mins: minsExpire } = getTimeLeft(expireDate);
 
+  // console.log(days, hours, mins)
 
-  console.log(dayExpire, hoursExpire, minsExpire)
   return (
     <div className="category__item">
       {days === 0 && hours === 0 && mins <= 30
@@ -248,13 +243,34 @@ function CategoryItem({
       <p className="category__item-name">{name}</p>
 
       <div className="category__item-info">
-        <p className="category__item-time">Đăng {Math.abs(days)} ngày trước</p>
+        <p className="category__item-time">{
+          days > 0
+            ? `Đăng ${Math.abs(days)} ngày trước`
+            : (hours > 0 ? `Đăng ${Math.abs(hours)} giờ trước` : `Đăng ${Math.abs(mins)} phút trước`)
+        }
+        </p>
         {!wish.isWish ? (
           <AiOutlineHeart onClick={handleAddToWishList} />
         ) : (
           <AiFillHeart onClick={handleRemoveToWishList} />
         )}
       </div>
+
+      <p className='category__item-expire'>
+        {dayExpire < 0 ? (
+          <p className='category__item-expire-end'>Đã hết hạn</p>
+        ) : dayExpire > 0 ? (
+          <p className='category__item-expire-still'>Còn: {dayExpire} ngày</p>
+        ) : hoursExpire <= 0 ? (
+          <p className='category__item-expire-still'>Còn: {minsExpire} phút</p>
+        ) : (
+          <p className='category__item-expire-still'>Còn: {hoursExpire} giờ</p>
+        )}
+      </p>
+
+      <p className='category__item-price'>
+        Giá: <span>{formatCurrency(price)}</span>
+      </p>
 
       {buyNow === 0 ? (
         ""
@@ -264,11 +280,25 @@ function CategoryItem({
         </p>
       )}
 
-      <p className="category__item-expire">
-        {
-          dayExpire < 0 ? <p>Đã hết hạn</p> : (dayExpire > 0 ? `Còn: ${dayExpire} ngày` : (hoursExpire <= 0 ? `Còn: ${minsExpire} phút` : `Còn: ${hoursExpire} giờ`))
-        }
-      </p>
+      {biggestBidder === null || biggestBidder.length === 0 ? (
+        <p className='category__item-biggestBidder'>
+          Chưa có người đặt giá cao nhất
+        </p>
+      ) : (
+        <p className='category__item-biggestBidder'>
+          Đặt cao nhất: <span>{biggestBidder[0].accName}</span>
+        </p>
+      )}
+
+      {offerTimes === null || offerTimes === 0 ? (
+        <p className='category__item-offerTime'>Chưa có lượt ra giá nào</p>
+      ) : (
+        <p className='category__item-offerTime'>
+          <span>{offerTimes}</span> lượt ra giá
+        </p>
+      )}
+
+
 
       <div className="category__item-button">
         <button

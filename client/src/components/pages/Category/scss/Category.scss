@@ -1,6 +1,6 @@
 .category {
   &__container {
-    margin-top: 20px;
+    margin: 20px 0;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-gap: 20px;
@@ -70,6 +70,7 @@
     &-buy {
       font-size: 14px;
       margin-top: 5px;
+
       & span {
         font-weight: 500;
       }
@@ -117,12 +118,48 @@
 
     &-expire {
       margin-top: 5px;
-      font-size: 14px;
-      & p {
-        display: inline-block;
+      font-size: 12px;
+      text-align: center;
+
+      &-end {
+        display: block;
         color: rgb(255, 67, 78);
         border: 1px solid rgb(255, 67, 78);
         padding: 5px;
+      }
+
+      &-still {
+        display: block;
+        color: #3d99dc;
+        border: 1px solid #3d99dc;
+        padding: 5px;
+      }
+    }
+
+    &-price {
+      margin-top: 8px;
+      font-size: 14px;
+
+      & span {
+        font-weight: 500;
+      }
+    }
+
+    &-offerTime {
+      font-size: 12px;
+      margin-top: 5px;
+
+      & span {
+        font-weight: 500;
+      }
+    }
+
+    &-biggestBidder {
+      margin-top: 8px;
+      font-size: 12px;
+
+      & span {
+        font-weight: 500;
       }
     }
   }
