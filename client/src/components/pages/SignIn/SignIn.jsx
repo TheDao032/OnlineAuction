@@ -16,6 +16,7 @@ import Loading from '../../Loading/Loading';
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import Forgot from '../Forgot/Forgot';
 import { Link } from 'react-router-dom';
+import swal from 'sweetalert';
 
 
 SignIn.propTypes = {};
@@ -31,7 +32,7 @@ function SignIn(props) {
 
   // const { pathname } = useLocation()
   const { url } = useRouteMatch()
-  console.log('store user', url)
+  // console.log('store user', url)
 
 
   const schema = yup.object().shape({
@@ -71,20 +72,48 @@ function SignIn(props) {
       const response = await axios
         .post('https://onlineauctionserver.herokuapp.com/api/authentication/login', postData)
 
-      console.log('Dữ liệu khi đăng nhập: ', response.data.data);
+      // console.log('Dữ liệu khi đăng nhập: ', response.data.data);
       const user = response.data.data
-      dispatch(logIn(user))
-
-      if (localStorage.getItem('@user') === null) {
-        localStorage.setItem('@user', JSON.stringify(user))
-      }
-      else {
-        localStorage.setItem('@user', JSON.stringify(user))
-      }
 
       setErr('')
-      // history.goBack()
       dispatch(setLoading(false));
+
+      // console.log(user)
+      localStorage.setItem('accId', user.user.accId)
+
+      if (user.user.accStatus === 2) {
+        swal({
+          title: 'Vui lòng xác thực Email!',
+          icon: 'info',
+          button: 'Xác thực'
+        }).then(() => {
+          history.push('sign-in/verify-email')
+        })
+
+      }
+      else if (user.user.accStatus === 1) {
+        swal({
+          text: 'Tài khoản của bạn đã bị vô hiệu hóa',
+          icon: 'error',
+          button: true
+        })
+      }
+
+      else if (user.user.accStatus === 0) {
+        dispatch(logIn(user))
+
+        if (localStorage.getItem('@user') === null) {
+          localStorage.setItem('@user', JSON.stringify(user))
+        }
+        else {
+          localStorage.removeItem('@user');
+          localStorage.setItem('@user', JSON.stringify(user))
+        }
+
+        history.push('/')
+      }
+
+
     } catch (error) {
       let errorMessage = error.response.data.errorMessage
       if (errorMessage === 'Password Incorrect!') errorMessage = "Mật khẩu không đúng"

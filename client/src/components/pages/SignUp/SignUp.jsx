@@ -25,28 +25,28 @@ function SignUp() {
   const [reErr, setReErr] = useState(false)
   const SITE_KEY = '6LeKiAkdAAAAAH5r5Us-hjlTA7zWNjTNQCze_b0Z'
 
-  const schema = yup.object().shape({
-    accEmail: yup
-      .string()
-      .required('Email không thể trống')
-      .email('Email không đúng định dạng')
-      .max(100, 'Tối đa 100 kí tự'),
-    accPassword: yup
-      .string()
-      .required('Mật khẩu không thể trống')
-      .max(100, 'Tối đa 100 kí tự'),
-    retype_pw: yup
-      .string()
-      .oneOf([yup.ref('accPassword')], 'Mật khẩu không khớp'),
-    accFullName: yup
-      .string()
-      .required('Tên không thể trống')
-      .max(100, 'Tối đa 100 kí tự')
-      .test("Have two word", "Nhập họ và tên", (value) => {
-        return value.trim().split(" ").length >= 2;
-      }),
-    accPhoneNumber: yup.string().max(15, 'Tối đa 15 kí tự'),
-  });
+  // const schema = yup.object().shape({
+  //   accEmail: yup
+  //     .string()
+  //     .required('Email không thể trống')
+  //     .email('Email không đúng định dạng')
+  //     .max(100, 'Tối đa 100 kí tự'),
+  //   accPassword: yup
+  //     .string()
+  //     .required('Mật khẩu không thể trống')
+  //     .max(100, 'Tối đa 100 kí tự'),
+  //   retype_pw: yup
+  //     .string()
+  //     .oneOf([yup.ref('accPassword')], 'Mật khẩu không khớp'),
+  //   accFullName: yup
+  //     .string()
+  //     .required('Tên không thể trống')
+  //     .max(100, 'Tối đa 100 kí tự')
+  //     .test("Have two word", "Nhập họ và tên", (value) => {
+  //       return value.trim().split(" ").length >= 2;
+  //     }),
+  //   accPhoneNumber: yup.string().max(15, 'Tối đa 15 kí tự'),
+  // });
 
   const form = useForm({
     defaultValues: {
@@ -57,7 +57,7 @@ function SignUp() {
       accPhoneNumber: '',
     },
 
-    resolver: yupResolver(schema),
+    // resolver: yupResolver(schema),
   });
 
   function directSignIn() {
@@ -70,7 +70,7 @@ function SignUp() {
   }
 
   const handleOnSubmit = async (data) => {
-    // console.log(data);
+    console.log(data);
 
     const postData = {
       "accEmail": data.accEmail.toString(),
@@ -92,12 +92,21 @@ function SignUp() {
         setErr('')
         console.log("Response", res);
         dispatch(setLoading(false))
-        swal("Thành công!", "Đăng ký thành công!", "success")
-          .then(() => {
-            history.push('/sign-in')
-          });
         setReCaptCha(false)
 
+        swal({
+          title: "Đăng ký thành công",
+          text: "Xác thưc tài khoản ngay",
+          icon: "success",
+          buttons: ['Để sau', 'Xác thực']
+        })
+          .then((verify) => {
+            if (verify) {
+              history.push('/sign-in/verify-email')
+            } else {
+              history.push('/sign-in')
+            }
+          });
       } catch (error) {
         console.log(error.response)
         let errMess = error.response.data.errorMessage
