@@ -29,6 +29,14 @@ export default function Search() {
   const [maxPage, setMaxPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  const sortByNew = () => {
+    fetchProductSearch();
+  }
+
+  const sortByPrice = () => {
+    fetchProductSearch1();
+  }
+
   const fetchProductSearch = async () => {
     try {
       setLoading(true);
@@ -37,6 +45,28 @@ export default function Search() {
         {
           text: text,
           orderMode: 0,
+        }
+      );
+      setLoading(false);
+      console.log('dl lieu sau khi search', response.data.listProducts);
+      setData(response.data.listProducts);
+
+      console.log('dl lieu sau khi phan trang', dataPagination);
+    } catch (error) {
+      console.log(error.response);
+      setLoading(false);
+    }
+  };
+
+
+  const fetchProductSearch1 = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        'https://onlineauctionserver.herokuapp.com/api/product/search',
+        {
+          text: text,
+          orderMode: 1,
         }
       );
       setLoading(false);
@@ -92,6 +122,16 @@ export default function Search() {
   console.log(dataSearch);
   return (
     <div>
+      <label className="dropdown123">
+        <div className="dd-button">
+          Sắp xếp theo
+        </div>
+        <input type="checkbox" className="dd-input" id="test" />
+        <ul className="dd-menu">
+          <li onClick={sortByNew}>Mới nhất</li>
+          <li onClick={sortByPrice}>Giá tăng dần </li>       
+        </ul>
+      </label>
       <div className='search grid wide'>
         {dataSearch.length === 0 ? (
           <Empty title='Không tìm thấy sản phẩm' />

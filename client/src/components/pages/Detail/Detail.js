@@ -131,7 +131,7 @@ export default function Detail() {
         //       ts = res.data.return_ts;
         //       console.log("ts nè:", res.data.return_ts);
         //     })
-      };)
+      });
     } catch (error) {}
   }
 
