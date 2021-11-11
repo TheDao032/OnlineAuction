@@ -19,6 +19,7 @@ import Category from "./components/pages/Category";
 import VerifyEmail from "./components/pages/VerifyEmail/VerifyEmail";
 import NewPassword from "./components/pages/NewPassword/NewPassword";
 // import SearchResult from './components/SearchResult';
+import ErrorPage from "./components/404";
 
 function App() {
   const dispatch = useDispatch();
@@ -56,6 +57,7 @@ function App() {
         <Route path="/admin" component={AdminFeature} />
         <Route path="/seller" component={SellerFeature} />
         <Route path="/bidder" component={BidderFeature} />
+        <Route path="*" component={ErrorPage} />
       </Switch>
     </>
   );

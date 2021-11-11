@@ -24,6 +24,10 @@ function Category(props) {
 
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [dataPagination, setDataPagination] = useState([]);
+  const [pageCurrent, setPageCurrent] = useState(3);
+  const [itemLimit, setImtemLimit] = useState(2);
+  const [maxPage, setMaxPage] = useState(1);
 
   async function getProductByCate() {
     setLoading(true);
@@ -48,6 +52,40 @@ function Category(props) {
   useEffect(() => {
     getProductByCate();
   }, [cateId]);
+
+  useEffect(() => {
+    console.log('dataSearch', product);
+    console.log((pageCurrent - 1) * itemLimit);
+    console.log(pageCurrent * itemLimit);
+    console.log(
+      product.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit)
+    );
+    setDataPagination(
+      product.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit)
+    );
+    setMaxPage(Math.ceil(product.length / itemLimit));
+  }, [product]);
+
+  useEffect(() => {
+    setDataPagination(
+      product.slice((pageCurrent - 1) * itemLimit, pageCurrent * itemLimit)
+    );
+  }, [pageCurrent]);
+
+  var dataPage = '';
+  const handleChange = (e) => {
+    dataPage = e.target.value;
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      if (parseInt(dataPage) < 1 || parseInt(dataPage) > maxPage) {
+        swal('Lỗi', 'Số trang không hợp lệ', 'error');
+      } else {
+        setPageCurrent(dataPage);
+      }
+    }
+  };
 
   return (
     <>
@@ -86,6 +124,34 @@ function Category(props) {
               })}
             </div>
           )}
+
+
+            <div className='pagination'>
+              <button
+                className='pagination-button'
+                disabled={pageCurrent === 1}
+                onClick={() => setPageCurrent(pageCurrent - 1)}
+              >
+                Prev
+              </button>
+              <br />
+              <input
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                type='number'
+                className='pagination-input'
+                placeholder={pageCurrent}
+              />
+              <span className='pagination-span'>/</span>
+              <p className='pagination-p'>{maxPage}</p>
+              <button
+                className='pagination-button'
+                disabled={pageCurrent === maxPage}
+                onClick={() => setPageCurrent(pageCurrent + 1)}
+              >
+                Next
+              </button>
+            </div>
         </div>
       )}
     </>
