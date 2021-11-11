@@ -2,6 +2,7 @@ import { ActionTypes } from '../contants/action-type';
 
 const initialState = {
   user: {},
+  loggedIn: false,
 };
 
 export const userReducer = (state = initialState, { type, payload }) => {
