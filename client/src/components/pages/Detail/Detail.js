@@ -1,29 +1,29 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   AiFillDislike,
   AiFillHeart,
   AiFillLike,
   AiOutlineHeart,
   AiFillEdit,
-} from 'react-icons/ai';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams, useRouteMatch } from 'react-router';
-import swal from 'sweetalert';
-import { setLoading } from '../../../redux/actions/loadingAction';
-import formatCurrency from '../../../util/formatCurrency';
-import formatTime from '../../../util/formatTime';
-import Loading from '../../Loading/Loading';
-import './scss/index.scss';
-import { imagePlaceholder } from '../../../util/imagePlaceholder';
-import getFullDay from '../../../util/getFullDay';
-import getTimeLeft from '../../../util/getTimeLeft';
-import { Route, Switch, useLocation } from 'react-router-dom';
-import AddDescription from './AddDescription';
+} from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useParams, useRouteMatch } from "react-router";
+import swal from "sweetalert";
+import { setLoading } from "../../../redux/actions/loadingAction";
+import formatCurrency from "../../../util/formatCurrency";
+import formatTime from "../../../util/formatTime";
+import Loading from "../../Loading/Loading";
+import "./scss/index.scss";
+import { imagePlaceholder } from "../../../util/imagePlaceholder";
+import getFullDay from "../../../util/getFullDay";
+import getTimeLeft from "../../../util/getTimeLeft";
+import { Route, Switch, useLocation } from "react-router-dom";
+import AddDescription from "./AddDescription";
 
-const dataUser = JSON.parse(localStorage.getItem('@user'));
-let role = dataUser === null ? '' : dataUser?.user?.role;
-let accId = dataUser === null ? '' : dataUser?.user?.accId;
+// const dataUser = JSON.parse(localStorage.getItem("@user"));
+// let role = dataUser === null ? '' : dataUser?.user?.role;
+// let accId = dataUser === null ? "" : dataUser?.user?.accId;
 
 export default function Detail() {
   const { prodId } = useParams();
@@ -32,13 +32,19 @@ export default function Detail() {
   const history = useHistory();
 
   const {
-    user: { accessToken },
+    user: {
+      accessToken,
+      user: { role },
+    },
   } = useSelector((state) => state.currentUser);
+
+  // console.log(role);
+
   const loadingState = useSelector((state) => state.loading);
 
   const [product, setProduct] = useState([]);
   const [seller, setSeller] = useState([]);
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState("");
   const [description, setDescription] = useState([]);
   const [relatedProduct, setRelatedProduct] = useState([]);
   const [listAuction, setListAuction] = useState([]);
@@ -53,11 +59,11 @@ export default function Detail() {
 
     try {
       const response = await axios
-        .post('https://onlineauctionserver.herokuapp.com/api/product/detail', {
+        .post("https://onlineauctionserver.herokuapp.com/api/product/detail", {
           prodId: parseInt(prodId),
         })
         .catch((err) => {
-          console.log('Err', err.response);
+          console.log("Err", err.response);
         });
 
       console.log(response.data.productDetail[0]);
@@ -73,30 +79,60 @@ export default function Detail() {
     }
   };
 
+  let ts = 0;
   async function getListAuction() {
+    // try {
+    //   await axios
+    //     .post(
+    //       "https://onlineauctionserver.herokuapp.com/api/auction/list-auction",
+    //       {
+    //         prodId: +prodId,
+    //         ts: ts.toString(),
+    //       },
+    //       {
+    //         headers: {
+    //           authorization: accessToken,
+    //         },
+    //       }
+    //     )
+    //     .then((res) => {
+    //       console.log("list auction: ", res);
+    //       setListAuction(res.data.listAuctions);
+    //       ts = res.data.return_ts;
+    //       console.log("ts nè:", res.data.return_ts);
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     })
+    //     .then(function () {
+    //       setTimeout(() => {
+    //         getListAuction();
+    //       }, 5000);
+    //       console.log("xong rồi");
+    //     });
+    // } catch (error) {
+    //   console.log(error.response);
+    // }
+
     try {
-      dispatch(setLoading(true));
-
-      const res = await axios.post(
-        'https://onlineauctionserver.herokuapp.com/api/auction/list-auction',
-        {
+      await axios({
+        method: "post",
+        url: "https://onlineauctionserver.herokuapp.com/api/auction/list-auction",
+        data: {
           prodId: +prodId,
+          ts: ts.toString(),
         },
-        {
-          headers: {
-            authorization: accessToken,
-          },
-        }
-      );
-
-      dispatch(setLoading(false));
-
-      console.log('list auction: ', res);
-      setListAuction(res.data.listAuctions);
-    } catch (error) {
-      dispatch(setLoading(false));
-      console.log(error.response);
-    }
+        headers: {
+          authorization: accessToken,
+        },
+      }).then((res) => {
+        console.log("list auction: ", res);
+        //       setListAuction(res.data.listAuctions);
+        //       ts = res.data.return_ts;
+        //       console.log("ts nè:", res.data.return_ts);
+        //     })
+      };)
+    } catch (error) {}
   }
 
   // console.log("Product detail abc: ", product);
@@ -133,19 +169,24 @@ export default function Detail() {
     mins: minSell,
   } = formatTime(createDate);
 
+  const src =
+    product.prodImages !== undefined || !product.prodImages
+      ? imagePlaceholder
+      : product.prodImages[0]?.prodImgSrc;
+
   return (
     <>
       {loadingState.loading ? (
         <Loading />
       ) : (
-        <div className='detail grid wide'>
-          <button className='detail__back' onClick={() => history.goBack()}>
+        <div className="detail grid wide">
+          <button className="detail__back" onClick={() => history.goBack()}>
             Back
           </button>
-          <div className='detail__container'>
-            <div className='detail__image'>
+          <div className="detail__container">
+            <div className="detail__image">
               <div
-                className='detail__image-item detail__image-item--big'
+                className="detail__image-item detail__image-item--big"
                 style={{
                   backgroundImage: `url(${
                     product.prodImages === undefined || !product.prodImages
@@ -156,24 +197,24 @@ export default function Detail() {
                   })`,
                 }}
               ></div>
-              <div className='detail__image-sub'>
+              <div className="detail__image-sub">
                 {product.prodImages === 0 ||
                 product.prodImages === undefined ? (
                   <>
                     <div
-                      className='detail__image-item detail__image-item--small'
+                      className="detail__image-item detail__image-item--small"
                       style={{
                         backgroundImage: `url("${imagePlaceholder}")`,
                       }}
                     ></div>
                     <div
-                      className='detail__image-item detail__image-item--small'
+                      className="detail__image-item detail__image-item--small"
                       style={{
                         backgroundImage: `url("${imagePlaceholder}")`,
                       }}
                     ></div>
                     <div
-                      className='detail__image-item detail__image-item--small'
+                      className="detail__image-item detail__image-item--small"
                       style={{
                         backgroundImage: `url("${imagePlaceholder}")`,
                       }}
@@ -184,29 +225,40 @@ export default function Detail() {
                     {product.prodImages.length === 0 ? (
                       <>
                         <div
-                          className='detail__image-item detail__image-item--small'
+                          className="detail__image-item detail__image-item--small"
                           style={{
                             backgroundImage: `url("${imagePlaceholder}")`,
                           }}
                         ></div>
                         <div
-                          className='detail__image-item detail__image-item--small'
+                          className="detail__image-item detail__image-item--small"
                           style={{
                             backgroundImage: `url("${imagePlaceholder}")`,
                           }}
                         ></div>
                         <div
-                          className='detail__image-item detail__image-item--small'
+                          className="detail__image-item detail__image-item--small"
                           style={{
                             backgroundImage: `url("${imagePlaceholder}")`,
                           }}
                         ></div>
                       </>
+                    ) : product.prodImages.length > 3 ? (
+                      product.prodImages.slice(1, 4).map((item) => {
+                        return (
+                          <div
+                            className="detail__image-item detail__image-item--small"
+                            style={{
+                              backgroundImage: `url("${item.prodImgSrc}")`,
+                            }}
+                          ></div>
+                        );
+                      })
                     ) : (
                       product.prodImages.slice(0, 3).map((item) => {
                         return (
                           <div
-                            className='detail__image-item detail__image-item--small'
+                            className="detail__image-item detail__image-item--small"
                             style={{
                               backgroundImage: `url("${item.prodImgSrc}")`,
                             }}
@@ -218,11 +270,11 @@ export default function Detail() {
                 )}
               </div>
             </div>
-            <div className='detail__info'>
-              <h3 className='detail__info-name'>{prodName}</h3>
-              <div className='detail__info-header'>
-                <p className='detail__info-releaseTime'>
-                  Đăng bán vào:{'   '}
+            <div className="detail__info">
+              <h3 className="detail__info-name">{prodName}</h3>
+              <div className="detail__info-header">
+                <p className="detail__info-releaseTime">
+                  Đăng bán vào:{"   "}
                   {daysSell > 0
                     ? `${daysSell} ngày trước`
                     : hours > 0
@@ -232,79 +284,79 @@ export default function Detail() {
                 <AddToWishList prodId={prodId} userRole={userRole} />
               </div>
 
-              <div className='currentPrice'>
-                <div className='currentPrice__left'>
-                  <p className='currentPrice__text'>Giá hiện tại</p>
-                  <p className='currentPrice__price'>
+              <div className="currentPrice">
+                <div className="currentPrice__left">
+                  <p className="currentPrice__text">Giá hiện tại</p>
+                  <p className="currentPrice__price">
                     {formatCurrency(biggestPrice)}
                   </p>
                 </div>
-                <div className='currentPrice__right'>
-                  <p className='currentPrice__textEnd'>Thời gian kết thúc</p>
+                <div className="currentPrice__right">
+                  <p className="currentPrice__textEnd">Thời gian kết thúc</p>
                   <DayLeft days={days} mins={mins} hours={hours} />
                 </div>
               </div>
 
               {prodBuyPrice !== null && (
-                <div className='buyNow'>
-                  <p className='buyNow__text'>Mua ngay với giá chỉ</p>
-                  <p className='buyNow__price'>
+                <div className="buyNow">
+                  <p className="buyNow__text">Mua ngay với giá chỉ</p>
+                  <p className="buyNow__price">
                     {formatCurrency(prodBuyPrice)}
                   </p>
-                  {userRole !== '' ? (
-                    <button className='buyNow__btn'>Mua ngay</button>
+                  {userRole !== "" ? (
+                    <button className="buyNow__btn">Mua ngay</button>
                   ) : (
-                    ''
+                    ""
                   )}
                 </div>
               )}
 
-              <div className='detail__seller'>
-                <p className='detail__seller-name'>
-                  Người bán:{' '}
+              <div className="detail__seller">
+                <p className="detail__seller-name">
+                  Người bán:{" "}
                   {seller.map((s) => (
                     <span>
-                      {' '}
-                      {s.accName === '' ? 'Unknown Seller' : s.accName}
+                      {" "}
+                      {s.accName === "" ? "Unknown Seller" : s.accName}
                     </span>
                   ))}
                 </p>
-                <p className='detail__seller-rate'>
-                  <p className='detail__seller-react'>
+                <p className="detail__seller-rate">
+                  <p className="detail__seller-react">
                     {seller[0]?.accGoodVote}
-                    <AiFillLike className='detail__seller-react--like' />
+                    <AiFillLike className="detail__seller-react--like" />
                   </p>
-                  <p className='detail__seller-react'>
+                  <p className="detail__seller-react">
                     {seller[0]?.accBadVote}
-                    <AiFillDislike className='detail__seller-react--dislike' />
+                    <AiFillDislike className="detail__seller-react--dislike" />
                   </p>
                 </p>
               </div>
 
-              <div className='detail__bidder'>
+              <div className="detail__bidder">
                 {product.biggestBidder === null ||
                 product.biggestBidder === undefined ? (
-                  <p className='detail__bidder-name'>
+                  <p className="detail__bidder-name">
                     Sản phẩm chưa có người đặt cao nhất
                   </p>
                 ) : (
                   <>
-                    <p className='detail__bidder-name'>
-                      Người đặt giá cao nhất:{' '}
+                    <p className="detail__bidder-name">
+                      Người đặt giá cao nhất:{" "}
                       <span>
-                        {product.biggestBidder[0].accName === ''
-                          ? 'Unknown Seller'
+                        {product.biggestBidder[0].accName === ""
+                          ? "Unknown Seller"
                           : product.biggestBidder[0].accName}
                       </span>
                     </p>
-                    <p className='detail__bidder-rate'>
-                      <p className='detail__bidder-react'>
-                        {product.biggestBidder[0].accGoodVote}{' '}
-                        <AiFillLike className='detail__bidder-react--like' />
+                    <p className="detail__bidder-rate">
+                      <p className="detail__bidder-react">
+                        {product.biggestBidder[0].accGoodVote}{" "}
+                        <AiFillLike className="detail__bidder-react--like" />
                       </p>
-                      <p className='detail__bidder-react'>
-                        {product.biggestBidder[0].accBadVote}{' '}
-                        <AiFillDislike className='detail__bidder-react--dislike' />
+                      <p className="detail__bidder-react">
+                        {product.biggestBidder[0].accBadVote}{" "}
+                        <AiFillDislike className="detail__bidder-react--dislike" />
                       </p>
                     </p>
                   </>
@@ -325,10 +377,9 @@ export default function Detail() {
           </div>
           <Description description={description} sellerID={sellerID} />
           <History list={listAuction} />
-          <div className='detail__relate'>
-            <h5 className='detail__relate-title'>Sản phẩm tương tự</h5>
+          <div className="detail__relate">
+            <h5 className="detail__relate-title">Sản phẩm tương tự</h5>
             <hr />
-
             {
               <>
                 {relatedProduct
@@ -337,7 +388,7 @@ export default function Detail() {
                 0 ? (
                   <p>Không có sản phẩm tương tự</p>
                 ) : (
-                  <div className='relate'>
+                  <div className="relate">
                     {relatedProduct
                       .slice(0, 5)
                       .filter((item) => item.prodId !== parseInt(prodId))
@@ -356,8 +407,8 @@ export default function Detail() {
                           <RelateItem
                             src={newItem.prodImages[0]?.prodImgSrc}
                             seller={
-                              newItem.seller[0]?.accName === ''
-                                ? 'Unknown seller'
+                              newItem.seller[0]?.accName === ""
+                                ? "Unknown seller"
                                 : newItem.seller?.accName
                             }
                             name={newItem.prodName}
@@ -389,14 +440,17 @@ function Offer({
   hours,
 }) {
   const defaultPrice =
-    biggestPrice === 0 ? biggestPrice + stepPrice : biggestPrice;
+    biggestPrice === 0 ? biggestPrice + stepPrice : biggestPrice + stepPrice;
   const [offer, setOffer] = useState(0);
   const [isLogin, setIsLogin] = useState(false);
 
   const dispatch = useDispatch();
   let { loggedIn } = useSelector((state) => state.currentUser);
   const {
-    user: { accessToken },
+    user: {
+      accessToken,
+      user: { role, accId },
+    },
   } = useSelector((state) => state.currentUser);
 
   const history = useHistory();
@@ -416,11 +470,11 @@ function Offer({
     setOffer(defaultPrice);
   }, [defaultPrice]);
 
-  async function handleMakeBet(e) {
+  function handleMakeBet(e) {
     e.preventDefault();
 
-    if (role === 'SEL' && accId === sellerID) {
-      return swal('Lỗi', 'Người bán không thể đấu giá!', 'error');
+    if (role === "SEL" && accId === sellerID) {
+      return swal("Lỗi", "Người bán không thể đấu giá!", "error");
     }
 
     const data = {
@@ -430,66 +484,79 @@ function Offer({
 
     console.log(data);
 
-    try {
-      dispatch(setLoading(true));
-      const res = await axios.post(
-        'https://onlineauctionserver.herokuapp.com/api/bidder/offer',
-        data,
-        {
-          headers: {
-            authorization: accessToken,
-          },
+    swal({
+      title: "Xác nhận",
+      text: `Bạn chắc chắn đấu giá sản phẩm này với số tiền ${formatCurrency(
+        parseFloat(offer)
+      )}`,
+      icon: "info",
+      buttons: ["Không", "Xác nhận"],
+      dangerMode: false,
+    }).then(async (confirm) => {
+      if (confirm) {
+        try {
+          dispatch(setLoading(true));
+          const res = await axios.post(
+            "https://onlineauctionserver.herokuapp.com/api/bidder/offer",
+            data,
+            {
+              headers: {
+                authorization: accessToken,
+              },
+            }
+          );
+
+          console.log(res);
+          dispatch(setLoading(false));
+
+          swal({
+            title: "Thành công",
+            text: `Đấu giá thành công với số tiền ${formatCurrency(
+              parseFloat(offer)
+            )}`,
+            icon: "success",
+            buttons: ["Ở lại", "Xem danh sách đã đấu giá"],
+            dangerMode: false,
+          }).then((goToList) => {
+            if (goToList) {
+              history.push("/bidder/profile/auctioned");
+            } else {
+            }
+          });
+        } catch (error) {
+          console.log(error.response);
+          dispatch(setLoading(false));
+
+          if (error.response.data.errorMessage)
+            swal("Unsuccessful", error.response.data.errorMessage, "error");
         }
-      );
-
-      console.log(res);
-      dispatch(setLoading(false));
-
-      swal({
-        title: 'Thành công',
-        text: `Đấu giá thành công với số tiền ${formatCurrency(
-          parseFloat(offer)
-        )}`,
-        icon: 'success',
-        buttons: ['Ở lại', 'Xem danh sách đã đấu giá'],
-        dangerMode: false,
-      }).then((goToList) => {
-        if (goToList) {
-          history.push('/bidder/profile/auctioned');
-        } else {
-        }
-      });
-    } catch (error) {
-      console.log(error.response);
-      dispatch(setLoading(false));
-
-      if (error.response.data.errorMessage)
-        swal('Unsuccessful', error.response.data.errorMessage, 'error');
-    }
+      } else {
+      }
+    });
   }
 
   return (
-    <form className='detail__offer'>
-      <label for='offer'>Giá đề nghị:</label>
+    <form className="detail__offer">
+      <label for="offer">Giá đề nghị:</label>
       <input
-        type='number'
-        id='offer'
-        name='offer'
-        className='detail__offer-input'
+        type="number"
+        id="offer"
+        name="offer"
+        className="detail__offer-input"
         value={offer}
         onChange={handleOnChange}
       />
       <hr />
       {days < 0 ? (
-        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
+        <p className="detail__offer-btn" style={{ display: "inline-block" }}>
           Thời gian đấu giá đã kết thúc
         </p>
       ) : isLogin ? (
-        <button className='detail__offer-btn' onClick={handleMakeBet}>
+        <button className="detail__offer-btn" onClick={handleMakeBet}>
           Ra giá
         </button>
       ) : (
-        <p className='detail__offer-btn' style={{ display: 'inline-block' }}>
+        <p className="detail__offer-btn" style={{ display: "inline-block" }}>
           Hãy đăng nhập để đấu giá sản phẩm này
         </p>
       )}
@@ -504,6 +571,12 @@ function Description({ description, sellerID }) {
   const loggedIn = currentUser?.loggedIn;
   const accId = currentUser?.user?.user?.accId;
 
+  const dispatch = useDispatch();
+
+  const {
+    user: { accessToken },
+  } = useSelector((state) => state.currentUser);
+
   const [isEdit, setIsEdit] = useState(false);
 
   function onAddDescription() {
@@ -513,42 +586,85 @@ function Description({ description, sellerID }) {
   function onCancel(value) {
     setIsEdit(value);
   }
+
+  async function handleAddDescription(prodDescription, prodId) {
+    const data = {
+      prodId,
+      prodDescription,
+    };
+
+    if (prodDescription === "") {
+      swal("Thất bại!", "Vui lòng nhập mô tả", "error");
+    } else {
+      try {
+        dispatch(setLoading(true));
+        const res = await axios.post(
+          "https://onlineauctionserver.herokuapp.com/api/seller/update-description",
+          data,
+          {
+            headers: {
+              authorization: accessToken,
+            },
+          }
+        );
+
+        dispatch(setLoading(false));
+        console.log(res);
+        swal("Thành công!", "Thêm mô tả thành công!", "success").then(() => {
+          window.location.reload();
+        });
+      } catch (error) {
+        console.log(error.response);
+        dispatch(setLoading(false));
+        swal("Thất bại!", "Có lỗi khi thêm mô tả, vui lòng thử lại", "error");
+      }
+    }
+    console.log(prodDescription, prodId);
+  }
+
   return (
     <>
-      <div className='detail__description'>
-        <div className='detail__description-header'>
-          <h5 className='detail__description-title'>Mô tả sản phẩm</h5>
-          {userRole === 'SEL' && accId === sellerID && loggedIn === true ? (
+      <div className="detail__description" style={{ overflow: "hidden" }}>
+        <div className="detail__description-header">
+          <h5 className="detail__description-title">Mô tả sản phẩm</h5>
+          {userRole === "SEL" && accId === sellerID && loggedIn === true ? (
             <button
-              className='detail__description-btn'
+              className="detail__description-btn"
               onClick={onAddDescription}
             >
               Thêm mô tả
             </button>
           ) : (
-            ''
+            ""
           )}
         </div>
         <hr />
-        {description.length === 0 || description[0].prod_desc_content === '' ? (
+        {description.length === 0 || description[0].prod_desc_content === "" ? (
           <p>Sản phẩm này chưa có mô tả</p>
         ) : (
           <>
-            {isEdit ? <AddDescription onCancel={onCancel} /> : ''}
+            {isEdit ? (
+              <AddDescription
+                onCancel={onCancel}
+                handleAddDescription={handleAddDescription}
+              />
+            ) : (
+              ""
+            )}
 
             {description?.map((item, index) => {
               return (
                 <>
                   {index !== 0 ? (
-                    <div className='detail__info-description-day'>
+                    <div className="detail__info-description-day">
                       <AiFillEdit />
                       <p>{getFullDay(item.prod_desc_updated_date)}</p>
                     </div>
                   ) : (
-                    ''
+                    ""
                   )}
                   <p
-                    className='detail__info-description'
+                    className="detail__info-description"
                     dangerouslySetInnerHTML={{ __html: item.prod_desc_content }}
                   ></p>
                 </>
@@ -570,25 +686,25 @@ function RelateItem({ src, seller, price, name, isEnd, prodId }) {
   }
 
   return (
-    <div className='relate__item' onClick={onClickRelate}>
+    <div className="relate__item" onClick={onClickRelate}>
       <div
-        className='relate__item-img'
+        className="relate__item-img"
         style={{
           backgroundImage: `url(${src === undefined ? imagePlaceholder : src})`,
         }}
       />
-      <p className='relate__item-name'>{name}</p>
-      <p className='relate__item-seller'>
+      <p className="relate__item-name">{name}</p>
+      <p className="relate__item-seller">
         <span>By</span>
         {seller}
       </p>
-      <p className='relate__item-price'>{formatCurrency(price)}</p>
+      <p className="relate__item-price">{formatCurrency(price)}</p>
       {isEnd ? (
-        <p className='relate__item-noti relate__item-noti--ended'>
+        <p className="relate__item-noti relate__item-noti--ended">
           Đã kết thúc
         </p>
       ) : (
-        <p className='relate__item-noti relate__item-noti--inprocess'>
+        <p className="relate__item-noti relate__item-noti--inprocess">
           Đang diễn ra
         </p>
       )}
@@ -597,34 +713,34 @@ function RelateItem({ src, seller, price, name, isEnd, prodId }) {
 }
 
 function TimeLeft({ days, hours, mins }) {
-  console.log(days, hours, mins);
+  // console.log(days, hours, mins);
 
   return (
-    <div className='currentPrice__timeleft-item'>
-      <p className='currentPrice__daysleft'>{days} ngày</p>
-      <p className='currentPrice__hoursleft'>{hours} giờ </p>
-      <p className='currentPrice__minsleft'>{mins} phút</p>
+    <div className="currentPrice__timeleft-item">
+      <p className="currentPrice__daysleft">{days} ngày</p>
+      <p className="currentPrice__hoursleft">{hours} giờ </p>
+      <p className="currentPrice__minsleft">{mins} phút</p>
     </div>
   );
 }
 
 function DayLeft({ days, hours, mins }) {
-  console.log(days, hours, mins);
+  // console.log(days, hours, mins);
 
   return (
-    <div className='currentPrice__timeEnd'>
+    <div className="currentPrice__timeEnd">
       {days >= 3 && (hours >= 0 || mins >= 0) ? (
         <TimeLeft days={days} hours={hours} mins={mins} />
       ) : days < 0 ? (
-        <p className='currentPrice__ended'>Đã kết thúc</p>
+        <p className="currentPrice__ended">Đã kết thúc</p>
       ) : days <= 3 ? (
-        <p className='currentPrice__timeleft'>Còn {days} ngày nữa</p>
+        <p className="currentPrice__timeleft">Còn {days} ngày nữa</p>
       ) : days === 0 && hours > 0 ? (
-        <p className='currentPrice__timeleft'>Còn {hours} giờ nữa</p>
+        <p className="currentPrice__timeleft">Còn {hours} giờ nữa</p>
       ) : days === 0 && hours === 0 ? (
-        <p className='currentPrice__timeleft'>Còn {mins} phút nữa</p>
+        <p className="currentPrice__timeleft">Còn {mins} phút nữa</p>
       ) : (
-        ''
+        ""
       )}
     </div>
   );
@@ -656,7 +772,7 @@ function AddToWishList({ prodId, userRole }) {
     if (loggedIn) {
       try {
         const res = await axios.get(
-          'https://onlineauctionserver.herokuapp.com/api/watch-list/list',
+          "https://onlineauctionserver.herokuapp.com/api/watch-list/list",
           {
             headers: {
               authorization: accessToken,
@@ -668,7 +784,7 @@ function AddToWishList({ prodId, userRole }) {
           setWishItem(res.data.listWatch);
         }
       } catch (error) {
-        console.log('Danh sách Watch list lỗi: ', error.response);
+        console.log("Danh sách Watch list lỗi: ", error.response);
       }
     }
   }
@@ -701,7 +817,7 @@ function AddToWishList({ prodId, userRole }) {
         dispatch(setLoading(true));
 
         const res = await axios.post(
-          'https://onlineauctionserver.herokuapp.com/api/watch-list/add',
+          "https://onlineauctionserver.herokuapp.com/api/watch-list/add",
           {
             prodId,
           },
@@ -715,18 +831,18 @@ function AddToWishList({ prodId, userRole }) {
         });
         dispatch(setLoading(false));
 
-        swal('Thành công!', 'Sản phẩm đã được thêm vào yêu thích!', 'success');
+        swal("Thành công!", "Sản phẩm đã được thêm vào yêu thích!", "success");
       } catch (err) {
         console.log(err.response);
         dispatch(setLoading(false));
         swal(
-          'Thất bại!',
-          'Có lỗi khi thêm sản phẩm vào yêu thích, vui lòng thử lại!',
-          'error'
+          "Thất bại!",
+          "Có lỗi khi thêm sản phẩm vào yêu thích, vui lòng thử lại!",
+          "error"
         );
       }
     } else {
-      history.push('/sign-in');
+      history.push("/sign-in");
     }
   }
 
@@ -735,7 +851,7 @@ function AddToWishList({ prodId, userRole }) {
     try {
       dispatch(setLoading(true));
       const res = await axios.post(
-        'https://onlineauctionserver.herokuapp.com/api/watch-list/delete',
+        "https://onlineauctionserver.herokuapp.com/api/watch-list/delete",
         {
           watchId,
         },
@@ -745,15 +861,15 @@ function AddToWishList({ prodId, userRole }) {
       console.log(res);
       dispatch(setLoading(false));
 
-      swal('Thành công!', 'Đã xóa khỏi danh sách yêu thích!', 'success');
+      swal("Thành công!", "Đã xóa khỏi danh sách yêu thích!", "success");
     } catch (err) {
       console.log(err.response);
       dispatch(setLoading(false));
 
       swal(
-        'Thất bại!',
-        'Có lỗi khi xóa sản phẩm khỏi yêu thích, vui lòng thử lại!',
-        'error'
+        "Thất bại!",
+        "Có lỗi khi xóa sản phẩm khỏi yêu thích, vui lòng thử lại!",
+        "error"
       );
     }
   }
@@ -761,23 +877,23 @@ function AddToWishList({ prodId, userRole }) {
   return (
     <>
       {!wish.isWish ? (
-        <div className='detail__wishList'>
+        <div className="detail__wishList">
           <button
-            className='detail__wishList-btn'
+            className="detail__wishList-btn"
             onClick={handleAddToWishList}
           >
             <AiOutlineHeart />
-            <p className='detail__wishList-text'>Thêm vào yêu thích</p>
+            <p className="detail__wishList-text">Thêm vào yêu thích</p>
           </button>
         </div>
       ) : (
-        <div className='detail__wishList detail__wishList--remove'>
+        <div className="detail__wishList detail__wishList--remove">
           <button
-            className='detail__wishList-btn'
+            className="detail__wishList-btn"
             onClick={handleRemoveToWishList}
           >
-            <AiFillHeart style={{ color: 'red' }} />
-            <p className='detail__wishList-text'>Xóa khỏi yêu thích</p>
+            <AiFillHeart style={{ color: "red" }} />
+            <p className="detail__wishList-text">Xóa khỏi yêu thích</p>
           </button>
         </div>
       )}
@@ -790,17 +906,17 @@ function History({ list = [] }) {
   const { prodId } = useParams();
 
   return (
-    <div className='detail__history'>
-      <h5 className='detail__history-title'>Lịch sử đấu giá</h5>
+    <div className="detail__history">
+      <h5 className="detail__history-title">Lịch sử đấu giá</h5>
       <hr />
       {list.length === 0 ? (
         <p>Chưa có ai đấu giá sản phẩm này</p>
       ) : (
         <>
-          <div className='detail__history-header'>
-            <table className='detail__history-table'>
-              <thead className='detail__history-thead'>
-                <tr className='detail__history-tr'>
+          <div className="detail__history-header">
+            <table className="detail__history-table">
+              <thead className="detail__history-thead">
+                <tr className="detail__history-tr">
                   <th>Thời điểm</th>
                   <th>Người mua</th>
                   <th>Giá</th>
@@ -808,9 +924,9 @@ function History({ list = [] }) {
               </thead>
             </table>
           </div>
-          <div className='detail__history-content'>
-            <table className='detail__history-table'>
-              <tbody className='detail__history-tbody'>
+          <div className="detail__history-content">
+            <table className="detail__history-table">
+              <tbody className="detail__history-tbody">
                 {list.map((item) => {
                   // let timeBid = item.createdDate.split(" ");
 
@@ -819,7 +935,7 @@ function History({ list = [] }) {
                       time={item.createdDate}
                       name={
                         item.sttBidderName === null
-                          ? 'Unknow Bidder'
+                          ? "Unknow Bidder"
                           : item.sttBidderName
                       }
                       price={item.sttBiggestPrice}
@@ -837,26 +953,26 @@ function History({ list = [] }) {
 
 function BidderHistory({ time, name, price }) {
   const converName = (name) => {
-    const stringArr = name.split(' ');
+    const stringArr = name.split(" ");
     const n = stringArr.length;
-    let newName = '';
+    let newName = "";
     for (let i = 0; i < n - 1; i++) {
       for (let s of stringArr[i]) {
-        s = '*';
+        s = "*";
         newName += s;
       }
-      newName += ' ';
+      newName += " ";
     }
     newName += stringArr[n - 1];
 
     return newName;
   };
 
-  const timeArr = time.split(' ');
+  const timeArr = time.split(" ");
   const timeBid = `${timeArr[1]} - ${getFullDay(timeArr[0])}`;
 
   return (
-    <tr className='detail__history-tr'>
+    <tr className="detail__history-tr">
       <td>{timeBid}</td>
       <td>{converName(name)}</td>
       <td>{formatCurrency(price)}</td>

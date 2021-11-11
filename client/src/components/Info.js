@@ -51,7 +51,7 @@ export default function Info() {
           "https://onlineauctionserver.herokuapp.com/api/product/list-biggest-price"
         )
         .catch((err) => {
-          console.log("Err", err);
+          console.log("Err", err.response);
         });
       dispatch(get_top_5_biggest_price(res.data.listBiggestPrice));
       console.log("5 sản phẩm giá cao: ", res.data.listBiggestPrice);

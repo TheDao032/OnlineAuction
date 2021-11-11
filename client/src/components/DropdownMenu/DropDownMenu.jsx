@@ -17,7 +17,7 @@ const Profile = {
     return (
       <>
         <span className="menu-signin__menu-item" onClick={directBidderProfile}>
-          Hồ sơ của bạn
+          Thông tin của bạn
         </span>
       </>
     );
@@ -26,12 +26,20 @@ const Profile = {
     const history = useHistory();
 
     function directSellerProfile() {
-      history.push("/seller");
+      history.push("/seller/manage");
     }
+
+    function directBidderProfile() {
+      history.push("/bidder/profile/my-profile");
+    }
+
     return (
       <>
         <span className="menu-signin__menu-item" onClick={directSellerProfile}>
-          Hồ sơ của bạn
+          Hồ sơ bán hàng
+        </span>
+        <span className="menu-signin__menu-item" onClick={directBidderProfile}>
+          Thông tin của bạn
         </span>
       </>
     );
@@ -42,10 +50,25 @@ const Profile = {
     function directAdminProfile() {
       history.push("/admin/category");
     }
+
+    function directSellerProfile() {
+      history.push("/seller/manage");
+    }
+
+    function directBidderProfile() {
+      history.push("/bidder/profile/my-profile");
+    }
+
     return (
       <>
+        <span className="menu-signin__menu-item" onClick={directSellerProfile}>
+          Hồ sơ bán hàng
+        </span>
+        <span className="menu-signin__menu-item" onClick={directBidderProfile}>
+          Thông tin của bạn
+        </span>
         <span className="menu-signin__menu-item" onClick={directAdminProfile}>
-          Hồ sơ của bạn
+          Quản lý
         </span>
       </>
     );
@@ -60,7 +83,7 @@ function DropDownMenu() {
 
   function handleLogout() {
     dispatch(logOut());
-    localStorage.clear();
+    localStorage.removeItem("@user");
     history.push("/");
   }
 
