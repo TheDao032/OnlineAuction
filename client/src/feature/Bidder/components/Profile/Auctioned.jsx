@@ -76,9 +76,10 @@ function Auctioned(props) {
                 item.prodOfferNumber === null || item.prodOfferNumber === 0
                   ? item.prodBeginPrice
                   : item.prodBeginPrice +
-                  (item.prodOfferNumber + item.prodStepPrice)
+                    (item.prodOfferNumber + item.prodStepPrice)
               }
               prodId={item.prodId}
+              prodBuyPrice={item.prodBuyPrice}
             />
           );
         })
@@ -95,14 +96,11 @@ function AuctionedItem({
   beginPrice,
   currentPrice,
   prodId,
+  prodBuyPrice,
 }) {
-  const {
-    days: daysSell,
-    hours: hoursSell,
-    mins: minSell,
-  } = formatTime(createDate);
+  const { days, hours, mins } = formatTime(createDate);
 
-  console.log(formatTime(createDate))
+  console.log(formatTime(createDate));
   const history = useHistory();
 
   function handleClickDetail() {
@@ -121,8 +119,11 @@ function AuctionedItem({
       <div className="auctioned__info">
         <p className="auctioned__seller">Người bán: {seller}</p>
         <p className="auctioned__timeStart">
-          Đăng lúc:{" "}
-          {`${Math.abs(daysSell)} ngày ${Math.abs(hoursSell)} giờ trước`}
+          {days > 0
+            ? `Đăng ${Math.abs(days)} ngày trước`
+            : hours > 0
+            ? `Đăng ${Math.abs(hours)} giờ trước`
+            : `Đăng ${Math.abs(mins)} phút trước`}
         </p>
         <h3 className="auctioned__name">{name}</h3>
 
@@ -130,7 +131,10 @@ function AuctionedItem({
           Giá khởi đầu: {formatCurrency(beginPrice)}
         </p>
         <p className="auctioned__price">
-          Giá hiện tại: {formatCurrency(currentPrice)}
+          Giá mua ngay:{" "}
+          {prodBuyPrice === 0 || prodBuyPrice === null
+            ? `Sản phẩm này không mua ngay`
+            : formatCurrency(prodBuyPrice)}
         </p>
 
         <button className="auctioned__detail" onClick={handleClickDetail}>
