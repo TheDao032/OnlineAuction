@@ -96,7 +96,7 @@ export default function Detail() {
         )
         .then((res) => {
           console.log('list auction: ', res);
-          setListAuction(res.data.listAuctions);
+          setListAuction(...listAuction, res.data.listAuctions);
           ts = res.data.return_ts;
         })
         .catch((err) => {
@@ -110,7 +110,7 @@ export default function Detail() {
     }
   }
 
-  // console.log("Product detail abc: ", product);
+  console.log('Product detail abc: ', listAuction);
   const sellerID = seller[0]?.accId;
 
   const {
@@ -252,7 +252,7 @@ export default function Detail() {
                   Đăng bán vào:{'   '}
                   {daysSell > 0
                     ? `${daysSell} ngày trước`
-                    : hours > 0
+                    : hoursSell > 0
                     ? `${hoursSell} giờ trước`
                     : `${minSell} phút trước`}
                 </p>
@@ -422,9 +422,11 @@ function Offer({
     biggestPrice === 0 ? biggestPrice + stepPrice : biggestPrice + stepPrice;
   const [offer, setOffer] = useState(0);
   const [isLogin, setIsLogin] = useState(false);
+  const history = useHistory();
 
   const dispatch = useDispatch();
   let { loggedIn, user } = useSelector((state) => state.currentUser);
+  const [ratingList, setRatingList] = useState([]);
 
   if (loggedIn) {
     accessToken = user.accessToken;
@@ -432,14 +434,27 @@ function Offer({
     accId = user.accId;
   }
 
-  // const {
-  //   user: {
-  //     accessToken,
-  //     user: { role, accId },
-  //   },
-  // } = useSelector((state) => state.currentUser);
+  async function getCommentVote() {
+    try {
+      const res = await axios.get(
+        'https://onlineauctionserver.herokuapp.com/api/comment/other-comment',
+        {
+          headers: {
+            authorization: accessToken,
+          },
+        }
+      );
 
-  const history = useHistory();
+      console.log(res.data.listComments);
+      setRatingList(res.data.listComments);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+
+  let totalRate = ratingList.length;
+  let goodVote = ratingList.filter((item) => item.cmtVote === 1).length;
+  let ratingPercent = (goodVote / totalRate) * 100;
 
   function handleOnChange(e) {
     const value = e.target.value;
@@ -451,6 +466,10 @@ function Offer({
   useEffect(() => {
     setIsLogin(loggedIn);
   }, [loggedIn]);
+
+  useEffect(() => {
+    getCommentVote();
+  }, []);
 
   useEffect(() => {
     setOffer(defaultPrice);
@@ -469,6 +488,14 @@ function Offer({
     };
 
     console.log(data);
+
+    if (ratingPercent < 80) {
+      return swal(
+        'Không thể đấu giá!',
+        'Điểm đánh giá của không tốt nên không được đấu giá',
+        'error'
+      );
+    }
 
     swal({
       title: 'Xác nhận',
@@ -951,14 +978,14 @@ function BidderHistory({ time, name, price }) {
     return newName;
   };
 
-  const timeArr = time.split(' ');
-  const timeBid = `${timeArr[1]} - ${getFullDay(timeArr[0])}`;
+  // const timeArr = time.split(' ');
+  // const timeBid = `${timeArr[1]} - ${getFullDay(timeArr[0])}`;
 
   return (
     <tr className='detail__history-tr'>
-      <td>{timeBid}</td>
+      {/* <td>{timeBid}</td>
       <td>{converName(name)}</td>
-      <td>{formatCurrency(price)}</td>
+      <td>{formatCurrency(price)}</td> */}
     </tr>
   );
 }

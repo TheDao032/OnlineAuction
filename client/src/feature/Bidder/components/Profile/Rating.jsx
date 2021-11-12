@@ -37,6 +37,10 @@ function Rating(props) {
     getRatingList()
   }, [])
 
+  let totalRate = ratingList.length;
+  let goodVote = ratingList.filter(item => item.cmtVote === 1).length
+  let ratingPercent = goodVote / totalRate * 100
+
   return (<>
     <div className='rating'>
       <div className='profile__title'>
@@ -55,7 +59,7 @@ function Rating(props) {
               <h3>Đánh giá của bạn:</h3>
               <div className='rating__general-rate'>
                 <p>
-                  10 <AiFillLike className='rating__general-like' /> và 31 <AiFillDislike className='rating__general-dislike' /> ({(10 * 100 / (10 + 31)).toFixed(2)}%)
+                  {goodVote} <AiFillLike className='rating__general-like' /> và {totalRate - goodVote} <AiFillDislike className='rating__general-dislike' /> ({ratingPercent.toFixed(2)}%)
                 </p>
               </div>
             </div>

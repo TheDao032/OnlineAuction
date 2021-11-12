@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { useHistory, useRouteMatch } from "react-router";
 import { Link } from "react-router-dom";
+import formatCurrency from "../../../../util/formatCurrency";
 
 InprocessItem.propTypes = {
   url: PropTypes.string,
@@ -39,7 +40,7 @@ function InprocessItem({
       </p>
       <br />
       <p className="seller__item-price">
-        Giá: <span>${price}</span>
+        Giá: <span>{formatCurrency(price)}</span>
       </p>
       <p className="seller__item-time">
         Còn lại: <span>{timeLeft}</span>
