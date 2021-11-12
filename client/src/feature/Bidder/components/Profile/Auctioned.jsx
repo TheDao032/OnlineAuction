@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import formatCurrency from "../../../../util/formatCurrency";
+import getTimeLeft from "../../../../util/getTimeLeft";
 import formatTime from "../../../../util/formatTime";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../../../../redux/actions/loadingAction";
@@ -56,33 +57,40 @@ function Auctioned(props) {
       {auctionList.length === 0 ? (
         <Empty />
       ) : (
-        auctionList.map((item) => {
-          return (
-            <AuctionedItem
-              src={
-                item.prodImages === undefined || item.prodImages?.length === 0
-                  ? imagePlaceholder
-                  : item.prodImages[0].prodImgSrc
-              }
-              seller={
-                item.seller.accName === null || item.seller.accName === ""
-                  ? item.seller.accEmail
-                  : item.seller.accName
-              }
-              createDate={item.createDate}
-              name={item.prodName}
-              beginPrice={item.prodBeginPrice}
-              currentPrice={
-                item.prodOfferNumber === null || item.prodOfferNumber === 0
-                  ? item.prodBeginPrice
-                  : item.prodBeginPrice +
-                  (item.prodOfferNumber + item.prodStepPrice)
-              }
-              prodId={item.prodId}
-              prodBuyPrice={item.prodBuyPrice}
-            />
-          );
-        })
+        auctionList
+          .filter(
+            (item) =>
+              getTimeLeft(item.expireDate).days >= 0 &&
+              (getTimeLeft(item.expireDate).hours >= 0 ||
+                getTimeLeft(item.expireDate).mins >= 0)
+          )
+          .map((item) => {
+            return (
+              <AuctionedItem
+                src={
+                  item.prodImages === undefined || item.prodImages?.length === 0
+                    ? imagePlaceholder
+                    : item.prodImages[0].prodImgSrc
+                }
+                seller={
+                  item.seller.accName === null || item.seller.accName === ""
+                    ? item.seller.accEmail
+                    : item.seller.accName
+                }
+                createDate={item.createDate}
+                name={item.prodName}
+                beginPrice={item.prodBeginPrice}
+                currentPrice={
+                  item.prodOfferNumber === null || item.prodOfferNumber === 0
+                    ? item.prodBeginPrice
+                    : item.prodBeginPrice +
+                      (item.prodOfferNumber + item.prodStepPrice)
+                }
+                prodId={item.prodId}
+                prodBuyPrice={item.prodBuyPrice}
+              />
+            );
+          })
       )}
     </div>
   );
@@ -122,8 +130,8 @@ function AuctionedItem({
           {days > 0
             ? `Đăng ${Math.abs(days)} ngày trước`
             : hours > 0
-              ? `Đăng ${Math.abs(hours)} giờ trước`
-              : `Đăng ${Math.abs(mins)} phút trước`}
+            ? `Đăng ${Math.abs(hours)} giờ trước`
+            : `Đăng ${Math.abs(mins)} phút trước`}
         </p>
         <h3 className="auctioned__name">{name}</h3>
 
