@@ -100,8 +100,11 @@ function EndedItem({ url, name, winner = {}, prodId }) {
 
 
     if (data.cmtVote === 0)
-      swal("Thất bại", "Vui lòng like hoặc dislike!", "error");
+      return swal("Thất bại", "Vui lòng like hoặc dislike!", "error");
 
+    if (data.comment === '' || data.comment === undefined) {
+      return swal("Thất bại", "Vui lòng ghi nhận xét!", "error");
+    }
     const reqBody = {
       cmtVote: data.cmtVote,
       cmtContent: data.comment,

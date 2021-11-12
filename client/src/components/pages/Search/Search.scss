@@ -214,14 +214,13 @@ input:focus::-webkit-input-placeholder {
   margin-left: 5px;
 }
 
-
 a {
   text-decoration: none;
   color: #000000;
 }
 
 a:hover {
-  color: #222222
+  color: #222222;
 }
 
 /* Dropdown */
@@ -229,8 +228,9 @@ a:hover {
 .dropdown123 {
   display: inline-block;
   position: relative;
-  margin: 20px 0px 30px 20px !important;
-
+  // margin: 20px 0px 30px 20px !important;
+  margin-top: 20px;
+  z-index: 2;
 }
 
 .dd-button {
@@ -250,18 +250,16 @@ a:hover {
   top: 50%;
   right: 15px;
   transform: translateY(-50%);
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 5px solid white;
-
 }
 
 .dd-button:hover {
   background-color: #eeeeee;
 }
-
 
 .dd-input {
   display: none;
@@ -274,18 +272,18 @@ a:hover {
   border-radius: 4px;
   padding: 0;
   margin: 2px 0 0 0;
-  box-shadow: 0 0 6px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
   list-style-type: none;
 }
 
 .dd-input + .dd-menu {
   display: none;
-} 
+}
 
 .dd-input:checked + .dd-menu {
   display: block;
-} 
+}
 
 .dd-menu li {
   padding: 10px 20px;
@@ -294,8 +292,8 @@ a:hover {
 }
 
 .dd-menu li:hover {
-  background-color: #AFA8FF;
-  color:  white !important;
+  background-color: #afa8ff;
+  color: white !important;
 }
 
 .dd-menu li a {
@@ -304,7 +302,7 @@ a:hover {
   padding: 10px 20px;
 }
 
-.dd-menu li.divider{
+.dd-menu li.divider {
   padding: 0;
   border-bottom: 1px solid #cccccc;
 }

@@ -31,11 +31,11 @@ export default function Search() {
 
   const sortByNew = () => {
     fetchProductSearch();
-  }
+  };
 
   const sortByPrice = () => {
     fetchProductSearch1();
-  }
+  };
 
   const fetchProductSearch = async () => {
     try {
@@ -57,7 +57,6 @@ export default function Search() {
       setLoading(false);
     }
   };
-
 
   const fetchProductSearch1 = async () => {
     try {
@@ -121,18 +120,16 @@ export default function Search() {
   if (loading) return <Loading />;
   console.log(dataSearch);
   return (
-    <div>
-      <label className="dropdown123">
-        <div className="dd-button">
-          Sắp xếp theo
-        </div>
-        <input type="checkbox" className="dd-input" id="test" />
-        <ul className="dd-menu">
+    <div className='search grid wide'>
+      <label className='dropdown123'>
+        <div className='dd-button'>Sắp xếp theo</div>
+        <input type='checkbox' className='dd-input' id='test' />
+        <ul className='dd-menu'>
           <li onClick={sortByNew}>Mới nhất</li>
-          <li onClick={sortByPrice}>Giá tăng dần </li>       
+          <li onClick={sortByPrice}>Giá tăng dần </li>
         </ul>
       </label>
-      <div className='search grid wide'>
+      <div className=''>
         {dataSearch.length === 0 ? (
           <Empty title='Không tìm thấy sản phẩm' />
         ) : (
