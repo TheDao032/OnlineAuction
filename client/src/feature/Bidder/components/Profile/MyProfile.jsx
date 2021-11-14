@@ -6,8 +6,8 @@ import axios from "axios";
 import swal from "sweetalert";
 import Loading from "../../../../components/Loading/Loading";
 
-const selectUser = (state) => state.currentUser;
 Wishlist.propTypes = {};
+const selectUser = (state) => state.currentUser;
 
 function Wishlist(props) {
   const { url } = useRouteMatch();
@@ -39,7 +39,9 @@ function Wishlist(props) {
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://onlineauctionserver.herokuapp.com/api/account/seller-permission",
+        "https://onlineauctionserver.herokuapp.com/api/account/seller-permission", {
+
+      },
         {
           headers: { authorization: accessToken },
         }
@@ -68,7 +70,7 @@ function Wishlist(props) {
             </p>
             <hr />
           </div>
-          {role === "SEL" ? (
+          {role === "SEL" || role === 'ADM' ? (
             ""
           ) : (
             <div className="profile__email profile__box">

@@ -67,6 +67,8 @@ function Winning() {
                   <WinningItem url={item.prodImages.length === 0 || item.prodImages[0] === undefined ? imagePlaceholder : item.prodImages[0].prodImgSrc}
                     name={item.prodName}
                     seller={item.seller.accName === null || item.seller.accName === '' ? item.seller.accEmail : item.seller.accName}
+                    sellerId={item.seller.accId}
+                    prodId={item.prodId}
                   />
                 )
               })
@@ -78,7 +80,8 @@ function Winning() {
   );
 }
 
-function WinningItem({ url, name, seller }) {
+function WinningItem({ url, name, seller, sellerId, prodId }) {
+  const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false);
   const [like, setLike] = useState({
     isLike: false,
@@ -92,6 +95,9 @@ function WinningItem({ url, name, seller }) {
     status: 0, //0: k like k dislike, 1: like, -1: dislike
     comment: '',
   });
+
+  const currentUser = useSelector(state => state.currentUser)
+  const accessToken = currentUser?.user?.accessToken
 
   function handleOpenComment() {
     if (isOpen) {
@@ -143,10 +149,49 @@ function WinningItem({ url, name, seller }) {
     setData({ ...data, [name]: value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
+    if (data.comment === '') {
+      return swal({
+        text: 'Hãy ghi nhận xét cho người bán!',
+        icon: 'error'
+      })
+    }
+
+    if (data.status === 0) {
+      return swal({
+        text: 'Hãy like hoặc dislike cho người bán!',
+        icon: 'error'
+      })
+    }
+
+    const body = {
+      toId: +sellerId,
+      cmtContent: data.comment,
+      prodId,
+      cmtVote: +data.status
+    }
+
     console.log('Data: ', data);
+
+    setLoading(true)
+    try {
+      const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/comment/new-comment', body, {
+        headers: {
+          authorization: accessToken
+        }
+      })
+
+      console.log(res)
+      setLoading(false)
+      swal('Thành công', `Đã gửi nhận xét đến ${seller}`, 'success')
+    } catch (err) {
+      setLoading(false)
+      console.log(err.response);
+      swal('Thất bại', `Có lỗi xảy ra, vui lòng thử lại`, 'error')
+
+    }
   }
 
   return (

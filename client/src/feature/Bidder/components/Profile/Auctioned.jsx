@@ -54,44 +54,50 @@ function Auctioned(props) {
         <hr />
       </div>
 
-      {auctionList.length === 0 ? (
-        <Empty />
-      ) : (
+      {
         auctionList
           .filter(
             (item) =>
               getTimeLeft(item.expireDate).days >= 0 &&
               (getTimeLeft(item.expireDate).hours >= 0 ||
                 getTimeLeft(item.expireDate).mins >= 0)
-          )
-          .map((item) => {
-            return (
-              <AuctionedItem
-                src={
-                  item.prodImages === undefined || item.prodImages?.length === 0
-                    ? imagePlaceholder
-                    : item.prodImages[0].prodImgSrc
-                }
-                seller={
-                  item.seller.accName === null || item.seller.accName === ""
-                    ? item.seller.accEmail
-                    : item.seller.accName
-                }
-                createDate={item.createDate}
-                name={item.prodName}
-                beginPrice={item.prodBeginPrice}
-                currentPrice={
-                  item.prodOfferNumber === null || item.prodOfferNumber === 0
-                    ? item.prodBeginPrice
-                    : item.prodBeginPrice +
+          ).length === 0
+          ? <Empty title='Không có sản phẩm đang đấu giá' />
+          : auctionList
+            .filter(
+              (item) =>
+                getTimeLeft(item.expireDate).days >= 0 &&
+                (getTimeLeft(item.expireDate).hours >= 0 ||
+                  getTimeLeft(item.expireDate).mins >= 0)
+            )
+            .map((item) => {
+              return (
+                <AuctionedItem
+                  src={
+                    item.prodImages === undefined || item.prodImages?.length === 0
+                      ? imagePlaceholder
+                      : item.prodImages[0].prodImgSrc
+                  }
+                  seller={
+                    item.seller.accName === null || item.seller.accName === ""
+                      ? item.seller.accEmail
+                      : item.seller.accName
+                  }
+                  createDate={item.createDate}
+                  name={item.prodName}
+                  beginPrice={item.prodBeginPrice}
+                  currentPrice={
+                    item.prodOfferNumber === null || item.prodOfferNumber === 0
+                      ? item.prodBeginPrice
+                      : item.prodBeginPrice +
                       (item.prodOfferNumber + item.prodStepPrice)
-                }
-                prodId={item.prodId}
-                prodBuyPrice={item.prodBuyPrice}
-              />
-            );
-          })
-      )}
+                  }
+                  prodId={item.prodId}
+                  prodBuyPrice={item.prodBuyPrice}
+                />
+              );
+            })
+      }
     </div>
   );
 }
@@ -130,8 +136,8 @@ function AuctionedItem({
           {days > 0
             ? `Đăng ${Math.abs(days)} ngày trước`
             : hours > 0
-            ? `Đăng ${Math.abs(hours)} giờ trước`
-            : `Đăng ${Math.abs(mins)} phút trước`}
+              ? `Đăng ${Math.abs(hours)} giờ trước`
+              : `Đăng ${Math.abs(mins)} phút trước`}
         </p>
         <h3 className="auctioned__name">{name}</h3>
 
