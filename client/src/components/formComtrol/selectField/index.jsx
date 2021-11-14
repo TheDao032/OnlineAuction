@@ -50,9 +50,9 @@ function SelectField(props) {
                 onBlur={onBlur}
                 value={value}>
 
-                <option selected disabled>Chọn loại hàng</option>
+                <option selected disabled>Chọn danh mục</option>
                 {
-                  categorys.map((item) => <option value={item.cateId}>{item.cateName}</option>)
+                  categorys.map((item) => <option value={item.cateId} key={item.cateId}>{item.cateName}</option>)
                 }
               </select>
             </div>

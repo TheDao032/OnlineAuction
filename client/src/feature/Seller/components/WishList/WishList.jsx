@@ -88,7 +88,7 @@ function WishList(props) {
             <WatchItem
               name={item.prodName}
               currentPrice={
-                item.prodBeginPrice + item.prodOfferNumber * item.prodStepPrice
+                item.prodBeginPrice
               }
               cateId={item.prodCateId}
               watchId={item.watchId}
@@ -157,7 +157,7 @@ function WatchItem({
         </p>
 
         <p className="seller__wishList-item-price">
-          Giá hiện tại: <span>{formatCurrency(currentPrice)}</span>
+          Giá khởi đầu: <span>{formatCurrency(currentPrice)}</span>
         </p>
         <button className="seller__wishList-item-btn" onClick={onHandleRemove}>
           <AiFillHeart />

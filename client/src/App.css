@@ -118,6 +118,7 @@ section {
 
 body {
   line-height: 1;
+  scrollbar-width: none;
 }
 
 ol,
@@ -174,4 +175,12 @@ button {
 a {
   cursor: pointer;
   text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, .5);
 }
