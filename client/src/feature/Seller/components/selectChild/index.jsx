@@ -33,8 +33,6 @@ function SelectChildCateFiled(props) {
   const fetchChildCategory = async () => {
     dispatch(setLoading(true));
     try {
-      console.log('vooooooooooooooo');
-
       const response = await axios.post(
         'https://onlineauctionserver.herokuapp.com/api/categories/list-child', {
         cateFather: parseInt(fatherCateId)
@@ -43,7 +41,7 @@ function SelectChildCateFiled(props) {
       setSubCate(response.data.subCategories)
 
     } catch (error) {
-      console.log('ccc', error.response);
+      console.log(error.response);
     }
 
     dispatch(setLoading(false));
@@ -54,6 +52,11 @@ function SelectChildCateFiled(props) {
       fetchChildCategory()
     }
   }, [fatherCateId])
+
+  useEffect(() => {
+    if (subCate === null) return
+    form.setValue('prodCateId', subCate[0].cateId)
+  }, [subCate])
 
   return (
     <Controller
@@ -69,7 +72,7 @@ function SelectChildCateFiled(props) {
           <p className='form__group-helperText'>{!!hasError && hasError}</p>
           <div className='form__group'>
             <label className='form__group-label'>{label}</label>
-            <select className='form__group-select'
+            <select className='form__group-select' name={name}
               style={{
                 border: `${!!hasError ? '1px solid red' : '1px solid black'}`
               }}
@@ -79,7 +82,12 @@ function SelectChildCateFiled(props) {
 
               <option selected disabled>Chọn mặt hàng</option>
               {
-                subCate?.map((item) => <option value={item.cateId}>{item.cateName}</option>)
+                subCate?.map((item) => {
+                  // console.log(form.setValue(name, item.cateId))
+                  return (
+                    <option value={item.cateId}>{item.cateName}</option>
+                  )
+                })
               }
             </select>
           </div>

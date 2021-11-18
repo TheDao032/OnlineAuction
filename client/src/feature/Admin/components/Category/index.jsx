@@ -250,7 +250,7 @@ function AdminCategory(props) {
                       <td>
                         <tbody className="admin__tbody admin__tbody-subCate">
                           {
-                            item.subCategories.length === 0 ? 'Chưa có danh mục con' :
+                            item.subCategories.length === 0 ? <span>Chưa có danh mục con</span> :
                               item.subCategories.map(sub => {
                                 return (
                                   <SubCategory

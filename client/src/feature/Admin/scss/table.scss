@@ -27,6 +27,10 @@
       grid-template-columns: 0.3fr 1.5fr 1fr 1fr 0.8fr 1fr;
     }
 
+    &--user {
+      grid-template-columns: 1.5fr 1.5fr 1fr 0.8fr 1fr 1fr;
+    }
+
     &___sub {
       width: 100%;
       &:nth-child(even) {
@@ -100,7 +104,6 @@
         -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        padding: 5px;
       }
     }
   }

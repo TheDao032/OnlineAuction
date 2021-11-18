@@ -1,7 +1,9 @@
 import React from 'react';
+import { useHistory } from 'react-router';
 import '../asset/css/404.css';
 
 function ErrorPage() {
+  const history = useHistory();
   return (
     <div>
       <a href target='_blank'>
@@ -41,9 +43,14 @@ function ErrorPage() {
               </p>
             </div>
           </a>
-          <div className='error__nav e-nav'>
-            <a href target='_blank'></a>
-            <a href target='_blanck' className='e-nav__link' />
+          <div
+            className='error__nav e-nav'
+            onClick={() => {
+              history.push('/');
+            }}
+          >
+            <span href target='_blank'></span>
+            <span href target='_blanck' className='e-nav__link' />
           </div>
         </div>
         {/* END Content */}

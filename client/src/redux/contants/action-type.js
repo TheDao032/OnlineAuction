@@ -10,4 +10,7 @@ export const ActionTypes = {
 
   // --------------------------
   LOADING: 'LOADING',
+
+  // --------------------------
+  GET_VALUE_TO_EDIT_POST: 'GET_VALUE_TO_EDIT_POST',
 };

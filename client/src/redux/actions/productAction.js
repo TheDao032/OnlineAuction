@@ -34,5 +34,13 @@ export const list_search = (products) => {
     };
 };
 
+export const getDetailToEdit = (products) => {
+    console.log('detail để sửa: ', products)
+
+    return {
+        type: ActionTypes.GET_VALUE_TO_EDIT_POST,
+        payload: products
+    }
+}
 
 

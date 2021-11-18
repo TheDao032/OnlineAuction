@@ -1,13 +1,11 @@
-import React, { useState, useEffect} from 'react';
-import PropTypes from 'prop-types';
-import './scss/index.scss'
-import { NavLink } from 'react-router-dom'
-import { useRouteMatch, Switch, Route, useHistory } from 'react-router-dom'
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { NavLink, Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import AdminCategory from './components/Category';
 import AdminProduct from './components/Product';
+import EditPost from './components/Product/EditPost';
 import AdminUser from './components/User';
-import { useSelector} from 'react-redux';
-
+import './scss/index.scss';
 
 AdminFeature.propTypes = {};
 
@@ -42,20 +40,23 @@ function AdminFeature(props) {
     //   }
     // }
   },[])
+  const { pathname } = useLocation()
 
 
   return <section className='admin__container grid wide'>
-    <ul className='admin__nav'>
-      <li>
-        <NavLink className='admin__nav-item' to={`${url}/category`}>Category</NavLink>
-      </li>
-      <li>
-        <NavLink className='admin__nav-item' to={`${url}/product`}>Product</NavLink>
-      </li>
-      <li>
-        <NavLink className='admin__nav-item' to={`${url}/user`}>User</NavLink>
-      </li>
-    </ul>
+    {pathname === '/admin/product/edit-post' ? "" :
+      <ul className='admin__nav'>
+        <li>
+          <NavLink className='admin__nav-item' to={`${url}/category`}>Category</NavLink>
+        </li>
+        <li>
+          <NavLink className='admin__nav-item' to={`${url}/product`}>Product</NavLink>
+        </li>
+        <li>
+          <NavLink className='admin__nav-item' to={`${url}/user`}>User</NavLink>
+        </li>
+      </ul>
+    }
     <div>
       {/* Ấn vô cái nào thì fetch dữ liệu cái đó đổ vô */}
 
@@ -63,8 +64,11 @@ function AdminFeature(props) {
         <Route path={`${url}/category`}>
           <AdminCategory />
         </Route>
-        <Route path={`${url}/product`}>
+        <Route exact path={`${url}/product`}>
           <AdminProduct />
+        </Route>
+        <Route path={`${url}/product/edit-post`}>
+          <EditPost />
         </Route>
         <Route path={`${url}/user`}>
           <AdminUser />
