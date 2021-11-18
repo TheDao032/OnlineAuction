@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { Link } from "react-router-dom";
-import "../asset/css/Info.css";
-import { Swiper, SwiperSlide } from "swiper/react/swiper-react.js";
-import "swiper/swiper.scss";
-import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { get_top_5_almost_over } from "../redux/actions/productAction";
-import { get_top_5_biggest_offer } from "../redux/actions/productAction";
-import { get_top_5_biggest_price } from "../redux/actions/productAction";
-import { setLoading } from "../redux/actions/loadingAction";
-import { imagePlaceholder } from "../util/imagePlaceholder";
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import '../asset/css/Info.css';
+import { Swiper, SwiperSlide } from 'swiper/react/swiper-react.js';
+import 'swiper/swiper.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { get_top_5_almost_over } from '../redux/actions/productAction';
+import { get_top_5_biggest_offer } from '../redux/actions/productAction';
+import { get_top_5_biggest_price } from '../redux/actions/productAction';
+import { setLoading } from '../redux/actions/loadingAction';
+import { imagePlaceholder } from '../util/imagePlaceholder';
 const selectTop5AlmostOver = (state) => state.top5Almost;
 
 export default function Info() {
@@ -30,11 +30,11 @@ export default function Info() {
       dispatch(setLoading(true));
 
       const res = await axios.get(
-        "https://onlineauctionserver.herokuapp.com/api/product/list-biggest-offer"
+        'https://onlineauctionserver.herokuapp.com/api/product/list-biggest-offer'
       );
 
       dispatch(get_top_5_biggest_offer(res.data.listBiggestOffer));
-      console.log("5 sản phẩm nhiều offer nhất: ", res.data.listBiggestOffer);
+      console.log('5 sản phẩm nhiều offer nhất: ', res.data.listBiggestOffer);
       setTopOffer(res.data.listBiggestOffer);
     } catch (error) {
       console.log(error.response);
@@ -48,13 +48,13 @@ export default function Info() {
       dispatch(setLoading(true));
       const res = await axios
         .get(
-          "https://onlineauctionserver.herokuapp.com/api/product/list-biggest-price"
+          'https://onlineauctionserver.herokuapp.com/api/product/list-biggest-price'
         )
         .catch((err) => {
-          console.log("Err", err.response);
+          console.log('Err', err.response);
         });
       dispatch(get_top_5_biggest_price(res.data.listBiggestPrice));
-      console.log("5 sản phẩm giá cao: ", res.data.listBiggestPrice);
+      console.log('5 sản phẩm giá cao: ', res.data.listBiggestPrice);
       setBiggestPrice(res.data.listBiggestPrice);
     } catch (error) {
       console.log(error.response);
@@ -69,13 +69,13 @@ export default function Info() {
       dispatch(setLoading(true));
       const res = await axios
         .get(
-          "https://onlineauctionserver.herokuapp.com/api/product/list-time-out"
+          'https://onlineauctionserver.herokuapp.com/api/product/list-time-out'
         )
         .catch((err) => {
-          console.log("Err", err);
+          console.log('Err', err);
         });
       dispatch(get_top_5_almost_over(res.data.listTimeOut));
-      console.log("5 sản phẩm gần kết thúc: ", res.data.listTimeOut);
+      console.log('5 sản phẩm gần kết thúc: ', res.data.listTimeOut);
       setTopOver(res.data.listTimeOut);
     } catch (error) {
       console.log(error.response);
@@ -89,45 +89,51 @@ export default function Info() {
     fetchProduct1();
     fetchProduct2();
     getProductOver();
+
+    return () => {
+      setBiggestPrice([]);
+      setTopOffer([]);
+      setTopOver([]);
+    };
   }, []);
 
   var sum = 0;
 
   return (
-    <div className="page-an">
-      <div className="banner">
-        <div className="banner-contain">
-          <h1 className="h1-banner">Dẫn đầu kĩ nguyên đấu giá thông minh</h1>
-          <div className="btn-container-tht">
-            <Link to="/signup" className="btn-tht">
+    <div className='page-an'>
+      <div className='banner'>
+        <div className='banner-contain'>
+          <h1 className='h1-banner'>Dẫn đầu kĩ nguyên đấu giá thông minh</h1>
+          <div className='btn-container-tht'>
+            <Link to='/signup' className='btn-tht'>
               Đăng ký ngay
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="page">
-        <div className="page-info">
-          <div className="contain-info">
-            <h2 className="h2-top">Top 5 sản phẩm có giá cao nhất</h2>
+      <div className='page'>
+        <div className='page-info'>
+          <div className='contain-info'>
+            <h2 className='h2-top'>Top 5 sản phẩm có giá cao nhất</h2>
 
-            <div className="slider-container">
+            <div className='slider-container'>
               <Swiper
                 watchSlidesProgress={true}
                 slidesPerView={3}
-                className="mySwiper"
+                className='mySwiper'
               >
                 {biggestPrice.map((item, index) => {
                   return (
-                    <SwiperSlide className="sl">
+                    <SwiperSlide className='sl' key={item.prodId}>
                       <h1>0{index + 1}</h1>
                       <h5
                         style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: "1",
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          paddingBottom: "0",
+                          display: '-webkit-box',
+                          WebkitLineClamp: '1',
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          paddingBottom: '0',
                         }}
                       >
                         {item.prodName}
@@ -140,18 +146,18 @@ export default function Info() {
                               ? imagePlaceholder
                               : item.prodImages[0].prodImgSrc
                           })`,
-                          border: "1px solid rgba(0,0,0,.2)",
-                          width: "350px",
-                          height: "200px",
-                          margin: "10px auto",
-                          backgroundPosition: "center",
-                          backgroundRepeat: "no-repeat",
-                          backgroundSize: "cover",
-                          borderRadius: "5px",
+                          border: '1px solid rgba(0,0,0,.2)',
+                          width: '350px',
+                          height: '200px',
+                          margin: '10px auto',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                          backgroundSize: 'cover',
+                          borderRadius: '5px',
                         }}
                       ></div>
                       <h6
-                        style={{ cursor: "pointer" }}
+                        style={{ cursor: 'pointer' }}
                         onClick={() => history.push(`/detail/${item.prodId}`)}
                       >
                         Xem Chi Tiết
@@ -163,20 +169,20 @@ export default function Info() {
             </div>
           </div>
 
-          <div className="page-info-1">
-            <div className="contain-info-1">
-              <h2 className="h2-top">
+          <div className='page-info-1'>
+            <div className='contain-info-1'>
+              <h2 className='h2-top'>
                 Top 5 sản phẩm giá được offer nhiều nhất
               </h2>
 
-              <div className="slider-container">
+              <div className='slider-container'>
                 <Swiper
                   watchSlidesProgress={true}
                   slidesPerView={3}
-                  className="mySwiper"
+                  className='mySwiper'
                 >
                   {topOffer.map((product, index) => (
-                    <SwiperSlide className="sl">
+                    <SwiperSlide className='sl' key={product.prodId}>
                       <h1>0{index + 1}</h1>
                       <h5>{product.prodName}</h5>
                       <div
@@ -187,19 +193,19 @@ export default function Info() {
                               ? imagePlaceholder
                               : product.prodImages[0].prodImgSrc
                           })`,
-                          border: "1px solid rgba(0,0,0,.2)",
-                          width: "350px",
-                          height: "200px",
-                          margin: "0px auto",
-                          marginBottom: "3px",
-                          backgroundPosition: "center",
-                          backgroundRepeat: "no-repeat",
-                          backgroundSize: "cover",
-                          borderRadius: "5px",
+                          border: '1px solid rgba(0,0,0,.2)',
+                          width: '350px',
+                          height: '200px',
+                          margin: '0px auto',
+                          marginBottom: '3px',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                          backgroundSize: 'cover',
+                          borderRadius: '5px',
                         }}
                       ></div>
                       <h6
-                        style={{ cursor: "pointer" }}
+                        style={{ cursor: 'pointer' }}
                         onClick={() =>
                           history.push(`/detail/${product.prodId}`)
                         }
@@ -213,17 +219,17 @@ export default function Info() {
             </div>
           </div>
 
-          <div className="contain-info">
-            <h2 className="h2-top">Top 5 sản phẩm gần kết thúc</h2>
+          <div className='contain-info'>
+            <h2 className='h2-top'>Top 5 sản phẩm gần kết thúc</h2>
 
-            <div className="slider-container">
+            <div className='slider-container'>
               <Swiper
                 watchSlidesProgress={true}
                 slidesPerView={3}
-                className="mySwiper"
+                className='mySwiper'
               >
                 {topOver.map((product, index) => (
-                  <SwiperSlide className="sl">
+                  <SwiperSlide className='sl' key={product.prodId}>
                     <h1>0{index + 1}</h1>
                     <h5>{product.prodName}</h5>
                     <div
@@ -234,19 +240,19 @@ export default function Info() {
                             ? imagePlaceholder
                             : product.prodImages[0].prodImgSrc
                         })`,
-                        border: "1px solid rgba(0,0,0,.2)",
-                        width: "350px",
-                        height: "200px",
-                        margin: "0px auto",
-                        marginBottom: "3px",
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
-                        backgroundSize: "cover",
-                        borderRadius: "5px",
+                        border: '1px solid rgba(0,0,0,.2)',
+                        width: '350px',
+                        height: '200px',
+                        margin: '0px auto',
+                        marginBottom: '3px',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: 'cover',
+                        borderRadius: '5px',
                       }}
                     ></div>
                     <h6
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: 'pointer' }}
                       onClick={() => history.push(`/detail/${product.prodId}`)}
                     >
                       Xem Chi Tiết

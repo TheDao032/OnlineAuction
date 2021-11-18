@@ -1,4 +1,4 @@
-import { convertToRaw, EditorState } from 'draft-js';
+import { convertToRaw, EditorState, ContentState, convertFromHTML } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
@@ -9,8 +9,19 @@ EditorField.propTypes = {
   onEditorStateChange: PropTypes.func
 };
 
-function EditorField({ onEditorStateChange = null }) {
-  const editorState = EditorState.createEmpty()
+function EditorField({ onEditorStateChange = null, propsDescription = [] }) {
+  let editorState;
+  if (propsDescription.length === 0) {
+    editorState = EditorState.createEmpty()
+  }
+  else {
+    editorState = EditorState.createWithContent(
+      ContentState.createFromBlockArray(
+        convertFromHTML('<p>My initial content.</p>')
+      )
+    )
+  }
+
   let [editor, setEditor] = useState(editorState)
 
   function onChangeEditorState(editorState) {

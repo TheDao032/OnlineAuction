@@ -51,6 +51,9 @@ function Category(props) {
 
   useEffect(() => {
     getProductByCate();
+    return () => {
+      setProduct([]);
+    };
   }, [cateId]);
 
   useEffect(() => {
@@ -100,6 +103,7 @@ function Category(props) {
               {product.map((item) => {
                 return (
                   <CategoryItem
+                    key={item.prodId}
                     src={
                       item.prodImages.length === 0 ||
                         item.prodImages[0] === undefined
@@ -126,32 +130,32 @@ function Category(props) {
           )}
 
 
-            <div className='pagination'>
-              <button
-                className='pagination-button'
-                disabled={pageCurrent === 1}
-                onClick={() => setPageCurrent(pageCurrent - 1)}
-              >
-                Prev
-              </button>
-              <br />
-              <input
-                onChange={handleChange}
-                onKeyPress={handleKeyPress}
-                type='number'
-                className='pagination-input'
-                placeholder={pageCurrent}
-              />
-              <span className='pagination-span'>/</span>
-              <p className='pagination-p'>{maxPage}</p>
-              <button
-                className='pagination-button'
-                disabled={pageCurrent === maxPage}
-                onClick={() => setPageCurrent(pageCurrent + 1)}
-              >
-                Next
-              </button>
-            </div>
+          <div className='pagination'>
+            <button
+              className='pagination-button'
+              disabled={pageCurrent === 1}
+              onClick={() => setPageCurrent(pageCurrent - 1)}
+            >
+              Prev
+            </button>
+            <br />
+            <input
+              onChange={handleChange}
+              onKeyPress={handleKeyPress}
+              type='number'
+              className='pagination-input'
+              placeholder={pageCurrent}
+            />
+            <span className='pagination-span'>/</span>
+            <p className='pagination-p'>{maxPage}</p>
+            <button
+              className='pagination-button'
+              disabled={pageCurrent === maxPage}
+              onClick={() => setPageCurrent(pageCurrent + 1)}
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </>
@@ -174,7 +178,7 @@ function CategoryItem({
   });
 
   const {
-    user: { accessToken },
+    user: { accessToken, user: { role } },
   } = useSelector((state) => state.currentUser);
   let { loggedIn } = useSelector((state) => state.currentUser);
 
@@ -322,7 +326,7 @@ function CategoryItem({
         )}
       </div>
 
-      <p className='category__item-expire'>
+      <div className='category__item-expire'>
         {dayExpire < 0 ? (
           <p className='category__item-expire-end'>Đã hết hạn</p>
         ) : dayExpire > 0 ? (
@@ -332,7 +336,7 @@ function CategoryItem({
         ) : (
           <p className='category__item-expire-still'>Còn: {hoursExpire} giờ</p>
         )}
-      </p>
+      </div>
 
       <p className='category__item-price'>
         Giá: <span>{formatCurrency(price)}</span>

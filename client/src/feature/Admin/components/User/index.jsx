@@ -1,10 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { BiCaretUp, BiCaretDown } from "react-icons/bi";
+import { BiCaretUp, BiCaretDown, BiLockOpenAlt } from "react-icons/bi";
+import { RiDeleteBin6Fill, RiEditFill } from "react-icons/ri";
+import { useSelector } from 'react-redux'
+import axios from 'axios';
+import Loading from '../../../../components/Loading/Loading';
+import swal from 'sweetalert';
 
 
 AdminUser.propTypes = {};
 
+const deleteCss = {
+  cursor: 'pointer',
+  fontSize: '20px',
+  padding: '8px 8px 8px 8px',
+  borderRadius: '3px',
+  background: '#ff7b7b',
+  marginRight: '8px',
+  color: '#333'
+}
+
+const unlockCss = {
+  cursor: 'pointer',
+  fontSize: '20px',
+  padding: '8px 8px 8px 8px',
+  borderRadius: '3px',
+  background: '#3d99dc',
+  marginRight: '8px',
+  color: '#333'
+}
 const upRoleCss = {
   cursor: 'pointer',
   fontSize: '25px',
@@ -19,99 +43,256 @@ const downRoleCss = {
   fontSize: '25px',
   padding: '5px',
   borderRadius: '3px',
-  background: '#ff7b7b'
+  background: '#ff7b7b',
+  marginRight: '8px'
 }
 
 function AdminUser(props) {
-  let catArr = [
-    {
-      id: 1,
-      name: 'AO',
-      price: 22.1,
-      dateEnd: 'Hôm nay',
-    },
-    {
-      id: 2,
-      name: 'QUAN LOT',
-      price: 20,
-      dateEnd: 'Hôm nay',
-    },
-    {
-      id: 3,
-      name: 'QUAN JOKKER QUAN JOKKER QUAN JOKKER QUAN JOKKER QUAN JOKKER QUAN JOKKER',
-      price: 22.1,
-      dateEnd: 'Ngày mai',
-    },
-    {
-      id: 4,
-      name: 'AO KHOAC',
-      price: 221.1,
-      dateEnd: 'Hôm kia',
-    },
-    {
-      id: 5,
-      name: 'QUAN DAI',
-      price: 30.1,
-      dateEnd: 'Hôm trước',
-    },
-  ]
+  const { user: { accessToken } } = useSelector(state => state.currentUser)
+  const [listUser, setListUser] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  const [arr, setArr] = useState(() => catArr)
 
-  function handleUpRole() {
-    console.log("Up role ")
+  async function getAllUser() {
+    setLoading(true)
+    try {
+      const res = await axios.get('https://onlineauctionserver.herokuapp.com/api/account/list', {
+        headers: {
+          authorization: accessToken
+        }
+      })
+      setLoading(false)
+      console.log(res.data.listAccouts)
+      setListUser(res.data.listAccouts)
+
+    } catch (err) {
+      setLoading(false)
+      console.log(err.response)
+    }
   }
 
-  function handleDownRole() {
-    console.log("Down role ")
+  useEffect(() => {
+    getAllUser()
+  }, [])
+
+  async function handleUpRole(accId, accRole) {
+    setLoading(true)
+    const role = accRole === 'BID' ? 'SEL' : 'ADM'
+    console.log(accId, accRole, role)
+    try {
+      const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/account/update-role', {
+        accId,
+        accRole: role
+      },
+        {
+          headers: {
+            authorization: accessToken
+          }
+        }
+      )
+
+      console.log(res)
+      getAllUser()
+      swal("Thành công", `Đã nâng lên '${role}'`, 'success')
+    } catch (err) {
+      console.log(err.response)
+      swal("Thất bại", 'Có lỗi xảy ra, vui lòng thử lại', 'error')
+    }
+
+    setLoading(false)
+  }
+
+  async function handleDownRole(accId, accRole) {
+    setLoading(true)
+    const role = accRole === 'ADM' ? 'SEL' : 'BID'
+    console.log(accId, accRole, role)
+    try {
+      const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/account/update-role', {
+        accId,
+        accRole: role
+      },
+        {
+          headers: {
+            authorization: accessToken
+          }
+        }
+      )
+
+      console.log(res)
+      getAllUser()
+      swal("Thành công", `Đã hạ xuống '${role}'`, 'success')
+
+    } catch (err) {
+      console.log(err.response)
+      swal("Thất bại", 'Có lỗi xảy ra, vui lòng thử lại', 'error')
+    }
+
+    setLoading(false)
+  }
+
+  function handleDelete(accId) {
+    swal({
+      text: "Bạn thật sự muốn xóa tài khoản",
+      icon: 'info',
+      buttons: ['Hủy', 'Xóa']
+    }).then(async confirm => {
+      if (confirm) {
+        setLoading(true)
+
+        const data = { accId }
+
+        try {
+          const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/account/delete', data, {
+            headers: {
+              authorization: accessToken
+            }
+          })
+
+          console.log(res)
+          getAllUser()
+          swal("Thành công", `Đã xóa tài khoản`, 'success')
+          setLoading(false)
+        } catch (err) {
+          console.log(err.response)
+          swal("Thất bại", 'Có lỗi xảy ra, vui lòng thử lại', 'error')
+          setLoading(false)
+        }
+      }
+    })
+
+
+  }
+
+  function handleUnLock(accId) {
+    swal({
+      text: "Bạn thật sự muốn mở khóa tài khoản",
+      icon: 'info',
+      buttons: ['Hủy', 'Mở']
+    }).then(async confirm => {
+      if (confirm) {
+        setLoading(true)
+
+        const data = {
+          accId,
+          accStatus: 0
+        }
+
+        try {
+          const res = await axios.post('https://onlineauctionserver.herokuapp.com/api/account/update-status', data, {
+            headers: {
+              authorization: accessToken
+            }
+          })
+
+          console.log(res)
+          getAllUser()
+          swal("Thành công", `Đã mở khóa tài khoản`, 'success')
+          setLoading(false)
+        } catch (err) {
+          console.log(err.response)
+          swal("Thất bại", 'Có lỗi xảy ra, vui lòng thử lại', 'error')
+          setLoading(false)
+        }
+      }
+    })
+
   }
 
 
 
   return (
-    <section className='admin'>
-      <div className='tbl-header'>
-        <table className='admin__table'>
-          <thead className='admin__thead'>
-            <tr className='admin__tr'>
-              <th>Code</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Date end</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-      <div className='tbl-content'>
-        <table className='admin__table'>
-          <tbody className='admin__tbody'>
-            {arr.map((item) => {
-              return (
-                <tr className='admin__tr' key={item.id}>
-                  <td>{item.id}</td>
-                  <td>
-                    <span className='admin__td-name'>
-                      {item.name}
-                    </span>
-                  </td>
-                  <td>${item.price}</td>
-                  <td>{item.dateEnd}</td>
-                  <td>
-                    <div style={upRoleCss} title='Up role' onClick={handleUpRole}>
-                      <BiCaretUp />
-                    </div>
-                    <div style={downRoleCss} title='Down role' onClick={handleDownRole}>
-                      <BiCaretDown />
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <>
+      {
+        loading
+          ?
+          <Loading />
+          :
+          <section className='admin'>
+            <div className='tbl-header'>
+              <table className='admin__table'>
+                <thead className='admin__thead'>
+                  <tr className='admin__tr admin__tr--user'>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div className='tbl-content'>
+              <table className='admin__table'>
+                <tbody className='admin__tbody'>
+                  {listUser.map((item) => {
+                    return (
+                      <tr className='admin__tr admin__tr--user' key={item.accId}>
+                        <td>
+                          <span className='admin__td-name'>
+                            {item.accFullName}
+                          </span>
+                        </td>
+                        <td>
+                          <span className='admin__td-name'>
+                            {item.accEmail}
+                          </span>
+                        </td>
+                        <td>
+                          <span className='admin__td-name'>
+                            {item.accPhoneNumber}
+                          </span>
+                        </td>
+                        <td>{item.accRole}</td>
+                        <td>
+                          {
+                            item.accStatus === 0 ? <p className='category__item-expire-still'>Đang hoạt động</p> : (
+                              item.accStatus === 1 ?
+                                <p className='category__item-expire-end'>Đã bị khóa</p>
+                                : <p className='category__item-expire-end'>Chưa xác thực</p>
+                            )
+                          }
+                        </td>
+                        <td style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          {item.accStatus === 0
+                            ?
+                            <>
+                              {item.accRole === 'ADM'
+                                ? ''
+                                :
+                                <div style={upRoleCss} title='Up role' onClick={() => handleUpRole(item.accId, item.accRole)}>
+                                  <BiCaretUp />
+                                </div>
+                              }
+                              {item.accRole === 'BID'
+                                ? ''
+                                :
+                                <div style={downRoleCss} title='Down role' onClick={() => handleDownRole(item.accId, item.accRole)}>
+                                  <BiCaretDown />
+                                </div>
+                              }
+                              <div style={deleteCss} title='Delete' onClick={() => handleDelete(item.accId)}>
+                                <RiDeleteBin6Fill />
+                              </div>
+                            </> : (
+                              item.accStatus === 1
+                                ?
+                                <div style={unlockCss} title='Mở khóa' onClick={() => handleUnLock(item.accId)}>
+                                  <BiLockOpenAlt />
+                                </div>
+                                : ''
+                            )
+                          }
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+      }
+    </>
   );
 }
 

@@ -188,6 +188,8 @@
   letter-spacing: .1rem;
   position: relative;
   overflow: hidden;
+
+  cursor: pointer;
 }
 
 .e-nav__link:before {

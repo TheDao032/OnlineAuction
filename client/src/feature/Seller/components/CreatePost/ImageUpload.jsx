@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 ImageUpload.propTypes = {
@@ -8,6 +8,9 @@ ImageUpload.propTypes = {
 };
 
 function ImageUpload({ file = [], onUploadImage = null, onDeleteImage = null }) {
+  // console.log(file)  
+
+
   function uploadSingleFile(e) {
     if (!onUploadImage) return
 
@@ -33,6 +36,7 @@ function ImageUpload({ file = [], onUploadImage = null, onDeleteImage = null }) 
   }
 
   const handleDeleteImg = (id) => {
+
     if (!onDeleteImage) return
 
     const cloneFile = [...file]
@@ -40,15 +44,21 @@ function ImageUpload({ file = [], onUploadImage = null, onDeleteImage = null }) 
     const fileList = cloneFile.filter((item) => item.id !== id);
     // console.log("file: ", fileList)
 
-    onDeleteImage(fileList)
-    // setValue({ ...value, file: fileList })
+    if (typeof id === 'number') {
+      onDeleteImage(fileList, { prodImgId: id })
+    }
+    else {
+      onDeleteImage(fileList, -1)
+
+    }
   }
+
 
   return (
     <>
       <div className='form__group'>
-        <input type='file' className='form__file' id='file' accept="image/*" disabled={file.length === 10} onChange={uploadSingleFile} />
-        <label for='file' className={`form__group-label form__group-label--file ${file.length === 10 && 'form__group-label--disabled'}`}>Choose image</label>
+        <input type='file' className='form__file' id='file' accept="image/*" disabled={file.length === 4} onChange={uploadSingleFile} />
+        <label for='file' className={`form__group-label form__group-label--file ${file.length === 4 && 'form__group-label--disabled'}`}>Choose image</label>
         {
           file.length < 3 && <span className='form__file-message'>*At least 3 images</span>
         }
