@@ -6,12 +6,38 @@ const updateAccountPassword = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-		  accId: { type: 'integer' },
 		  accOldPassword: { type: 'string', pattern: '' },
 		  accNewPassword: { type: 'string', pattern: '', minLength: 1 },
-		  accConfirmPassword: { type: 'string', pattern: '', minLength: 1 },
+		  accConfirmPassword: { type: 'string', pattern: '', minLength: 1 }
 		},
 	  	required: ['accOldPassword', 'accNewPassword', 'accConfirmPassword'],
+	  	additionalProperties: true
+  	}
+
+  	const ajv = new ajvLib({
+	  	allErrors: true
+  	})
+
+  	const validator = ajv.compile(shema)
+  	const valid = validator(req.body)
+
+  	if (!valid) {
+		return res.status(400).json({
+			errorMessage: validator.errors[0].message,
+			statusCode: errorCode
+		})
+  	}
+
+ 	next()
+}
+
+const resetAccountPassword = (req, res, next) => {
+	const shema = {
+		type: 'object',
+		properties: {
+		  accId: { type: 'integer' }
+		},
+	  	required: ['accId'],
 	  	additionalProperties: true
   	}
 
@@ -65,7 +91,7 @@ const updateAccount = (req, res, next) => {
   		type: 'object',
   		properties: {
 			accId: { type: 'integer' },
-    		accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{6,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
+    		accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{5,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
     		accPhoneNumber: { type: 'string', pattern: '', maxLength: 15 },
     		accRole: { type: 'string', pattern: '', maxLength: 5 }
   		},
@@ -159,7 +185,7 @@ const deleteAccount = (req, res, next) => {
 	})
 
 	const validator = ajv.compile(shema)
-	const valid = validator(req.params)
+	const valid = validator(req.body)
 
 	if (!valid) {
 		return res.status(400).json({
@@ -263,5 +289,6 @@ module.exports = {
 	queryInfo,
 	deleteAccount,
 	updateStatusAccount,
-	upgradeRoleAccount
+	upgradeRoleAccount,
+	resetAccountPassword
 }

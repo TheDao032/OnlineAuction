@@ -10,6 +10,9 @@ const accountModel = require('../models/account.model')
 const roleModel = require('../models/role.model')
 const commentModel = require('../models/comment.model')
 
+const mailService = require('../services/mailService')
+const mailOptions = require('../template/mailOptions')
+
 const successCode = 0
 const errorCode = 1
 
@@ -25,6 +28,7 @@ router.get('/list', accountValidation.queryInfo, async (req, res) => {
 				accEmail: element.acc_email,
 				accPhoneNumber: element.acc_phone_number,
 				accFullName: element.acc_full_name,
+				accRole: element.acc_role,
 				accStatus: element.acc_status
 			}
 		})
@@ -199,6 +203,42 @@ router.post('/update-password', accountValidation.updateAccountPassword, async (
 	})
 })
 
+router.post('/reset-password', accountValidation.resetAccountPassword, async (req, res) => {
+	const { accId } = req.body
+	const { accRole } = req.account
+
+	if (!roleModel.checkAdminRole(accRole)) {
+		return res.status(400).json({
+			errorMessage: 'Permission Access Denied'
+		})
+	}
+
+	const accInfo = await accountModel.findById(accId)
+
+	if (accInfo.length === 0) {
+		return res.status(400).json({ 
+			errorMessage: 'User Does Not Exist',
+			statusCode: errorCode
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	const hashPassword = bcrypt.hashSync('ABC123', 3)
+	const accountInfo = {
+		acc_password: hashPassword,
+		acc_updated_date: presentDate
+	}
+
+	await accountModel.update(accId, accountInfo)
+
+	await mailService.sendMail(mailOptions.resetPasswordOptions(accEmail, accEmail, 'ABC123'), req, res)
+
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
+
 router.post('/delete', accountValidation.deleteAccount, async (req, res) => {
 	const { accId } = req.body
 	const { accRole } = req.account
@@ -350,7 +390,7 @@ router.post('/update-status', accountValidation.updateStatusAccount, async (req,
 		})
 	}
 
-	if (accStatus !== '0' || accStatus !== '1' && accStatus !== '2') {
+	if (accStatus !== 0 && accStatus !== 1 && accStatus !== 2) {
 		return res.status(400).json({
 			statusCode: errorCode,
 			errorMessage: `Invalid Status`
