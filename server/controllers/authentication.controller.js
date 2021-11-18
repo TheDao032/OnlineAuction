@@ -65,8 +65,6 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 
 	var token = (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString()
 
-	await mailService.sendMail(mailOptions.registerOptions(accEmail, accEmail, token), req, res)
-
 	const hashPassword = bcrypt.hashSync(accPassword, 3)
 	const hashToken = bcrypt.hashSync(token, 3)
 
@@ -86,6 +84,8 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 	.returning('acc_id')
 	.insert(accountInfo)
 
+	await mailService.sendMail(mailOptions.registerOptions(accEmail, accEmail, token), req, res)
+
 	return res.status(200).json({
 		statusCode: successCode,
 		accId: newAccId[0]
@@ -93,8 +93,7 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 })
 
 router.post('/verification-email', authenticationValidate.confirmToken, async (req, res) => {
-	const { accToken }  = req.body
-	const { accId } = req.account
+	const { accToken, accId }  = req.body
 	
 	const result = await accountModel.findById(accId)
 
@@ -127,12 +126,11 @@ router.post('/verification-email', authenticationValidate.confirmToken, async (r
 	}
 	
 
-	await accountModel.update(accid, accountInfo)
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
-	})
-	
+	})	
 })
 
 router.post('/forgot-password', authenticationValidate.forgotPassword, async (req, res) => {
@@ -150,7 +148,7 @@ router.post('/forgot-password', authenticationValidate.forgotPassword, async (re
 	let token = 'f' + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString()
 
 	const cusName = result[0].acc_email
-	await mailService.sendMail(mailOptions.forgotPasswordOptions(accEmail, cusName, token), req, res)
+	
 	const hashToken = bcrypt.hashSync(token, 3)
 	
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -161,6 +159,8 @@ router.post('/forgot-password', authenticationValidate.forgotPassword, async (re
 
 	await accountModel.update(result[0].acc_id, accountInfo)
 
+	await mailService.sendMail(mailOptions.forgotPasswordOptions(accEmail, cusName, token), req, res)
+
 	return res.status(200).json({
 		statusCode: successCode,
 		accId: result[0].acc_id
@@ -168,9 +168,7 @@ router.post('/forgot-password', authenticationValidate.forgotPassword, async (re
 })
 
 router.post('/new-password', authenticationValidate.newPassword, async (req, res) => {
-	const { accPassword, tokenChangePass }  = req.body
-
-	const { accId } = req.account
+	const { accPassword, tokenChangePass, accId }  = req.body
 
 	const accountInfo = await accountModel.findById(accId)
 

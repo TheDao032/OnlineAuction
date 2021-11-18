@@ -98,8 +98,12 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 	// const listBidder = await auctionStatusModel.findAll()
 	const allAccount = await accountModel.findAll()
 	const prodImages = await productImageModel.findAll()
+	const allCategories = await categoriesModel.findAll()
 	
 	const convertListProduct = allProducts.map((element) => {
+
+		const cateInfo = allCategories.find((item) => item.cate_id === element.prod_cate_id)
+
 		const sellerInfo = allAccount.filter((item) => item.acc_id === element.prod_acc_id)
 		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
 			return {
@@ -121,7 +125,10 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 			return {
 				prodId: element.prod_id,
 				prodName: element.prod_name,
-				prodCateId: element.prod_cate_id,
+				prodCate: {
+					cateId: element.prod_cate_id,
+					cateFatherId: cateInfo.cate_father
+				},
 				prodOfferNumber: element.prod_offer_number,
 				prodBeginPrice: element.prod_begin_price,
 				prodStepPrice: element.prod_step_price,
@@ -136,7 +143,10 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 		return {
 			prodId: element.prod_id,
 			prodName: element.prod_name,
-			prodCateId: element.prod_cate_id,
+			prodCate: {
+				cateId: element.prod_cate_id,
+				cateFatherId: cateInfo.cate_father
+			},
 			prodOfferNumber: element.prod_offer_number,
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
@@ -386,7 +396,7 @@ router.get('/list-biggest-price', async (req, res) => {
 	const listBidder = await auctionStatusModel.findAll()
 	const allAccount = await accountModel.findAll()
 
-	const listFilter = allProduct.sort((a, b) => b.prod_begin_price - a.prod_begin_price)
+	const listFilter = allProduct.sort((a, b) => b.prod_begin_price - a.prod_begin_price).filter((item) => moment(item.prod_expired_date) > moment())
 
 	const result = listFilter.map((element) => {
 		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
@@ -846,7 +856,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 						prodStepPrice: element.prod_step_price,
 						prodBuyPrice: element.prod_buy_price,
 						prodImages: prodImageInfo || [],
-						owner: accountInfo || null,
+						biggestBidder: accountInfo || null,
 						createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 						expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 					}
@@ -861,7 +871,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					prodStepPrice: element.prod_step_price,
 					prodBuyPrice: element.prod_buy_price,
 					prodImages: prodImageInfo || [],
-					owner: null,
+					biggestBidder: null,
 					createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 					expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
