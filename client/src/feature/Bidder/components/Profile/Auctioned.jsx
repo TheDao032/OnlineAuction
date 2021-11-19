@@ -94,6 +94,7 @@ function Auctioned(props) {
                   }
                   prodId={item.prodId}
                   prodBuyPrice={item.prodBuyPrice}
+                  biggestId={item.biggestBidder.accId}
                 />
               );
             })
@@ -111,8 +112,12 @@ function AuctionedItem({
   currentPrice,
   prodId,
   prodBuyPrice,
+  biggestId
 }) {
   const { days, hours, mins } = formatTime(createDate);
+
+  const { user } = useSelector(state => state.currentUser)
+  const userId = user.user.accId
 
   // console.log(formatTime(createDate));
   const history = useHistory();
@@ -123,6 +128,11 @@ function AuctionedItem({
 
   return (
     <div className="auctioned__item">
+      {biggestId === userId
+        ?
+        <div className='auctioned__new'>TOP</div>
+        : ''
+      }
       <div
         className="auctioned__image"
         style={{

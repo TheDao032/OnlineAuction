@@ -90,6 +90,24 @@ function Category(props) {
     }
   };
 
+  function formatName(str) {
+    const arrStr = str.split('').filter((item) => item !== ' ');
+
+    let newStr = '';
+    for (let i = 0; i < arrStr.length; i++) {
+      newStr += ' ';
+
+      for (let j = 0; j < arrStr[i].length; j++) {
+        if (i % 2 !== 0) {
+          arrStr[i] = '*';
+        }
+        newStr += arrStr[i];
+      }
+    }
+
+    return newStr.split(' ').filter((item) => item !== '');
+  }
+
   return (
     <>
       {loading ? (
@@ -294,9 +312,27 @@ function CategoryItem({
 
   // console.log(days, hours, mins)
 
+  function formatName(str) {
+    const arrStr = str.split('').filter((item) => item !== ' ');
+
+    let newStr = '';
+    for (let i = 0; i < arrStr.length; i++) {
+      newStr += ' ';
+
+      for (let j = 0; j < arrStr[i].length; j++) {
+        if (i % 2 !== 0) {
+          arrStr[i] = '*';
+        }
+        newStr += arrStr[i];
+      }
+    }
+
+    return newStr.split(' ').filter((item) => item !== '');
+  }
+
   return (
     <div className="category__item">
-      {days === 0 && hours === 0 && mins <= 30
+      {days === 0 && hours === 0 && mins <= 59
         ?
         <div className='category__new'>
           NEW
@@ -356,7 +392,7 @@ function CategoryItem({
         </p>
       ) : (
         <p className='category__item-biggestBidder'>
-          Đặt cao nhất: <span>{biggestBidder[0].accName}</span>
+          Đặt cao nhất: <span>{formatName(biggestBidder[0].accName)}</span>
         </p>
       )}
 

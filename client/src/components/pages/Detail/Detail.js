@@ -20,6 +20,7 @@ import getTimeLeft from '../../../util/getTimeLeft';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import AddDescription from './AddDescription';
 import ErrorPage from '../../404';
+import SlideShow from './SlideShow';
 
 export default function Detail() {
   const { prodId } = useParams();
@@ -47,7 +48,11 @@ export default function Detail() {
   const [description, setDescription] = useState([]);
   const [relatedProduct, setRelatedProduct] = useState([]);
   const [biggestPrice, setBiggestPrice] = useState(0);
-  const [listAuction, setListAuction] = useState(() => []);
+
+  const [listAuction, setListAuction] = useState([]);
+  const [flag, setFlag] = useState([]);
+
+  const [showImg, setShowImg] = useState(false);
 
   useEffect(() => {
     setUserRole(role);
@@ -81,7 +86,6 @@ export default function Detail() {
     }
   };
 
-  let arr = [];
   let ts = 0;
   async function getListAuction() {
     try {
@@ -101,34 +105,29 @@ export default function Detail() {
           }
         )
         .then((res) => {
-          // console.log('list auction: ', res);
-          // console.log('list cũ ', listAuction);
-          // console.log('list mới', res.data.listAuctions);
-          // let newList = [...res.data.listAuctions, ...listAuction];
-          // console.log('list merge: ', newList);
-          arr = res.data.listAuctions;
-          console.log('trong axíos', arr);
-          // setListAuction([...listAuction, res.data.listAuctions]);
           ts = res.data.return_ts;
 
-          return res.data.listAuctions;
+          if (res.data.listAuctions.length !== 0) {
+            setFlag(res.data.listAuctions);
+          }
         })
         .catch((err) => {
           console.log(err.response);
         })
-        .then(function (resList) {
-          if (resList.length !== 0) {
-            setListAuction(resList);
-          }
+        .then(function () {
           getListAuction();
         });
     } catch (error) {
       console.log(error.response);
     }
   }
-  // console.log('list cũ ', arr);
 
-  console.log('Product detail abc: ', listAuction);
+  useEffect(() => {
+    setListAuction(listAuction.concat(flag));
+  }, [flag]);
+
+  console.log('7: ', listAuction);
+
   const sellerID = seller[0]?.accId;
 
   const {
@@ -240,6 +239,10 @@ export default function Detail() {
     });
   }
 
+  function onShowSlider() {
+    setShowImg(true);
+  }
+
   return (
     <>
       {loading ? (
@@ -250,12 +253,22 @@ export default function Detail() {
             <ErrorPage />
           ) : (
             <div className='detail grid wide'>
+              {showImg ? (
+                <SlideShow
+                  imageList={product.prodImages}
+                  setShowImg={setShowImg}
+                />
+              ) : (
+                ''
+              )}
+
               <button className='detail__back' onClick={() => history.goBack()}>
                 Back
               </button>
               <div className='detail__container'>
                 <div className='detail__image'>
                   <div
+                    onClick={onShowSlider}
                     className='detail__image-item detail__image-item--big'
                     style={{
                       backgroundImage: `url(${
@@ -317,6 +330,7 @@ export default function Detail() {
                           product.prodImages.slice(1, 4).map((item) => {
                             return (
                               <div
+                                onClick={onShowSlider}
                                 key={item.prodImgId}
                                 className='detail__image-item detail__image-item--small'
                                 style={{
@@ -329,6 +343,7 @@ export default function Detail() {
                           product.prodImages.slice(0, 3).map((item) => {
                             return (
                               <div
+                                onClick={onShowSlider}
                                 key={item.prodImgId}
                                 className='detail__image-item detail__image-item--small'
                                 style={{
@@ -657,6 +672,14 @@ function Offer({
         } catch (error) {
           console.log(error.response);
           setLoading(false);
+
+          if (error.response.data.errorMessage.includes('First Time')) {
+            return swal(
+              'Thông tin',
+              'Chờ sự cho phép của người bán khi lần đầu đấu giá',
+              'info'
+            );
+          }
 
           if (error.response.data.errorMessage)
             swal('Unsuccessful', error.response.data.errorMessage, 'error');
