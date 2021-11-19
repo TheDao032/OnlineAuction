@@ -25,7 +25,7 @@ function Category(props) {
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dataPagination, setDataPagination] = useState([]);
-  const [pageCurrent, setPageCurrent] = useState(3);
+  const [pageCurrent, setPageCurrent] = useState(1);
   const [itemLimit, setImtemLimit] = useState(2);
   const [maxPage, setMaxPage] = useState(1);
 
@@ -100,7 +100,7 @@ function Category(props) {
             <Empty title="Danh mục này chưa có sản phẩm" />
           ) : (
             <div className="category__container">
-              {product.map((item) => {
+                {dataPagination.map((item) => {
                 return (
                   <CategoryItem
                     key={item.prodId}

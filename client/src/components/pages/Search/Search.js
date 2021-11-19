@@ -24,7 +24,7 @@ export default function Search() {
   console.log('nguoi dung nhap la:', text);
   const [dataSearch, setData] = useState([]);
   const [dataPagination, setDataPagination] = useState([]);
-  const [pageCurrent, setPageCurrent] = useState(3);
+  const [pageCurrent, setPageCurrent] = useState(1);
   const [itemLimit, setImtemLimit] = useState(2);
   const [maxPage, setMaxPage] = useState(1);
   const [loading, setLoading] = useState(false);
