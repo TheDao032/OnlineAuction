@@ -131,7 +131,13 @@ function ListPermission(props) {
       const newListPermission = listPermission.filter(
         (item) => item.perBidderId !== bidderId
       );
+
+      const newListAuction = listAuction.filter(
+        (item) => item.sttBidderId !== bidderId
+      );
+
       setListPermission(newListPermission);
+      setListAuction(newListAuction);
     } catch (error) {
       dispatch(setLoading(false));
       console.log(error.response);
@@ -193,6 +199,7 @@ function ListPermission(props) {
                   price={item.sttBiggestPrice}
                   time={item.createdDate}
                   bidderId={item.sttBidderId}
+                  onTakePermissiton={handleTakePermission}
                 />
               );
             })
@@ -222,9 +229,10 @@ function ListPermissionItem({
   }
 
   function handleTakePermission() {
-    if (!onGivePermission) return;
+    if (!onTakePermissiton) return;
     onTakePermissiton(bidderId, prodId);
   }
+
 
   return (
     <div className="listPermission__item">
@@ -251,9 +259,24 @@ function ListPermissionItem({
   );
 }
 
-function ListAuctionItem({ name, price, time, bidderId }) {
+function ListAuctionItem({ name, price, time, bidderId, onTakePermissiton }) {
   const dispatch = useDispatch();
   const { prodId } = useParams();
+
+
+  function handleCancleBidder() {
+    if (!onTakePermissiton) return;
+
+    swal({
+      text: 'Bạn muốn từ chối quyền ra giá của người này?',
+      icon: 'info',
+      buttons: ['Hủy', 'Đồng ý']
+    }).then(confirm => {
+      if (confirm) {
+        onTakePermissiton(bidderId, prodId);
+      }
+    })
+  }
 
   return (
     <div className="listPermission__item">
@@ -264,7 +287,7 @@ function ListAuctionItem({ name, price, time, bidderId }) {
           }`}</span>
       </h6>
       <div className="listPermission__item-action">
-        <button className="listPermission__item-btn listPermission__item-btn--no">
+        <button className="listPermission__item-btn listPermission__item-btn--no" onClick={handleCancleBidder}>
           <AiOutlineClose />
           <p>Từ chối</p>
         </button>

@@ -31,6 +31,10 @@
       grid-template-columns: 1.5fr 1.5fr 1fr 0.8fr 1fr 1fr;
     }
 
+    &--upgrade {
+      grid-template-columns: 1.5fr 1.5fr 1fr 1fr;
+    }
+
     &___sub {
       width: 100%;
       &:nth-child(even) {

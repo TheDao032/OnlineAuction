@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink, Route, Switch, useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import AdminCategory from './components/Category';
+import ListUpRole from './components/ListUpRole';
 import AdminProduct from './components/Product';
 import EditPost from './components/Product/EditPost';
 import AdminUser from './components/User';
@@ -22,24 +23,24 @@ function AdminFeature(props) {
     role = user.role;
   }
   const history = useHistory();
-  useEffect(() => {
-    const token =  accessToken;
-    if (token === '') {
-      history.replace("/sign-in")
-    }
-    // if(token !== '' && role === 'SEL')
-    // {
-    //   alert("dsdfsdfsdfs");
-    //   history.push("/bidder");
-    // }
-    // else{
-    //   if(role === 'SEL' || role === 'BID')
-    //   {
-    //     console.log("----------------------------------------fhgfhfghgfhf");
-    //     
-    //   }
-    // }
-  },[])
+  // useEffect(() => {
+  //   const token = accessToken;
+  //   if (token === '') {
+  //     history.replace("/sign-in")
+  //   }
+  //   // if(token !== '' && role === 'SEL')
+  //   // {
+  //   //   alert("dsdfsdfsdfs");
+  //   //   history.push("/bidder");
+  //   // }
+  //   // else{
+  //   //   if(role === 'SEL' || role === 'BID')
+  //   //   {
+  //   //     console.log("----------------------------------------fhgfhfghgfhf");
+  //   //     
+  //   //   }
+  //   // }
+  // }, [])
   const { pathname } = useLocation()
 
 
@@ -54,6 +55,9 @@ function AdminFeature(props) {
         </li>
         <li>
           <NavLink className='admin__nav-item' to={`${url}/user`}>User</NavLink>
+        </li>
+        <li>
+          <NavLink className='admin__nav-item' to={`${url}/permission`}>List Permission</NavLink>
         </li>
       </ul>
     }
@@ -72,6 +76,9 @@ function AdminFeature(props) {
         </Route>
         <Route path={`${url}/user`}>
           <AdminUser />
+        </Route>
+        <Route path={`${url}/permission`}>
+          <ListUpRole />
         </Route>
       </Switch>
     </div>

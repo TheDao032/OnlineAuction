@@ -31,9 +31,9 @@ function App() {
     user: { accessToken },
   } = useSelector((state) => state.currentUser);
 
-  const decodeToken = jwt.decode(accessToken);
+  // const decodeToken = jwt.decode(accessToken);
 
-  let isExpired = false;
+  // let isExpired = false;
   useEffect(() => {
     if (localStorage.getItem('@user') !== null) {
       dispatch(logIn(JSON.parse(localStorage.getItem('@user'))));
@@ -52,13 +52,13 @@ function App() {
   //   });
   // }
 
-  console.log(decodeToken);
+  // console.log(decodeToken);
 
-  if (decodeToken?.exp < dateNow.getTime()) {
-    console.log('hết hạn rồi');
-  } else {
-    console.log('còn hạn');
-  }
+  // if (decodeToken?.exp < dateNow.getTime()) {
+  //   console.log('hết hạn rồi');
+  // } else {
+  //   console.log('còn hạn');
+  // }
   return (
     <>
       {pathname.includes('/signup') || pathname.includes('/sign-in') ? (

@@ -337,9 +337,27 @@ function SearchItem({
     mins: minsExpire,
   } = getTimeLeft(expireDate);
 
+  function formatName(str) {
+    const arrStr = str.split('').filter((item) => item !== ' ');
+
+    let newStr = '';
+    for (let i = 0; i < arrStr.length; i++) {
+      newStr += ' ';
+
+      for (let j = 0; j < arrStr[i].length; j++) {
+        if (i % 2 !== 0) {
+          arrStr[i] = '*';
+        }
+        newStr += arrStr[i];
+      }
+    }
+
+    return newStr.split(' ').filter((item) => item !== '');
+  }
+
   return (
     <div className='search__item'>
-      {days === 0 && hours === 0 && mins <= 30 ? (
+      {days === 0 && hours === 0 && mins <= 59 ? (
         <div className='search__new'>NEW</div>
       ) : (
         ''
@@ -400,7 +418,7 @@ function SearchItem({
         </p>
       ) : (
         <p className='search__item-biggestBidder'>
-          Đặt cao nhất: <span>{biggestBidder[0].accName}</span>
+          Đặt cao nhất: <span>{formatName(biggestBidder[0].accName)}</span>
         </p>
       )}
 
