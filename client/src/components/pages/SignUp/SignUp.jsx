@@ -23,7 +23,9 @@ function SignUp() {
   const [err, setErr] = useState("");
   const [reCaptCha, setReCaptCha] = useState(false);
   const [reErr, setReErr] = useState(false);
-  const SITE_KEY = "6LeKiAkdAAAAAH5r5Us-hjlTA7zWNjTNQCze_b0Z";
+  // const SITE_KEY = "6LeKiAkdAAAAAH5r5Us-hjlTA7zWNjTNQCze_b0Z";
+  // site key vercel
+  const SITE_KEY = '6Le8KCAdAAAAAGEiCB4ImLPpWAxdYBp4AJACKbxN'
 
   const schema = yup.object().shape({
     accEmail: yup

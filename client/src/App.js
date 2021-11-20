@@ -21,6 +21,7 @@ import NewPassword from './components/pages/NewPassword/NewPassword';
 // import SearchResult from './components/SearchResult';
 import ErrorPage from './components/404';
 import jwt from 'jsonwebtoken';
+import RatingDetail from './components/pages/Rating';
 
 function App() {
   const dispatch = useDispatch();
@@ -31,9 +32,6 @@ function App() {
     user: { accessToken },
   } = useSelector((state) => state.currentUser);
 
-  // const decodeToken = jwt.decode(accessToken);
-
-  // let isExpired = false;
   useEffect(() => {
     if (localStorage.getItem('@user') !== null) {
       dispatch(logIn(JSON.parse(localStorage.getItem('@user'))));
@@ -42,23 +40,6 @@ function App() {
 
   // console.log('url nè: ', pathname);
 
-  // if (localStorage.getItem('@user') !== null) {
-  //   const token = JSON.parse(localStorage.getItem('@user'));
-  //   console.log(token.accessToken);
-  //   jwt.verify(token.accessToken, (err) => {
-  //     if (err) {
-  //       console.log(err);
-  //     }
-  //   });
-  // }
-
-  // console.log(decodeToken);
-
-  // if (decodeToken?.exp < dateNow.getTime()) {
-  //   console.log('hết hạn rồi');
-  // } else {
-  //   console.log('còn hạn');
-  // }
   return (
     <>
       {pathname.includes('/signup') || pathname.includes('/sign-in') ? (
@@ -81,6 +62,11 @@ function App() {
         <Route path={`/sign-in/verify-email`} component={VerifyEmail} />
         <Route path='/search/:text' component={Search} />
         <Route exact path='/detail/:prodId' component={Detail} />
+        <Route
+          exact
+          path='/detail/:prodId/rating/:accId'
+          component={RatingDetail}
+        />
         <Route exact path='/category/:cateId' component={Category} />
         <Route path='/admin'>
           <AdminFeature />
