@@ -24,7 +24,7 @@ import SlideShow from './SlideShow';
 
 export default function Detail() {
   const { prodId } = useParams();
-
+  const { url } = useRouteMatch();
   const history = useHistory();
 
   const { loggedIn, user } = useSelector((state) => state.currentUser);
@@ -125,8 +125,6 @@ export default function Detail() {
   useEffect(() => {
     setListAuction(listAuction.concat(flag));
   }, [flag]);
-
-  console.log('7: ', listAuction);
 
   const sellerID = seller[0]?.accId;
 
@@ -241,6 +239,11 @@ export default function Detail() {
 
   function onShowSlider() {
     setShowImg(true);
+  }
+
+  function handSeeMoreRating(accId) {
+    console.log(accId);
+    history.push(`${url}/rating/${accId}`);
   }
 
   return (
@@ -428,6 +431,12 @@ export default function Detail() {
                         {seller[0]?.accBadVote}
                         <AiFillDislike className='detail__seller-react--dislike' />
                       </p>
+                      <button
+                        className='detail__seller-seemore'
+                        onClick={() => handSeeMoreRating(seller[0]?.accId)}
+                      >
+                        Xem chi tiết
+                      </button>
                     </div>
                   </div>
 
@@ -449,13 +458,23 @@ export default function Detail() {
                         </p>
                         <div className='detail__bidder-rate'>
                           <p className='detail__bidder-react'>
-                            {product.biggestBidder[0].accGoodVote}{' '}
+                            {product?.biggestBidder[0]?.accGoodVote}{' '}
                             <AiFillLike className='detail__bidder-react--like' />
                           </p>
                           <p className='detail__bidder-react'>
                             {product.biggestBidder[0].accBadVote}{' '}
                             <AiFillDislike className='detail__bidder-react--dislike' />
                           </p>
+                          <button
+                            className='detail__seller-seemore'
+                            onClick={() =>
+                              handSeeMoreRating(
+                                product?.biggestBidder[0]?.accId
+                              )
+                            }
+                          >
+                            Xem chi tiết
+                          </button>
                         </div>
                       </>
                     )}
