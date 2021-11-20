@@ -141,9 +141,17 @@ export default function Detail() {
   const currenPrice = prodBeginPrice + prodOfferNumber * prodStepPrice;
 
   useEffect(() => {
-    console.log('vô đây');
-    fetchProductDetail();
-    getListAuction();
+    async function run() {
+      setLoading(true);
+      setListAuction([]);
+      console.log('vô đây');
+      await fetchProductDetail();
+      getListAuction();
+
+      setLoading(false);
+    }
+
+    run();
   }, [prodId]);
 
   for (let i = 0; i < listAuction.length; i++) {
@@ -216,6 +224,7 @@ export default function Detail() {
             if (goToList) {
               history.push('/bidder/profile/auctioned');
             } else {
+              fetchProductDetail();
             }
           });
         } catch (error) {
@@ -490,6 +499,7 @@ export default function Detail() {
                     prodId={prodId}
                     biggestPrice={biggestPrice}
                     setLoading={setLoading}
+                    fetchProductDetail={fetchProductDetail}
                   />
                 </div>
               </div>
@@ -564,6 +574,7 @@ function Offer({
   mins,
   hours,
   setLoading,
+  fetchProductDetail,
 }) {
   let accessToken = '';
   let role = '';
@@ -686,6 +697,7 @@ function Offer({
             if (goToList) {
               history.push('/bidder/profile/auctioned');
             } else {
+              fetchProductDetail();
             }
           });
         } catch (error) {
@@ -867,7 +879,7 @@ function RelateItem({ src, seller, price, name, isEnd, prodId }) {
   const history = useHistory();
 
   function onClickRelate() {
-    history.push(`/detail/${prodId}`);
+    history.replace(`/detail/${prodId}`);
     window.scrollTo(0, 0);
   }
 
